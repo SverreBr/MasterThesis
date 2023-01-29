@@ -1,10 +1,10 @@
 package alternatingOffers;
 
-import utilities.Settings;
+import utilities.Game;
 
 public class PlayerToM extends Player {
 
-    public PlayerToM(String playerName, Settings settings) {
-        super(playerName, settings);
+    public PlayerToM(String playerName, Game game) {
+        super(playerName, game);
     }
 }

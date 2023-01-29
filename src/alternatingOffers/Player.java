@@ -1,8 +1,8 @@
 package alternatingOffers;
 
-import utilities.Settings;
+import utilities.Game;
 
-import java.util.Set;
+import java.awt.*;
 
 public abstract class Player {
 
@@ -11,13 +11,14 @@ public abstract class Player {
      */
     private int[] tokens;
     public final String name;
-    public final Settings settings;
+    public final Game game;
 
-//    private final
+    public Point startingPosition;
+    public Point goalPosition;
 
-    public Player (String namePlayer, Settings settings) {
+    public Player (String namePlayer, Game game) {
         name = namePlayer;
-        this.settings = settings;
+        this.game = game;
     }
 
     /**
@@ -36,6 +37,23 @@ public abstract class Player {
     }
 
 //    public int calculateCurrentPoints() {
-//        continue
+//
 //    }
+
+    public void setStartingPosition(Point startingPosition) {
+        this.startingPosition = startingPosition;
+    }
+
+    public Point getStartingPosition() {
+        return startingPosition;
+    }
+
+    public void setGoalPosition(Point goalPosition) {
+        this.goalPosition = goalPosition;
+    }
+
+    public Point getGoalPosition() {
+        return goalPosition;
+    }
+
 }

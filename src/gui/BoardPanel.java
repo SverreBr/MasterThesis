@@ -1,6 +1,5 @@
 package gui;
 
-import utilities.Board;
 import utilities.Game;
 
 import javax.swing.*;
@@ -25,7 +24,7 @@ public class BoardPanel extends JComponent {
         rh.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHints(rh);
 
-        Dimension dim = game.getBoardSize();
+//        Dimension dim = game.getBoardSize();
 //        for (int y = 0; y < dim.height; y++) {
 //            for (int x = 0; x < dim.width; x++) {
 //                Site site = simulation.getSite(x, y);
@@ -36,6 +35,10 @@ public class BoardPanel extends JComponent {
 //        }
 
         paintGrid(g2);
+
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 36));
+        paintStartLocation(g2);
+        paintGoalLocation(g2);
 
 //        if (selected != null)
 //            paintSelection(g2);
@@ -76,5 +79,32 @@ public class BoardPanel extends JComponent {
     private Dimension getSiteSize() {
         Dimension size = game.getBoardSize();
         return new Dimension(getSize().width / size.width, getSize().height / size.height);
+    }
+
+    private void paintStartLocation(Graphics2D g2) {
+        String symbol = "X";
+        drawSymbol(symbol, g2, game.initiator.getStartingPosition());
+        drawSymbol(symbol, g2, game.responder.getStartingPosition());
+    }
+
+    private void paintGoalLocation(Graphics2D g2) {
+        String symbol = "Gi";
+        drawSymbol(symbol, g2, game.initiator.getGoalPosition());
+
+        symbol = "Gr";
+        drawSymbol(symbol, g2, game.responder.getGoalPosition());
+    }
+
+    public void drawSymbol(String symbol, Graphics2D g2, Point position) {
+        Dimension siteSize = getSiteSize();
+        FontMetrics metrics = g2.getFontMetrics(g2.getFont());
+
+        int x = (siteSize.width - metrics.stringWidth(symbol)) / 2;
+        int y = ((siteSize.height - metrics.getHeight()) / 2) + metrics.getAscent();
+
+        g2.setColor(Color.BLACK);
+        g2.drawString(symbol,
+                x + siteSize.width * position.x,
+                y + siteSize.height * position.y);
     }
 }

@@ -1,6 +1,7 @@
 package gui;
 
 import alternatingOffers.PlayerToM;
+import utilities.Settings;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -10,8 +11,11 @@ import java.awt.*;
 public class AgentPanel extends JPanel {
 
     private final JTextPane info;
-    private final String[] content = new String[8];
-    private final String[] style = {"bold", "regular"};
+    private final String[] content = new String[7];
+    private final String[] style = {
+            "bold", "regular", "regular", "regular", "regular",
+            "regular", "regular"
+    };
     private final PlayerToM agent;
 
     public AgentPanel(PlayerToM agent) {
@@ -30,7 +34,6 @@ public class AgentPanel extends JPanel {
         addStylesToDocument(doc);
 
         this.add(info, BorderLayout.NORTH);
-
     }
 
     private void addStylesToDocument(StyledDocument doc) {
@@ -55,7 +58,8 @@ public class AgentPanel extends JPanel {
         for (int i = 2; i <= 5; i++) {
             content[i] = "";
         }
-//        content[6] = "points:" + agent.calculateCurrentPoints();
+        content[6] = "points:";
+        //+ agent.calculateCurrentPoints();
 
 
         // Generate agent info panel
@@ -65,8 +69,7 @@ public class AgentPanel extends JPanel {
             for (int i = 0; i < content.length; i++) {
                 doc.insertString(doc.getLength(), content[i] + "\n", doc.getStyle(style[i]));
             }
-        }
-        catch (BadLocationException ble) {
+        } catch (BadLocationException ble) {
             System.err.println("Couldn't insert text into text pane.");
         }
     }
@@ -89,8 +92,9 @@ public class AgentPanel extends JPanel {
 
         int[] tokens = agent.getTokens();
         for (int i = 0; i < tokens.length; i++) {
-            g2.setColor(agent.settings.getColor(tokens[i]));
+            g2.setColor(Settings.getColor(tokens[i]));
             g2.fillOval(offset + i * tokenSize, height, tokenSize, tokenSize);
         }
     }
+
 }
