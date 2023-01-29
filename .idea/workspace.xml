@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4c3eaeca-6416-4fda-96a2-84ca87714428" name="Changes" comment="Initial model and graphics">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/alternatingOffers/Player.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/alternatingOffers/PlayerToM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/AgentPanel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/BoardPanel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/ButtonPanel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gui/MainPanel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utilities/Board.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utilities/Game.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utilities/Settings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +76,7 @@
       <workItem from="1674727802938" duration="10675000" />
       <workItem from="1674744659595" duration="6000" />
       <workItem from="1674744852099" duration="2361000" />
-      <workItem from="1674990495054" duration="7730000" />
+      <workItem from="1674990495054" duration="7907000" />
     </task>
     <task id="LOCAL-00001" summary="Setup code Master Thesis">
       <created>1673623642842</created>
@@ -96,7 +85,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673623642842</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Initial model and graphics">
+      <created>1674998435456</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1674998435456</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
