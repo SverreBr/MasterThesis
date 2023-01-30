@@ -4,9 +4,8 @@ package utilities;
 import alternatingOffers.PlayerToM;
 
 import java.awt.*;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 
 /**
  * utilities.Game class: the two players and the coloured trails board
@@ -48,12 +47,12 @@ public class Game {
      * Generate and distribute tokens for players
      */
     private void generateAndDistributeTokens() {
-        int[] tokensInit = new int[TOKEN_DIVERSITY];
-        int[] tokensResp = new int[TOKEN_DIVERSITY];
+        List<Integer> tokensInit = new ArrayList<>();
+        List<Integer> tokensResp = new ArrayList<>();
 
         for (int i = 0; i < TOKENS_PER_PLAYER; i++) {
-            tokensInit[(int) (Math.random() * TOKEN_DIVERSITY)]++;
-            tokensResp[(int) (Math.random() * TOKEN_DIVERSITY)]++;
+            tokensInit.add((int) (Math.random() * TOKEN_DIVERSITY));
+            tokensResp.add((int) (Math.random() * TOKEN_DIVERSITY));
         }
         initiator.obtainTokens(tokensInit);
         responder.obtainTokens(tokensResp);

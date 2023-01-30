@@ -7,8 +7,9 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.*;
 import java.awt.*;
+import java.util.List;
 
-public class AgentPanel extends JPanel {
+public class AgentPanel extends JComponent {
 
     private final JTextPane info;
     private final String[] content = new String[7];
@@ -33,6 +34,7 @@ public class AgentPanel extends JPanel {
         StyledDocument doc = info.getStyledDocument();
         addStylesToDocument(doc);
 
+        updateInfo();
         this.add(info, BorderLayout.NORTH);
     }
 
@@ -61,7 +63,6 @@ public class AgentPanel extends JPanel {
         content[6] = "points:";
         //+ agent.calculateCurrentPoints();
 
-
         // Generate agent info panel
         StyledDocument doc = info.getStyledDocument();
         try {
@@ -75,24 +76,21 @@ public class AgentPanel extends JPanel {
     }
 
     @Override
-    public void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();
         paintChips(g2);
-
-        updateInfo();
-
         g2.dispose();
     }
 
     private void paintChips(Graphics2D g2) {
         int tokenSize = 25;
-        int offset = 20;
+        int offset = 30;
         int height = 70;
 
-        int[] tokens = agent.getTokens();
-        for (int i = 0; i < tokens.length; i++) {
-            g2.setColor(Settings.getColor(tokens[i]));
+        List<Integer> tokens = agent.getTokens();
+        for (int i = 0; i < tokens.size(); i++) {
+            g2.setColor(Settings.getColor(tokens.get(i)));
             g2.fillOval(offset + i * tokenSize, height, tokenSize, tokenSize);
         }
     }

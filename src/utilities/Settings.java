@@ -6,8 +6,19 @@ import java.util.ArrayList;
 public class Settings {
 //    public static Dictionary<Integer, Color> colors = new Hashtable<>();
 
+    /**
+     * Score for reaching goal
+     */
     public static final int SCORE_GOAL = 50;
-    public static final int SCORE_STEP = 10;
+
+    /**
+     * Score subtracted when goal not reached
+     */
+    public static final int SCORE_STEP_SHORT = -10;
+
+    /**
+     * Score added when tokens left over
+     */
     public static final int SCORE_SURPLUS = 5;
 
     public static Color getColor(int x) {

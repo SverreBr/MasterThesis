@@ -3,13 +3,14 @@ package alternatingOffers;
 import utilities.Game;
 
 import java.awt.*;
+import java.util.List;
 
 public abstract class Player {
 
     /**
      * Fields
      */
-    private int[] tokens;
+    private List<Integer> tokens;
     public final String name;
     public final Game game;
 
@@ -24,15 +25,15 @@ public abstract class Player {
     /**
      * Give the player tokens
      */
-    public void obtainTokens(int [] initTokens) {
+    public void obtainTokens(List<Integer> initTokens) {
         tokens = initTokens;
     }
 
     public int getNumTokens() {
-        return tokens.length;
+        return tokens.size();
     }
 
-    public int[] getTokens() {
+    public List<Integer> getTokens() {
         return tokens;
     }
 

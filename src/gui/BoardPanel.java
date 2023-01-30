@@ -15,8 +15,8 @@ public class BoardPanel extends JComponent {
     }
 
     @Override
-    public void paint(Graphics g) {
-        paintComponent(g);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g.create();
         Map<RenderingHints.Key, Object> rh = new HashMap<>();
@@ -67,7 +67,7 @@ public class BoardPanel extends JComponent {
         int offset = 1;
         for (int x = 0; x < simulationSize.width; x++) {
             for (int y = 0; y < simulationSize.height; y++) {
-                g2.setColor(game.board.getSquareColor(x, y));
+                g2.setColor(game.board.getTileColor(x, y));
                 g2.fillRect(
                         x * siteSize.width + offset, y * siteSize.height + offset,
                         siteSize.width - offset, siteSize.height - offset);
@@ -82,6 +82,12 @@ public class BoardPanel extends JComponent {
     }
 
     private void paintStartLocation(Graphics2D g2) {
+        Dimension siteSize = getSiteSize();
+        int offset = 1;
+        g2.setColor(Color.WHITE);
+        g2.fillRect(
+                2 * siteSize.width + offset, 2 * siteSize.height + offset,
+                siteSize.width - offset, siteSize.height - offset);
         String symbol = "X";
         drawSymbol(symbol, g2, game.initiator.getStartingPosition());
         drawSymbol(symbol, g2, game.responder.getStartingPosition());

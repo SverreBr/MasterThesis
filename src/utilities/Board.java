@@ -1,6 +1,8 @@
 package utilities;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class Board {
 
@@ -30,7 +32,7 @@ public class Board {
         }
     }
 
-    public int getSquareNumber(int x, int y) {
+    public int getTileColorNumber(int x, int y) {
         return board[x][y];
     }
 
@@ -40,7 +42,7 @@ public class Board {
      * @param y y-location
      * @return The color corresponding to the square on the board
      */
-    public Color getSquareColor(int x, int y) {
+    public Color getTileColor(int x, int y) {
         return Settings.getColor(board[x][y]);
     }
 
@@ -58,8 +60,8 @@ public class Board {
      * @param goalLoc       the goal location
      * @return              the manhattan distance from current location to goal location
      */
-    public int distanceToGoal(int[] currentLoc, int[] goalLoc) {
-        return Math.abs(currentLoc[0] - goalLoc[0]) + Math.abs(currentLoc[1] - goalLoc[1]);
+    public int distanceToGoal(Point currentLoc, Point goalLoc) {
+        return Math.abs(currentLoc.x - goalLoc.x) + Math.abs(currentLoc.y - goalLoc.y);
     }
 
 //    public List<int[]> getShortestPathGivenTokens(int[] currentLoc, int[] goalLoc, int[] tokens) {
@@ -69,4 +71,42 @@ public class Board {
 //        List<int[]> shortestPath = new ArrayList<>();
 //        return shortestPath;
 //    }
+
+//    public int calculateScore(Point currLoc, List<Integer> tokens, Point goalLoc) {
+//
+//        if (currLoc.equals(goalLoc)) {
+//            // Goal location reached
+//            return (Settings.SCORE_GOAL + Settings.SCORE_SURPLUS * tokens.size());
+//        }
+//
+//        if (tokens.size() == 0) {
+//            // No possible moves anymore
+//            return (Settings.SCORE_STEP_SHORT * distanceToGoal(currLoc, goalLoc));
+//        }
+//
+//        int newX, newY, tileColor;
+//        List<Point> possibleMoves = getPossibleMoves();
+//        for (Point move : possibleMoves) {
+//            newX = currLoc.x + move.x;
+//            newY = currLoc.y + move.y;
+//            if ((0 <= newX) && (newX < boardWidth) && (0 <= newY) && (newY < boardHeight)) {
+//                tileColor = getTileColorNumber(newX, newY);
+//                if (tokens.contains(tileColor)) {
+//                    // Move is allowed
+//                    newPoints = points
+//                    someFunction()
+//                }
+//                someFunction(new Point(newX, newY), points)
+//            }
+//        }
+//    }
+
+    private List<Point> getPossibleMoves() {
+        return Arrays.asList(
+                new Point(-1,-1),
+                new Point(-1, 1),
+                new Point(1, -1),
+                new Point (1, 1)
+        );
+    }
 }

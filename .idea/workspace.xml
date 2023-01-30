@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4c3eaeca-6416-4fda-96a2-84ca87714428" name="Changes" comment="added workspace to gitignore">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="4c3eaeca-6416-4fda-96a2-84ca87714428" name="Changes" comment="Added graphics for goal and starting positions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/alternatingOffers/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/alternatingOffers/Player.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/alternatingOffers/PlayerToM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/alternatingOffers/PlayerToM.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/AgentPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/AgentPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/BoardPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/BoardPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utilities/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utilities/Board.java" afterDir="false" />
@@ -28,6 +26,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -85,7 +88,9 @@
       <workItem from="1674744659595" duration="6000" />
       <workItem from="1674744852099" duration="2361000" />
       <workItem from="1674990495054" duration="8018000" />
-      <workItem from="1675004017199" duration="8692000" />
+      <workItem from="1675004017199" duration="8823000" />
+      <workItem from="1675064621398" duration="3643000" />
+      <workItem from="1675075720997" duration="5228000" />
     </task>
     <task id="LOCAL-00001" summary="Setup code Master Thesis">
       <created>1673623642842</created>
@@ -108,7 +113,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674998641904</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added graphics for goal and starting positions">
+      <created>1675012949435</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1675012949435</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,6 +141,7 @@
     <MESSAGE value="Setup code Master Thesis" />
     <MESSAGE value="Initial model and graphics" />
     <MESSAGE value="added workspace to gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="added workspace to gitignore" />
+    <MESSAGE value="Added graphics for goal and starting positions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added graphics for goal and starting positions" />
   </component>
 </project>
