@@ -1,5 +1,6 @@
 package gui;
 
+import controller.GameListener;
 import utilities.Game;
 
 import javax.swing.*;
@@ -7,11 +8,12 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BoardPanel extends JComponent {
+public class BoardPanel extends JComponent implements GameListener {
     private final Game game;
 
     public BoardPanel(Game game) {
         this.game = game;
+        this.game.addListener(this);
     }
 
     @Override
@@ -23,16 +25,6 @@ public class BoardPanel extends JComponent {
         rh.put(RenderingHints.KEY_TEXT_ANTIALIASING,  RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         rh.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHints(rh);
-
-//        Dimension dim = game.getBoardSize();
-//        for (int y = 0; y < dim.height; y++) {
-//            for (int x = 0; x < dim.width; x++) {
-//                Site site = simulation.getSite(x, y);
-//
-//                if (site.getAgent() != null)
-//                    paintAgent(g2, site, site.getAgent());
-//            }
-//        }
 
         paintGrid(g2);
 
@@ -67,7 +59,7 @@ public class BoardPanel extends JComponent {
         int offset = 1;
         for (int x = 0; x < simulationSize.width; x++) {
             for (int y = 0; y < simulationSize.height; y++) {
-                g2.setColor(game.board.getTileColor(x, y));
+                g2.setColor(game.board.getTileColor(new Point(x, y)));
                 g2.fillRect(
                         x * siteSize.width + offset, y * siteSize.height + offset,
                         siteSize.width - offset, siteSize.height - offset);
@@ -112,5 +104,10 @@ public class BoardPanel extends JComponent {
         g2.drawString(symbol,
                 x + siteSize.width * position.x,
                 y + siteSize.height * position.y);
+    }
+
+    @Override
+    public void gameChanged() {
+        this.repaint();
     }
 }

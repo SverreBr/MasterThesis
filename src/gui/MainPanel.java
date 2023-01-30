@@ -3,6 +3,7 @@ package gui;
 import utilities.Game;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 /**
@@ -17,22 +18,36 @@ public class MainPanel extends JFrame {
         setResizable(false);
 
         int BUTTON_PANEL_WIDTH = 330;
+        int AGENT_PANEL_HEIGHT = 450;
         int MAIN_PANEL_SIZE = 651;
 
-        AgentPanel AgentPanelInit = new AgentPanel(game.initiator);
-        AgentPanelInit.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
+        JPanel leftBody = new JPanel();
+        leftBody.setLayout(new BorderLayout());
+        leftBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
+
+        AgentPanel agentPanelInit = new AgentPanel(game.initiator);
+        agentPanelInit.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
+
+        leftBody.add(agentPanelInit, BorderLayout.NORTH);
 
         BoardPanel boardPanel = new BoardPanel(game);
         boardPanel.setPreferredSize(new Dimension(MAIN_PANEL_SIZE, MAIN_PANEL_SIZE));
 
-        AgentPanel AgentPanelResp = new AgentPanel(game.responder);
-        AgentPanelResp.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
+        JPanel rightBody = new JPanel();
+        rightBody.setLayout(new BorderLayout());
+        rightBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
+
+        AgentPanel agentPanelResp = new AgentPanel(game.responder);
+        agentPanelResp.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
+        ButtonPanel buttonPanel = new ButtonPanel(game);
+
+        rightBody.add(agentPanelResp, BorderLayout.NORTH);
+        rightBody.add(buttonPanel, BorderLayout.SOUTH);
 
         getContentPane().setLayout(new FlowLayout());
-
-        getContentPane().add(AgentPanelInit);
+        getContentPane().add(leftBody);
         getContentPane().add(boardPanel);
-        getContentPane().add(AgentPanelResp);
+        getContentPane().add(rightBody);
         pack();
     }
 }

@@ -1,6 +1,7 @@
 package gui;
 
 import alternatingOffers.PlayerToM;
+import controller.GameListener;
 import utilities.Settings;
 
 import javax.swing.*;
@@ -9,7 +10,7 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.util.List;
 
-public class AgentPanel extends JComponent {
+public class AgentPanel extends JComponent implements GameListener {
 
     private final JTextPane info;
     private final String[] content = new String[7];
@@ -36,6 +37,8 @@ public class AgentPanel extends JComponent {
 
         updateInfo();
         this.add(info, BorderLayout.NORTH);
+
+        this.agent.game.addListener(this);
     }
 
     private void addStylesToDocument(StyledDocument doc) {
@@ -60,8 +63,7 @@ public class AgentPanel extends JComponent {
         for (int i = 2; i <= 5; i++) {
             content[i] = "";
         }
-        content[6] = "points:";
-        //+ agent.calculateCurrentPoints();
+        content[6] = "points: " + agent.calculateScore(agent.startingPosition, agent.getTokens(), agent.goalPosition);
 
         // Generate agent info panel
         StyledDocument doc = info.getStyledDocument();
@@ -84,7 +86,7 @@ public class AgentPanel extends JComponent {
     }
 
     private void paintChips(Graphics2D g2) {
-        int tokenSize = 25;
+        int tokenSize = 40;
         int offset = 30;
         int height = 70;
 
@@ -95,4 +97,9 @@ public class AgentPanel extends JComponent {
         }
     }
 
+    @Override
+    public void gameChanged() {
+        updateInfo();
+        this.repaint();
+    }
 }

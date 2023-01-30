@@ -23,11 +23,11 @@ public class Settings {
 
     public static Color getColor(int x) {
         return switch (x) {
-            case 0 -> Color.BLUE;
-            case 1 -> Color.GREEN;
-            case 2 -> Color.ORANGE;
-            case 3 -> Color.RED;
-            case 4 -> Color.YELLOW;
+            case 0 -> Color.decode("#0072b2");
+            case 1 -> Color.decode("#009e73");
+            case 2 -> Color.decode("#d55e00");
+            case 3 -> Color.decode("#cc79a7");
+            case 4 -> Color.decode("#f0e442");
             default -> Color.BLACK;
         };
     }

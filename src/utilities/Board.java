@@ -24,6 +24,10 @@ public class Board {
         initBoard(tokenDiversity);
     }
 
+    public void resetBoard(int tokenDiversity) {
+        this.initBoard(tokenDiversity);
+    }
+
     private void initBoard(int tokenDiversity) {
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
@@ -32,18 +36,16 @@ public class Board {
         }
     }
 
-    public int getTileColorNumber(int x, int y) {
-        return board[x][y];
+    public int getTileColorNumber(Point point) {
+        return board[point.y][point.x];
     }
 
     /**
      * Get color of the (x,y) square of the board
-     * @param x x-location
-     * @param y y-location
      * @return The color corresponding to the square on the board
      */
-    public Color getTileColor(int x, int y) {
-        return Settings.getColor(board[x][y]);
+    public Color getTileColor(Point point) {
+        return Settings.getColor(board[point.y][point.x]);
     }
 
     public int getBoardHeight() {
@@ -72,41 +74,23 @@ public class Board {
 //        return shortestPath;
 //    }
 
-//    public int calculateScore(Point currLoc, List<Integer> tokens, Point goalLoc) {
-//
-//        if (currLoc.equals(goalLoc)) {
-//            // Goal location reached
-//            return (Settings.SCORE_GOAL + Settings.SCORE_SURPLUS * tokens.size());
-//        }
-//
-//        if (tokens.size() == 0) {
-//            // No possible moves anymore
-//            return (Settings.SCORE_STEP_SHORT * distanceToGoal(currLoc, goalLoc));
-//        }
-//
-//        int newX, newY, tileColor;
-//        List<Point> possibleMoves = getPossibleMoves();
-//        for (Point move : possibleMoves) {
-//            newX = currLoc.x + move.x;
-//            newY = currLoc.y + move.y;
-//            if ((0 <= newX) && (newX < boardWidth) && (0 <= newY) && (newY < boardHeight)) {
-//                tileColor = getTileColorNumber(newX, newY);
-//                if (tokens.contains(tileColor)) {
-//                    // Move is allowed
-//                    newPoints = points
-//                    someFunction()
-//                }
-//                someFunction(new Point(newX, newY), points)
-//            }
-//        }
-//    }
+    public int calculateTileScore(Point currLoc, List<Integer> tokens, Point goalLoc) {
+        int score = 0;
+        if (currLoc.equals(goalLoc)) {
+            score += Settings.SCORE_GOAL;
+        } else {
+            score += Settings.SCORE_STEP_SHORT * distanceToGoal(currLoc, goalLoc);
+        }
+        score += Settings.SCORE_SURPLUS * tokens.size();
+        return score;
+    }
 
-    private List<Point> getPossibleMoves() {
+    public List<Point> getPossibleMoves() {
         return Arrays.asList(
-                new Point(-1,-1),
-                new Point(-1, 1),
-                new Point(1, -1),
-                new Point (1, 1)
+                new Point(-1,0),
+                new Point(1, 0),
+                new Point(0, -1),
+                new Point (0, 1)
         );
     }
 }

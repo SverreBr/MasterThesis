@@ -2,10 +2,13 @@ package utilities;
 
 // imports
 import alternatingOffers.PlayerToM;
+import controller.GameListener;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * utilities.Game class: the two players and the coloured trails board
@@ -15,20 +18,23 @@ public class Game {
     /**
      * Fields
      */
-    static final int BOARD_WIDTH = 5;
-    static final int BOARD_HEIGHT = 5;
-    static final int TOKEN_DIVERSITY = 4;
-    static final int TOKENS_PER_PLAYER = 4;
+    static private final int BOARD_WIDTH = 5;
+    static private final int BOARD_HEIGHT = 5;
+    static private final int TOKEN_DIVERSITY = 3;
+    static private final int TOKENS_PER_PLAYER = 4;
 
 
-    public final PlayerToM initiator;
-    public final PlayerToM responder;
-    public final Board board;
+    public PlayerToM initiator;
+    public PlayerToM responder;
+    public Board board;
+
+    private final Set<GameListener> listeners;
 
     /**
      * Constructor
      */
     public Game() {
+        this.listeners = new HashSet<>();
         this.board = new Board(BOARD_HEIGHT, BOARD_WIDTH, TOKEN_DIVERSITY);
         this.initiator = new PlayerToM("Initiator", this);
         this.responder = new PlayerToM("Responder", this);
@@ -37,6 +43,10 @@ public class Game {
     }
 
     private void initGame() {
+        this.initiator.resetPlayer();
+        this.responder.resetPlayer();
+        this.board.resetBoard(TOKEN_DIVERSITY);
+
         // Distribute tokens to players
         generateAndDistributeTokens();
         assignStartingPositions();
@@ -54,9 +64,8 @@ public class Game {
             tokensInit.add((int) (Math.random() * TOKEN_DIVERSITY));
             tokensResp.add((int) (Math.random() * TOKEN_DIVERSITY));
         }
-        initiator.obtainTokens(tokensInit);
-        responder.obtainTokens(tokensResp);
-        System.out.println("Tokens distributed.");
+        this.initiator.obtainTokens(tokensInit);
+        this.responder.obtainTokens(tokensResp);
     }
 
     public void assignStartingPositions() {
@@ -76,6 +85,22 @@ public class Game {
     }
 
     public Dimension getBoardSize() {
-        return new Dimension(board.getBoardWidth(), board.getBoardHeight());
+        return new Dimension(this.board.getBoardWidth(), this.board.getBoardHeight());
+    }
+
+    public void reset() {
+        initGame();
+        notifyListeners();
+    }
+
+    protected void notifyListeners() {
+        System.out.println("\n------\n");
+        for (GameListener gameListener : this.listeners) {
+            gameListener.gameChanged();
+        }
+    }
+
+    public void addListener(GameListener listener) {
+        this.listeners.add(listener);
     }
 }
