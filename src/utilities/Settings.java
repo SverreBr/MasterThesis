@@ -3,8 +3,10 @@ package utilities;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * class that contains the settings of the game
+ */
 public class Settings {
-//    public static Dictionary<Integer, Color> colors = new Hashtable<>();
 
     /**
      * Score for reaching goal
@@ -21,6 +23,11 @@ public class Settings {
      */
     public static final int SCORE_SURPLUS = 5;
 
+    /**
+     * Returns a color given a certain integer
+     * @param x the integer number
+     * @return the color corresponding to the integer
+     */
     public static Color getColor(int x) {
         return switch (x) {
             case 0 -> Color.decode("#0072b2");
@@ -32,25 +39,33 @@ public class Settings {
         };
     }
 
-    public static ArrayList<Point> getGoalPositions() {
+    /**
+     * returns all possible goal locations given a minimum distance
+     * @return possible goal locations
+     */
+    public static ArrayList<Point> getGoalPositions(Point startLoc, int minDistance, int maxX, int maxY) {
         ArrayList<Point> goalPositions = new ArrayList<>();
-        goalPositions.add(new Point(0,0));
-        goalPositions.add(new Point(0,1));
-        goalPositions.add(new Point(0,3));
-        goalPositions.add(new Point(0,4));
+        Point point;
 
-        goalPositions.add(new Point(1,0));
-        goalPositions.add(new Point(1,4));
-
-        goalPositions.add(new Point(3,0));
-        goalPositions.add(new Point(3,4));
-
-        goalPositions.add(new Point(4,0));
-        goalPositions.add(new Point(4,1));
-        goalPositions.add(new Point(4,3));
-        goalPositions.add(new Point(4,4));
+        for (int x = 0; x < maxX; x++) {
+            for (int y = 0; y < maxY; y++) {
+                point = new Point(x,y);
+                if (manhattanDistance(startLoc, point) >= minDistance) {
+                    goalPositions.add(point);
+                }
+            }
+        }
 
         return goalPositions;
     }
 
+    /**
+     * calculates the manhattan distance between two points
+     * @param from  starting point
+     * @param to    destination point
+     * @return the manhattan distance between two points as an integer
+     */
+    public static int manhattanDistance(Point from, Point to) {
+        return (Math.abs(from.x - to.x) + Math.abs(from.y - to.y));
+    }
 }

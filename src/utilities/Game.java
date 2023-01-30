@@ -16,18 +16,48 @@ import java.util.Set;
 public class Game {
 
     /**
-     * Fields
+     * number of tiles as the width of the board
      */
     static private final int BOARD_WIDTH = 5;
+
+    /**
+     * number of tiles as the height of the board
+     */
     static private final int BOARD_HEIGHT = 5;
+
+    /**
+     * number of different colors as tiles of the board
+     */
     static private final int TOKEN_DIVERSITY = 3;
+
+    /**
+     * number of tokens an agent obtains
+     */
     static private final int TOKENS_PER_PLAYER = 4;
 
+    /**
+     * minimum (manhattan) distance from start location to goal location where the goal can be placed
+     */
+    static private final int MIN_GOAL_DISTANCE = 3;
 
+    /**
+     * the initiator agent
+     */
     public PlayerToM initiator;
+
+    /**
+     * the responding agent
+     */
     public PlayerToM responder;
+
+    /**
+     * the board of the game
+     */
     public Board board;
 
+    /**
+     * the listeners to the model game
+     */
     private final Set<GameListener> listeners;
 
     /**
@@ -42,6 +72,10 @@ public class Game {
         initGame();
     }
 
+    /**
+     * Initializes the game. Resets agents, resets the board, generates and distributes new tokens, and assigns starting
+     * and goal positions to the agents.
+     */
     private void initGame() {
         this.initiator.resetPlayer();
         this.responder.resetPlayer();
@@ -50,11 +84,12 @@ public class Game {
         // Distribute tokens to players
         generateAndDistributeTokens();
         assignStartingPositions();
-        assignGoalPositions();
+        assignGoalPosition(initiator);
+        assignGoalPosition(responder);
     }
 
     /**
-     * Generate and distribute tokens for players
+     * Generate and distribute tokens for the agents
      */
     private void generateAndDistributeTokens() {
         List<Integer> tokensInit = new ArrayList<>();
@@ -68,31 +103,45 @@ public class Game {
         this.responder.obtainTokens(tokensResp);
     }
 
+    /**
+     * assign starting positions to both agents
+     */
     public void assignStartingPositions() {
         this.initiator.setStartingPosition(new Point(2, 2));
         this.responder.setStartingPosition(new Point(2, 2));
     }
 
-    public void assignGoalPositions() {
-        int randomNum;
-        ArrayList<Point> goalPositions = Settings.getGoalPositions();
+    /**
+     * assigns a goal position to the agent
+     * @param agent the agent a goal position has to be assigned to
+     */
+    public void assignGoalPosition(PlayerToM agent) {
+        ArrayList<Point> goalPositions = Settings.getGoalPositions(agent.getStartingPosition(), MIN_GOAL_DISTANCE,
+                this.board.getBoardWidth(), this.board.getBoardHeight());
 
-        randomNum = (int) (Math.random() * goalPositions.size());
-        this.initiator.setGoalPosition(goalPositions.get(randomNum));
-
-        randomNum = (int) (Math.random() * goalPositions.size());
-        this.responder.setGoalPosition(goalPositions.get(randomNum));
+        int randomNum = (int) (Math.random() * goalPositions.size());
+        agent.setGoalPosition(goalPositions.get(randomNum));
     }
 
+    /**
+     * gets the size of board
+     * @return a dimension with the width and height of the board
+     */
     public Dimension getBoardSize() {
         return new Dimension(this.board.getBoardWidth(), this.board.getBoardHeight());
     }
 
+    /**
+     * resets the board to a new initialization
+     */
     public void reset() {
         initGame();
         notifyListeners();
     }
 
+    /**
+     * when a change occurs to the game, the listeners are notified with this method
+     */
     protected void notifyListeners() {
         System.out.println("\n------\n");
         for (GameListener gameListener : this.listeners) {
@@ -100,6 +149,10 @@ public class Game {
         }
     }
 
+    /**
+     * adds a listener to this model
+     * @param listener the listener to be added to this model
+     */
     public void addListener(GameListener listener) {
         this.listeners.add(listener);
     }
