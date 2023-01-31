@@ -104,9 +104,10 @@ public class BoardPanel extends JComponent implements GameListener {
         Dimension siteSize = getTileSize();
         int offset = 1;
         String symbol = "X";
-        g2.setColor(Color.WHITE);
+
 
         Point startLocation = game.initiator.getStartingPosition();
+        g2.setColor(Color.WHITE);
         g2.fillRect(
                 startLocation.x * siteSize.width + offset, startLocation.y * siteSize.height + offset,
                 siteSize.width - offset, siteSize.height - offset);
@@ -114,6 +115,7 @@ public class BoardPanel extends JComponent implements GameListener {
         drawSymbol(symbol, g2, startLocation);
 
         startLocation = game.responder.getStartingPosition();
+        g2.setColor(Color.WHITE);
         g2.fillRect(
                 startLocation.x * siteSize.width + offset, startLocation.y * siteSize.height + offset,
                 siteSize.width - offset, siteSize.height - offset);
