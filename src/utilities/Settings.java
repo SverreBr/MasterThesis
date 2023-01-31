@@ -25,6 +25,7 @@ public class Settings {
 
     /**
      * Returns a color given a certain integer
+     *
      * @param x the integer number
      * @return the color corresponding to the integer
      */
@@ -41,6 +42,7 @@ public class Settings {
 
     /**
      * returns all possible goal locations given a minimum distance
+     *
      * @return possible goal locations
      */
     public static ArrayList<Point> getGoalPositions(Point startLoc, int minDistance, int maxX, int maxY) {
@@ -49,7 +51,7 @@ public class Settings {
 
         for (int x = 0; x < maxX; x++) {
             for (int y = 0; y < maxY; y++) {
-                point = new Point(x,y);
+                point = new Point(x, y);
                 if (manhattanDistance(startLoc, point) >= minDistance) {
                     goalPositions.add(point);
                 }
@@ -61,8 +63,9 @@ public class Settings {
 
     /**
      * calculates the manhattan distance between two points
-     * @param from  starting point
-     * @param to    destination point
+     *
+     * @param from starting point
+     * @param to   destination point
      * @return the manhattan distance between two points as an integer
      */
     public static int manhattanDistance(Point from, Point to) {

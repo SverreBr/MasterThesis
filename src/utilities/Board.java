@@ -27,9 +27,9 @@ public class Board {
     /**
      * Constructs a random square board setting according to the specified parameters
      *
-     * @param boardWidth      size of the (square) board in number of tiles
-     * @param boardHeight     size of the board in number of tiles
-     * @param tokenDiversity  number of different colors of tiles and chips
+     * @param boardWidth     size of the (square) board in number of tiles
+     * @param boardHeight    size of the board in number of tiles
+     * @param tokenDiversity number of different colors of tiles and chips
      */
     public Board(int boardHeight, int boardWidth, int tokenDiversity) {
         this.boardHeight = boardHeight;
@@ -40,6 +40,7 @@ public class Board {
 
     /**
      * resets the board and initializes a new one.
+     *
      * @param tokenDiversity the number of different colors used to construct the board
      */
     public void resetBoard(int tokenDiversity) {
@@ -48,6 +49,7 @@ public class Board {
 
     /**
      * Initializes the board, that is, we give numbers to each tile corresponding to a color.
+     *
      * @param tokenDiversity the number of different colors to be used in the board
      */
     private void initBoard(int tokenDiversity) {
@@ -60,6 +62,7 @@ public class Board {
 
     /**
      * gets the number (corresponding to a color) of a tile of the board
+     *
      * @param point the coordinates of the tile
      * @return the number that corresponds to the color of that tile
      */
@@ -69,6 +72,7 @@ public class Board {
 
     /**
      * Get color of the (x,y) square of the board
+     *
      * @return The color corresponding to the square on the board
      */
     public Color getTileColor(Point point) {
@@ -77,6 +81,7 @@ public class Board {
 
     /**
      * gets the height of the board
+     *
      * @return the board height
      */
     public int getBoardHeight() {
@@ -85,6 +90,7 @@ public class Board {
 
     /**
      * gets the width of the board
+     *
      * @return the board width
      */
     public int getBoardWidth() {
@@ -93,9 +99,10 @@ public class Board {
 
     /**
      * Calculates the shortest manhattan distance from a particular location to the goal location
-     * @param currentLoc    the current location
-     * @param goalLoc       the goal location
-     * @return              the manhattan distance from current location to goal location
+     *
+     * @param currentLoc the current location
+     * @param goalLoc    the goal location
+     * @return the manhattan distance from current location to goal location
      */
     public int distanceToGoal(Point currentLoc, Point goalLoc) {
         return Math.abs(currentLoc.x - goalLoc.x) + Math.abs(currentLoc.y - goalLoc.y);
@@ -111,6 +118,7 @@ public class Board {
 
     /**
      * calculates the score from a current tile to a goal tile given some tokens
+     *
      * @param currLoc current location
      * @param tokens  the tokens
      * @param goalLoc goal location
@@ -129,14 +137,15 @@ public class Board {
 
     /**
      * get the possible moves on the board
+     *
      * @return a list of possible moves as points
      */
     public List<Point> getPossibleMoves() {
         return Arrays.asList(
-                new Point(-1,0),
+                new Point(-1, 0),
                 new Point(1, 0),
                 new Point(0, -1),
-                new Point (0, 1)
+                new Point(0, 1)
         );
     }
 }

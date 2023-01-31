@@ -7,18 +7,32 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * ButtonPanel: the panel with buttons
+ */
 public class ButtonPanel extends JPanel implements ActionListener {
 
+    /**
+     * The game model
+     */
     private final Game game;
 
+    /**
+     * Constructor: creates the button panel
+     *
+     * @param game the game model
+     */
     public ButtonPanel(Game game) {
         this.game = game;
         createButtonPanel();
     }
 
+    /**
+     * Creates the buttons on the button panel
+     */
     private void createButtonPanel() {
         this.setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.LINE_AXIS));
@@ -49,6 +63,11 @@ public class ButtonPanel extends JPanel implements ActionListener {
         this.add(buttons, BorderLayout.SOUTH);
     }
 
+    /**
+     * Action corresponding with a button event
+     *
+     * @param e the event to be processed
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if ("restart".equals(e.getActionCommand())) {
@@ -60,6 +79,5 @@ public class ButtonPanel extends JPanel implements ActionListener {
         if ("exit".equals(e.getActionCommand())) {
             System.exit(0);
         }
-
     }
 }

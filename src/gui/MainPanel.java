@@ -3,7 +3,6 @@ package gui;
 import utilities.Game;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 
 /**
@@ -11,6 +10,11 @@ import java.awt.*;
  */
 public class MainPanel extends JFrame {
 
+    /**
+     * Makes the main panel
+     *
+     * @param game the game model
+     */
     public MainPanel(Game game) {
         super("Colored Trails");
 

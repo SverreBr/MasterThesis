@@ -1,6 +1,7 @@
 package utilities;
 
 // imports
+
 import alternatingOffers.PlayerToM;
 import controller.GameListener;
 
@@ -113,6 +114,7 @@ public class Game {
 
     /**
      * assigns a goal position to the agent
+     *
      * @param agent the agent a goal position has to be assigned to
      */
     public void assignGoalPosition(PlayerToM agent) {
@@ -125,6 +127,7 @@ public class Game {
 
     /**
      * gets the size of board
+     *
      * @return a dimension with the width and height of the board
      */
     public Dimension getBoardSize() {
@@ -151,6 +154,7 @@ public class Game {
 
     /**
      * adds a listener to this model
+     *
      * @param listener the listener to be added to this model
      */
     public void addListener(GameListener listener) {
