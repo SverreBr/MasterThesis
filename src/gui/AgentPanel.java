@@ -1,13 +1,14 @@
 package gui;
 
-import alternatingOffers.PlayerToM;
 import controller.GameListener;
+import utilities.Player;
 import utilities.Settings;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,68 +21,127 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private final JTextPane info;
 
+    private final JTextPane messagePane;
+
+    private final JScrollPane messageScroll;
+
     /**
      * Content of the info text pane
      */
-    private final String[] content = new String[7];
+    private final String[] content = new String[6];
 
     /**
      * The style of the content of the text pane
      */
     private final String[] style = {
             "bold", "regular", "regular", "regular", "regular",
-            "regular", "regular"
+            "regular"
     };
+
+    /**
+     * Content of the messages text pane
+     */
+    private List<String> messages;
+
+    /**
+     * The style of the content of the messages pane
+     */
+    private List<String> styleMessages;
 
     /**
      * The agent model of this panel
      */
-    private final PlayerToM agent;
+    private final Player agent;
 
     /**
      * Constructor of the agent panel
      *
      * @param agent the model of the agent
      */
-    public AgentPanel(PlayerToM agent) {
+    public AgentPanel(Player agent) {
         this.agent = agent;
 
         this.setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        info = new JTextPane();
-        info.setPreferredSize(new Dimension(270, 400));
-        info.setMaximumSize(new Dimension(270, 400));
-        info.setEditable(false);
-        info.setOpaque(false);
-        info.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0), BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED), BorderFactory.createEmptyBorder(5, 5, 5, 5))));
-        StyledDocument doc = info.getStyledDocument();
-        addStylesToDocument(doc);
-
+        this.info = new JTextPane();
+        createTextPane();
         updateInfo();
+
+        this.messagePane = new JTextPane();
+        this.messageScroll = new JScrollPane(this.messagePane);
+        createScrollMessagePane();
+        createMessages();
+
+        changeBackgrounds();
+
         this.add(info, BorderLayout.NORTH);
+        this.add(messageScroll, BorderLayout.CENTER);
 
         this.agent.game.addListener(this);
     }
 
-    /**
-     * Adds some style to the text pane of the panel
-     *
-     * @param doc the document
-     */
-    private void addStylesToDocument(StyledDocument doc) {
-        // Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+    private void changeBackgrounds() {
+        this.info.setBackground(Settings.getBackGroundColor());
+        this.messageScroll.setBackground(Settings.getBackGroundColor());
+        this.messagePane.setBackground(Settings.getBackGroundColor());
+        this.setBackground(Settings.getBackGroundColor());
+    }
 
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "SansSerif");
-        StyleConstants.setFontSize(regular, 16);
+    private void createTextPane() {
+        info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - 20, Settings.AGENT_TEXT_HEIGHT));
+        info.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_TEXT_HEIGHT));
+        info.setEditable(false);
+        info.setOpaque(false);
+        info.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0), BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED), BorderFactory.createEmptyBorder(5, 5, 5, 5))));
+        StyledDocument doc = info.getStyledDocument();
+        Settings.addStylesToDocument(doc);
+    }
 
-        Style s = doc.addStyle("italic", regular);
-        StyleConstants.setItalic(s, true);
+    private void createScrollMessagePane() {
+        messageScroll.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
+        messageScroll.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
+        messageScroll.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5))));
 
-        s = doc.addStyle("bold", regular);
-        StyleConstants.setBold(s, true);
+        messagePane.setEditable(false);
+        messagePane.setOpaque(false);
+
+        StyledDocument doc = messagePane.getStyledDocument();
+        Settings.addStylesToDocument(doc);
+    }
+
+    public void addAgentMessages() {
+        for (String message : agent.messages) {
+            this.messages.add(message);
+            this.styleMessages.add("regular");
+        }
+    }
+
+    private void createMessages() {
+        messages = new ArrayList<>();
+        styleMessages = new ArrayList<>();
+
+        messages.add("Messages:");
+        styleMessages.add("italic");
+    }
+
+    private void updateMessages() {
+        createMessages();
+        addAgentMessages();
+        // Generate agent info panel
+        StyledDocument doc = messagePane.getStyledDocument();
+        try {
+            doc.remove(0, doc.getLength());
+            for (int i = 0; i < messages.size(); i++) {
+                doc.insertString(doc.getLength(), messages.get(i) + "\n", doc.getStyle(styleMessages.get(i)));
+            }
+        } catch (BadLocationException ble) {
+            System.err.println("Couldn't insert text into message pane.");
+        }
     }
 
     /**
@@ -91,10 +151,11 @@ public class AgentPanel extends JComponent implements GameListener {
         content[0] = agent.name;
         content[1] = "chips:";
 
-        for (int i = 2; i <= 5; i++) {
+        for (int i = 2; i <= 4; i++) {
             content[i] = "";
         }
-        content[6] = "points: " + agent.calculateScore(agent.startingPosition, agent.getTokens(), agent.goalPosition);
+        content[5] = "points: " + agent.calculateScore(agent.startingPosition, agent.getTokens(),
+                agent.startingPosition, agent.goalPosition);
 
         // Generate agent info panel
         StyledDocument doc = info.getStyledDocument();
@@ -136,6 +197,7 @@ public class AgentPanel extends JComponent implements GameListener {
     @Override
     public void gameChanged() {
         updateInfo();
+        updateMessages();
         this.repaint();
     }
 }

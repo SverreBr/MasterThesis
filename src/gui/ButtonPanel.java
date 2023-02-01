@@ -1,6 +1,7 @@
 package gui;
 
 import utilities.Game;
+import utilities.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,10 @@ public class ButtonPanel extends JPanel implements ActionListener {
      * The game model
      */
     private final Game game;
+
+    private JPanel southButtons;
+
+    private JPanel body;
 
     /**
      * Constructor: creates the button panel
@@ -34,9 +39,9 @@ public class ButtonPanel extends JPanel implements ActionListener {
         this.setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(buttons, BoxLayout.LINE_AXIS));
-        buttons.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        southButtons = new JPanel();
+        southButtons.setLayout(new BoxLayout(southButtons, BoxLayout.LINE_AXIS));
+        southButtons.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         JButton restart = new JButton("Restart");
         restart.setActionCommand("restart");
@@ -46,21 +51,33 @@ public class ButtonPanel extends JPanel implements ActionListener {
         exit.setActionCommand("exit");
         exit.addActionListener(this);
 
-        buttons.add(Box.createHorizontalGlue());
-        buttons.add(restart);
-        buttons.add(Box.createRigidArea(new Dimension(5, 0)));
-        buttons.add(exit);
+        southButtons.add(Box.createHorizontalGlue());
+        southButtons.add(restart);
+        southButtons.add(Box.createRigidArea(new Dimension(5, 0)));
+        southButtons.add(exit);
 
-        JPanel body = new JPanel();
+        body = new JPanel();
         body.setLayout(new GridLayout(0, 1));
+        body.setBorder(BorderFactory.createEmptyBorder(5,0,5,0));
 
-        // body.add(buttons1);
-        // body.add(forwardLabel);
-//        body.add(buttons2);
+        JButton step = new JButton("Step");
+        step.setActionCommand("step");
+        step.addActionListener(this);
+
+        body.add(Box.createHorizontalGlue());
+        body.add(step);
+
+        changeBackgrounds();
 
 //        this.add(info, BorderLayout.NORTH);
         this.add(body, BorderLayout.CENTER);
-        this.add(buttons, BorderLayout.SOUTH);
+        this.add(southButtons, BorderLayout.SOUTH);
+    }
+
+    private void changeBackgrounds() {
+        setBackground(Settings.getBackGroundColor());
+        southButtons.setBackground(Settings.getBackGroundColor());
+        body.setBackground(Settings.getBackGroundColor());
     }
 
     /**
@@ -78,6 +95,10 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
         if ("exit".equals(e.getActionCommand())) {
             System.exit(0);
+        }
+
+        if ("step".equals(e.getActionCommand())) {
+            game.step();
         }
     }
 }

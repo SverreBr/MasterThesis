@@ -3,6 +3,7 @@ package utilities;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Board class: the game board of the colored trails
@@ -26,36 +27,28 @@ public class Board {
 
     /**
      * Constructs a random square board setting according to the specified parameters
-     *
-     * @param boardWidth     size of the (square) board in number of tiles
-     * @param boardHeight    size of the board in number of tiles
-     * @param tokenDiversity number of different colors of tiles and chips
      */
-    public Board(int boardHeight, int boardWidth, int tokenDiversity) {
-        this.boardHeight = boardHeight;
-        this.boardWidth = boardWidth;
+    public Board() {
+        this.boardHeight = Settings.BOARD_HEIGHT;
+        this.boardWidth = Settings.BOARD_WIDTH;
         board = new int[boardHeight][boardWidth];
-        initBoard(tokenDiversity);
+        initBoard();
     }
 
     /**
      * resets the board and initializes a new one.
-     *
-     * @param tokenDiversity the number of different colors used to construct the board
      */
-    public void resetBoard(int tokenDiversity) {
-        this.initBoard(tokenDiversity);
+    public void resetBoard() {
+        this.initBoard();
     }
 
     /**
      * Initializes the board, that is, we give numbers to each tile corresponding to a color.
-     *
-     * @param tokenDiversity the number of different colors to be used in the board
      */
-    private void initBoard(int tokenDiversity) {
+    private void initBoard() {
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
-                board[i][j] = (int) (Math.random() * tokenDiversity);
+                board[i][j] = (int) (Math.random() * Settings.TOKEN_DIVERSITY);
             }
         }
     }
@@ -97,17 +90,6 @@ public class Board {
         return boardWidth;
     }
 
-    /**
-     * Calculates the shortest manhattan distance from a particular location to the goal location
-     *
-     * @param currentLoc the current location
-     * @param goalLoc    the goal location
-     * @return the manhattan distance from current location to goal location
-     */
-    public int distanceToGoal(Point currentLoc, Point goalLoc) {
-        return Math.abs(currentLoc.x - goalLoc.x) + Math.abs(currentLoc.y - goalLoc.y);
-    }
-
 //    public List<int[]> getShortestPathGivenTokens(int[] currentLoc, int[] goalLoc, int[] tokens) {
 //        int dist = distanceToGoal(currentLoc, goalLoc);
 //        int initPoints = tokens.length * Settings.SCORE_SURPLUS - dist * Settings.SCORE_STEP;
@@ -124,13 +106,13 @@ public class Board {
      * @param goalLoc goal location
      * @return the score corresponding to this tile
      */
-    public int calculateTileScore(Point currLoc, List<Integer> tokens, Point goalLoc) {
-        int score = 0;
-        if (currLoc.equals(goalLoc)) {
+    public int calculateTileScore(Point currLoc, List<Integer> tokens, Point startLoc, Point goalLoc) {
+        int score = 0, stepsTowardsGoal;
+        stepsTowardsGoal = Settings.manhattanDistance(startLoc, goalLoc) - Settings.manhattanDistance(currLoc, goalLoc);
+
+        if (currLoc.equals(goalLoc))
             score += Settings.SCORE_GOAL;
-        } else {
-            score += Settings.SCORE_STEP_SHORT * distanceToGoal(currLoc, goalLoc);
-        }
+        score += Settings.SCORE_STEP * Math.max(0, stepsTowardsGoal);
         score += Settings.SCORE_SURPLUS * tokens.size();
         return score;
     }

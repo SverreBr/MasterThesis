@@ -1,6 +1,7 @@
-package alternatingOffers;
+package utilities;
 
 import utilities.Game;
+import utilities.Player;
 
 /**
  * PlayerToM: class for the theory of mind of the agent

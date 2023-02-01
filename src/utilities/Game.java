@@ -2,14 +2,11 @@ package utilities;
 
 // imports
 
-import alternatingOffers.PlayerToM;
 import controller.GameListener;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 /**
  * utilities.Game class: the two players and the coloured trails board
@@ -17,39 +14,20 @@ import java.util.Set;
 public class Game {
 
     /**
-     * number of tiles as the width of the board
-     */
-    static private final int BOARD_WIDTH = 5;
-
-    /**
-     * number of tiles as the height of the board
-     */
-    static private final int BOARD_HEIGHT = 5;
-
-    /**
-     * number of different colors as tiles of the board
-     */
-    static private final int TOKEN_DIVERSITY = 3;
-
-    /**
-     * number of tokens an agent obtains
-     */
-    static private final int TOKENS_PER_PLAYER = 4;
-
-    /**
-     * minimum (manhattan) distance from start location to goal location where the goal can be placed
-     */
-    static private final int MIN_GOAL_DISTANCE = 3;
-
-    /**
      * the initiator agent
      */
-    public PlayerToM initiator;
+    public Player initiator;
+
+    public List<Integer> offerInit = null;
 
     /**
      * the responding agent
      */
-    public PlayerToM responder;
+    public Player responder;
+
+    public List<Integer> offerResp = null;
+
+    public String turn = "Initiator";
 
     /**
      * the board of the game
@@ -61,12 +39,16 @@ public class Game {
      */
     private final Set<GameListener> listeners;
 
+    public boolean inGame;
+
+    public List<Integer> allTokens;
+
     /**
      * Constructor
      */
     public Game() {
         this.listeners = new HashSet<>();
-        this.board = new Board(BOARD_HEIGHT, BOARD_WIDTH, TOKEN_DIVERSITY);
+        this.board = new Board();
         this.initiator = new PlayerToM("Initiator", this);
         this.responder = new PlayerToM("Responder", this);
 
@@ -80,7 +62,8 @@ public class Game {
     private void initGame() {
         this.initiator.resetPlayer();
         this.responder.resetPlayer();
-        this.board.resetBoard(TOKEN_DIVERSITY);
+        this.board.resetBoard();
+        this.inGame = true;
 
         // Distribute tokens to players
         generateAndDistributeTokens();
@@ -95,13 +78,17 @@ public class Game {
     private void generateAndDistributeTokens() {
         List<Integer> tokensInit = new ArrayList<>();
         List<Integer> tokensResp = new ArrayList<>();
+        this.allTokens = new ArrayList<>();
 
-        for (int i = 0; i < TOKENS_PER_PLAYER; i++) {
-            tokensInit.add((int) (Math.random() * TOKEN_DIVERSITY));
-            tokensResp.add((int) (Math.random() * TOKEN_DIVERSITY));
+        for (int i = 0; i < Settings.TOKENS_PER_PLAYER; i++) {
+            tokensInit.add((int) (Math.random() * Settings.TOKEN_DIVERSITY));
+            tokensResp.add((int) (Math.random() * Settings.TOKEN_DIVERSITY));
         }
+
         this.initiator.obtainTokens(tokensInit);
         this.responder.obtainTokens(tokensResp);
+        this.allTokens.addAll(tokensInit);
+        this.allTokens.addAll(tokensInit);
     }
 
     /**
@@ -117,8 +104,8 @@ public class Game {
      *
      * @param agent the agent a goal position has to be assigned to
      */
-    public void assignGoalPosition(PlayerToM agent) {
-        ArrayList<Point> goalPositions = Settings.getGoalPositions(agent.getStartingPosition(), MIN_GOAL_DISTANCE,
+    public void assignGoalPosition(Player agent) {
+        ArrayList<Point> goalPositions = Settings.getGoalPositions(agent.getStartingPosition(), Settings.MIN_GOAL_DISTANCE,
                 this.board.getBoardWidth(), this.board.getBoardHeight());
 
         int randomNum = (int) (Math.random() * goalPositions.size());
@@ -140,6 +127,60 @@ public class Game {
     public void reset() {
         initGame();
         notifyListeners();
+    }
+
+    public void step() {
+        if (!inGame) {
+            System.out.println("Game is already over!");
+            return;
+        }
+
+        if (turn.equals("Initiator")) {
+            // turn initiator
+            this.initiator.makeOffer(responder, offerResp);
+        } else {
+            // turn responder
+            this.responder.makeOffer(responder, offerInit);
+        }
+        notifyListeners();
+    }
+
+    public void offerAccepted(Player p, List<Integer> offer) {
+        // player p accepts offer
+        inGame = false;
+        List<Integer> counterOffer = new ArrayList<>(allTokens);
+        for (Integer integer : offer) {
+            counterOffer.remove(integer);
+        }
+
+        if (p.name.equals("Initiator")) {
+            distributeTokensToPlayer(this.initiator, offer);
+            distributeTokensToPlayer(this.responder, counterOffer);
+        } else {
+            distributeTokensToPlayer(this.initiator, counterOffer);
+            distributeTokensToPlayer(this.responder, offer);
+        }
+    }
+
+    public void negotiationFailed() {
+        inGame = false;
+        System.out.println("Negotiation failed.");
+    }
+
+    public void distributeTokensToPlayer(Player p, List<Integer> offer) {
+        p.obtainTokens(offer);
+    }
+
+    public void makeOffer(Player p, List<Integer> offer) {
+        if (p.name.equals("Initiator")) {
+            System.out.println("Initiator makes offer");
+            this.offerInit = offer;
+            turn = "Responder";
+        } else {
+            System.out.println("Responder makes offer");
+            this.offerResp = offer;
+            turn = "Initiator";
+        }
     }
 
     /**
