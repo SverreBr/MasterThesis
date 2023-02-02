@@ -1,6 +1,7 @@
 package utilities;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -129,5 +130,47 @@ public class Board {
                 new Point(0, -1),
                 new Point(0, 1)
         );
+    }
+
+    /**
+     * Calculates the score that an agent obtains when starting on the currLoc and having goalLoc as goal location
+     * with tokens as his colored chips
+     *
+     * @param currLoc starting location
+     * @param tokens  the colored chips
+     * @param goalLoc goal location
+     * @return the score as an integer
+     */
+    public int calculateScore(Point currLoc, List<Integer> tokens, Point startLoc, Point goalLoc) {
+        // Calculate current score.
+        int currScore = this.calculateTileScore(currLoc, tokens, startLoc, goalLoc);
+
+        if (currLoc.equals(goalLoc) || (tokens.size() == 0)) {
+            // Goal location reached or no possible moves anymore
+            return currScore;
+        }
+
+        int tileColor, highestScore = currScore;
+        Point newLoc;
+        List<Integer> newTokens;
+        List<Point> possibleMoves = this.getPossibleMoves();
+        for (Point move : possibleMoves) {
+            newLoc = new Point(currLoc.x + move.x, currLoc.y + move.y);
+            if ((0 <= newLoc.x) && (newLoc.x < boardWidth) &&
+                    (0 <= newLoc.y) && (newLoc.y < boardHeight)) {
+                tileColor = this.getTileColorNumber(newLoc);
+                if (tokens.contains(tileColor)) {
+                    // Move is allowed
+                    newTokens = new ArrayList<>(tokens);
+                    newTokens.remove(Integer.valueOf(tileColor));
+                    highestScore = Math.max(highestScore, calculateScore(newLoc, newTokens, startLoc, goalLoc));
+                }
+            }
+        }
+        return highestScore;
+    }
+
+    public int calculateScoreAgent(Player agent) {
+        return calculateScore(agent.startingPosition, agent.getTokens(), agent.startingPosition, agent.goalPosition);
     }
 }

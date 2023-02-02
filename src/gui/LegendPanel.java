@@ -136,8 +136,11 @@ public class LegendPanel extends JPanel implements GameListener {
     }
 
     @Override
-    public void gameChanged() {
+    public void newGame() {
         updateLegendText();
         this.repaint();
     }
+
+    @Override
+    public void gameChanged() {}
 }

@@ -40,7 +40,7 @@ public class Settings {
     /**
      * number of different colors as tiles of the board
      */
-    public static final int TOKEN_DIVERSITY = 3;
+    public static final int TOKEN_DIVERSITY = 4;
 
     /**
      * number of tokens an agent obtains
@@ -54,11 +54,11 @@ public class Settings {
 
 
     public static final int BUTTON_PANEL_WIDTH = 300;
-    public static final int AGENT_PANEL_HEIGHT = 500;
-    public static final int AGENT_TEXT_HEIGHT = 200;
+    public static final int AGENT_PANEL_HEIGHT = 570;
+    public static final int AGENT_TEXT_HEIGHT = 290;
 
 //    int BUTTON_PANEL_HEIGHT = 0;
-    public static final int MAIN_PANEL_SIZE = 750;
+    public static final int MAIN_PANEL_SIZE = 800;
 
     public static final String START_LOCATION_SYMBOL = "X";
     public static final String START_LOCATION_SYMBOL_INITIATOR = "Xi";

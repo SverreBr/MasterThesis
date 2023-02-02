@@ -167,7 +167,10 @@ public class BoardPanel extends JComponent implements GameListener {
     }
 
     @Override
-    public void gameChanged() {
+    public void newGame() {
         this.repaint();
     }
+
+    @Override
+    public void gameChanged() {}
 }

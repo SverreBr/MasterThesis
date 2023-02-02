@@ -28,14 +28,15 @@ public class AgentPanel extends JComponent implements GameListener {
     /**
      * Content of the info text pane
      */
-    private final String[] content = new String[6];
+    private final String[] content = new String[12];
 
     /**
      * The style of the content of the text pane
      */
     private final String[] style = {
             "bold", "regular", "regular", "regular", "regular",
-            "regular"
+            "regular", "regular", "regular", "regular", "regular",
+            "regular", "regular"
     };
 
     /**
@@ -53,6 +54,9 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private final Player agent;
 
+    private List<Integer> initialTokens;
+    private int initialPoints;
+
     /**
      * Constructor of the agent panel
      *
@@ -60,6 +64,8 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     public AgentPanel(Player agent) {
         this.agent = agent;
+        this.initialTokens = agent.getTokens();
+        this.initialPoints = agent.calculateCurrentScore();
 
         this.setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -72,6 +78,7 @@ public class AgentPanel extends JComponent implements GameListener {
         this.messageScroll = new JScrollPane(this.messagePane);
         createScrollMessagePane();
         createMessages();
+        updateMessages();
 
         changeBackgrounds();
 
@@ -149,15 +156,29 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private void updateInfo() {
         content[0] = agent.name;
-        content[1] = "chips:";
+        content[1] = "initial chips:";
 
         for (int i = 2; i <= 4; i++) {
             content[i] = "";
         }
-        content[5] = "points: " + agent.calculateScore(agent.startingPosition, agent.getTokens(),
-                agent.startingPosition, agent.goalPosition);
+        content[5] = "points: " + this.initialPoints;
 
-        // Generate agent info panel
+        if (!agent.game.inGame) {
+            content[6] = "---";
+            content[7] = "final distribution chips:";
+            for (int i = 8; i <= 10; i++) {
+                content[i] = "";
+            }
+            content[11] = "points: " + agent.game.board.calculateScoreAgent(agent);
+        } else {
+            for (int i = 6; i <= 11; i++) {
+                content[i] = "";
+            }
+        }
+        generateAgentInfo();
+    }
+
+    private void generateAgentInfo() {
         StyledDocument doc = info.getStyledDocument();
         try {
             doc.remove(0, doc.getLength());
@@ -187,10 +208,18 @@ public class AgentPanel extends JComponent implements GameListener {
         int offset = 30;
         int height = 70;
 
-        List<Integer> tokens = agent.getTokens();
-        for (int i = 0; i < tokens.size(); i++) {
-            g2.setColor(Settings.getColor(tokens.get(i)));
+        for (int i = 0; i < this.initialTokens.size(); i++) {
+            g2.setColor(Settings.getColor(this.initialTokens.get(i)));
             g2.fillOval(offset + i * tokenSize, height, tokenSize, tokenSize);
+        }
+
+        if (!agent.game.inGame) {
+            List<Integer> tokens = agent.getTokens();
+            height = 195;
+            for (int i = 0; i < tokens.size(); i++) {
+                g2.setColor(Settings.getColor(tokens.get(i)));
+                g2.fillOval(offset + i * tokenSize, height, tokenSize, tokenSize);
+            }
         }
     }
 
@@ -199,5 +228,12 @@ public class AgentPanel extends JComponent implements GameListener {
         updateInfo();
         updateMessages();
         this.repaint();
+    }
+
+    @Override
+    public void newGame() {
+        this.initialTokens = agent.getTokens();
+        this.initialPoints = agent.calculateCurrentScore();
+        gameChanged();
     }
 }

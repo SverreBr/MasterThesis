@@ -3,6 +3,7 @@ package utilities;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -120,42 +121,8 @@ public abstract class Player {
         return goalPosition;
     }
 
-    /**
-     * Calculates the score that an agent obtains when starting on the currLoc and having goalLoc as goal location
-     * with tokens as his colored chips
-     *
-     * @param currLoc starting location
-     * @param tokens  the colored chips
-     * @param goalLoc goal location
-     * @return the score as an integer
-     */
-    public int calculateScore(Point currLoc, List<Integer> tokens, Point startLoc, Point goalLoc) {
-        // Calculate current score.
-        int currScore = game.board.calculateTileScore(currLoc, tokens, startLoc, goalLoc);
-
-        if (currLoc.equals(goalLoc) || (tokens.size() == 0)) {
-            // Goal location reached or no possible moves anymore
-            return currScore;
-        }
-
-        int tileColor, highestScore = currScore;
-        Point newLoc;
-        List<Integer> newTokens;
-        List<Point> possibleMoves = game.board.getPossibleMoves();
-        for (Point move : possibleMoves) {
-            newLoc = new Point(currLoc.x + move.x, currLoc.y + move.y);
-            if ((0 <= newLoc.x) && (newLoc.x < game.board.getBoardWidth()) &&
-                    (0 <= newLoc.y) && (newLoc.y < game.board.getBoardHeight())) {
-                tileColor = game.board.getTileColorNumber(newLoc);
-                if (tokens.contains(tileColor)) {
-                    // Move is allowed
-                    newTokens = new ArrayList<>(tokens);
-                    newTokens.remove(Integer.valueOf(tileColor));
-                    highestScore = Math.max(highestScore, calculateScore(newLoc, newTokens, startLoc, goalLoc));
-                }
-            }
-        }
-        return highestScore;
+    public int calculateCurrentScore() {
+        return game.board.calculateScoreAgent(this);
     }
 
     public void makeOffer(Player p, List<Integer> offer) {
@@ -184,21 +151,29 @@ public abstract class Player {
     }
 
     public List<Integer> selectInitialOffer() {
-        return new ArrayList<>(this.tokens);
+        return makeRandomOffer();
     }
 
     public List<Integer> selectOffer(Player p, List<Integer> offer) {
+        return makeRandomOffer();
+    }
 
-        return new ArrayList<>(this.tokens);
+    private List<Integer> makeRandomOffer() {
+        List<Integer> allTokens = game.getAllTokens();
+        Collections.shuffle(allTokens);
+        List <Integer> newOffer = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            newOffer.add(allTokens.get(i));
+        }
+        return newOffer;
     }
 
     public boolean receiveOffer(Player p, List<Integer> offer) {
-        int currPoints = game.board.calculateTileScore(startingPosition, tokens, startingPosition, goalPosition);
-        int otherPoints = game.board.calculateTileScore(startingPosition, offer, startingPosition, goalPosition);
+        int currPoints = game.board.calculateScore(startingPosition, tokens, startingPosition, goalPosition);
+        int otherPoints = game.board.calculateScore(startingPosition, offer, startingPosition, goalPosition);
         System.out.println("Current points = " + currPoints + ". New points = " + otherPoints);
         if (otherPoints > currPoints) {
             // accept offer?
-            System.out.println("Offer accepted.");
             acceptOffer(offer);
             return true;
         }

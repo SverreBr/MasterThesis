@@ -18,16 +18,16 @@ public class Game {
      */
     public Player initiator;
 
-    public List<Integer> offerInit = null;
+    public List<Integer> offerInit;
 
     /**
      * the responding agent
      */
     public Player responder;
 
-    public List<Integer> offerResp = null;
+    public List<Integer> offerResp;
 
-    public String turn = "Initiator";
+    public String turn;
 
     /**
      * the board of the game
@@ -64,6 +64,9 @@ public class Game {
         this.responder.resetPlayer();
         this.board.resetBoard();
         this.inGame = true;
+        this.offerInit = null;
+        this.offerResp = null;
+        this.turn = "Initiator";
 
         // Distribute tokens to players
         generateAndDistributeTokens();
@@ -88,7 +91,7 @@ public class Game {
         this.initiator.obtainTokens(tokensInit);
         this.responder.obtainTokens(tokensResp);
         this.allTokens.addAll(tokensInit);
-        this.allTokens.addAll(tokensInit);
+        this.allTokens.addAll(tokensResp);
     }
 
     /**
@@ -126,7 +129,7 @@ public class Game {
      */
     public void reset() {
         initGame();
-        notifyListeners();
+        notifyListenersNewGame();
     }
 
     public void step() {
@@ -193,6 +196,12 @@ public class Game {
         }
     }
 
+    protected void notifyListenersNewGame() {
+        for (GameListener gameListener : this.listeners) {
+            gameListener.newGame();
+        }
+    }
+
     /**
      * adds a listener to this model
      *
@@ -200,5 +209,9 @@ public class Game {
      */
     public void addListener(GameListener listener) {
         this.listeners.add(listener);
+    }
+
+    public List<Integer> getAllTokens() {
+        return allTokens;
     }
 }
