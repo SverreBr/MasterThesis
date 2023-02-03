@@ -78,7 +78,7 @@ public class BoardPanel extends JComponent implements GameListener {
         int offset = 1;
         for (int x = 0; x < simulationSize.width; x++) {
             for (int y = 0; y < simulationSize.height; y++) {
-                g2.setColor(game.board.getTileColor(new Point(x, y)));
+                g2.setColor(game.getBoard().getTileColor(new Point(x, y)));
                 g2.fillRect(
                         x * siteSize.width + offset, y * siteSize.height + offset,
                         siteSize.width - offset, siteSize.height - offset);
@@ -108,8 +108,8 @@ public class BoardPanel extends JComponent implements GameListener {
 
         Point startInit, startResp;
 
-        startInit = game.initiator.getStartingPosition();
-        startResp = game.responder.getStartingPosition();
+        startInit = game.getInitiator().getStartingPosition();
+        startResp = game.getResponder().getStartingPosition();
 
         g2.setColor(Color.WHITE);
         g2.fillRect(
@@ -135,8 +135,8 @@ public class BoardPanel extends JComponent implements GameListener {
     private void paintGoalLocation(Graphics2D g2) {
         Point goalInit, goalResp;
 
-        goalInit = game.initiator.getGoalPosition();
-        goalResp = game.responder.getGoalPosition();
+        goalInit = game.getInitiator().getGoalPosition();
+        goalResp = game.getResponder().getGoalPosition();
 
         if (goalInit.equals(goalResp)) {
             drawSymbol(Settings.GOAL_LOCATION_SYMBOL, g2, goalInit);

@@ -3,7 +3,6 @@ package utilities;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,31 +11,35 @@ import java.util.List;
 public abstract class Player {
 
     /**
-     * list of integers that represent the colored chips
+     * list of integers that represent the colored chips, where each list index represents the color and the number in
+     * the list is the amount of chips
      */
-    private List<Integer> tokens;
+    private int[] chips;
 
     /**
      * Name of the agent
      */
-    public final String name;
+    private final String name;
 
     /**
      * Model of the game
      */
-    public final Game game;
+    private final Game game;
 
     /**
      * Starting position of the agent
      */
-    public Point startingPosition;
+    private Point startingPosition;
 
     /**
      * Goal position of the agent
      */
-    public Point goalPosition;
+    private Point goalPosition;
 
-    public List<String> messages;
+    /**
+     * List of messages send
+     */
+    private List<String> messages;
 
     /**
      * Constructor
@@ -45,7 +48,7 @@ public abstract class Player {
      * @param game       model of the game
      */
     public Player(String namePlayer, Game game) {
-        name = namePlayer;
+        this.name = namePlayer;
         this.game = game;
         resetPlayer();
     }
@@ -54,17 +57,49 @@ public abstract class Player {
      * Resets the agent. Removes all colored chips, and sets the starting and goal position to null
      */
     public void resetPlayer() {
-        tokens = new ArrayList<>();
-        messages = new ArrayList<>();
-        startingPosition = null;
-        goalPosition = null;
+        this.chips = this.game.makeNewChipBin();
+        this.messages = new ArrayList<>();
+        this.startingPosition = null;
+        this.goalPosition = null;
+    }
+
+    /**
+     * Getter for name
+     *
+     * @return the name of the agent
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Getter for game
+     *
+     * @return the game model
+     */
+    public Game getGame() {
+        return this.game;
+    }
+
+    /**
+     * Getter for messages
+     *
+     * @return list of messages
+     */
+    public List<String> getMessages() {
+        return this.messages;
     }
 
     /**
      * Give the player colored chips
      */
-    public void obtainTokens(List<Integer> initTokens) {
-        tokens = initTokens;
+    public void addChips(int[] newChips) {
+        for (int i = 0; i < newChips.length; i++)
+            this.chips[i] += newChips[i];
+    }
+
+    public void setNewChips(int[] newChips) {
+        System.arraycopy(newChips, 0, this.chips, 0, newChips.length);
     }
 
     /**
@@ -72,17 +107,17 @@ public abstract class Player {
      *
      * @return number of chips
      */
-    public int getNumTokens() {
-        return tokens.size();
+    public int getNumChips() {
+        return this.game.calculateNumChips(this.chips);
     }
 
     /**
      * Get the chips of the agent
      *
-     * @return a list of integers that represent the tokens
+     * @return an array of integers that represent the tokens
      */
-    public List<Integer> getTokens() {
-        return tokens;
+    public int[] getChips() {
+        return this.chips;
     }
 
     /**
@@ -100,7 +135,7 @@ public abstract class Player {
      * @return the starting position of the agent
      */
     public Point getStartingPosition() {
-        return startingPosition;
+        return this.startingPosition;
     }
 
     /**
@@ -118,15 +153,20 @@ public abstract class Player {
      * @return the goal position of the agent
      */
     public Point getGoalPosition() {
-        return goalPosition;
+        return this.goalPosition;
     }
 
+    /**
+     * Calculates the current score of the agent
+     *
+     * @return score of the agent
+     */
     public int calculateCurrentScore() {
-        return game.board.calculateScoreAgent(this);
+        return this.game.getBoard().calculateScoreAgent(this);
     }
 
-    public void makeOffer(Player p, List<Integer> offer) {
-        List<Integer> curOffer;
+    public void makeOffer(Player p, int[] offer) {
+        int[] curOffer;
         boolean offerAccepted = false;
 
         if (offer == null) {
@@ -145,32 +185,40 @@ public abstract class Player {
         }
 
         if (curOffer == null)
-            game.negotiationFailed();
+            this.game.negotiationFailed();
 
         sendOffer(curOffer);
     }
 
-    public List<Integer> selectInitialOffer() {
+    public int[] selectInitialOffer() {
         return makeRandomOffer();
     }
 
-    public List<Integer> selectOffer(Player p, List<Integer> offer) {
+    public int[] selectOffer(Player p, int[] offer) {
         return makeRandomOffer();
     }
 
-    private List<Integer> makeRandomOffer() {
-        List<Integer> allTokens = game.getAllTokens();
-        Collections.shuffle(allTokens);
-        List <Integer> newOffer = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            newOffer.add(allTokens.get(i));
+    private int[] makeRandomOffer() {
+        int[] allChips = this.game.getAllChipsInGame().clone();
+        System.out.println("all chips in the game: " + Arrays.toString(allChips));
+        int[] newOffer = this.game.makeNewChipBin();
+        int chipsToDraw = Settings.CHIPS_PER_PLAYER;
+        int randNum;
+
+        while (chipsToDraw > 0) {
+            randNum = (int) (Math.random() * Settings.CHIP_DIVERSITY);
+            if (allChips[randNum] > 0) {
+                chipsToDraw -= 1;
+                newOffer[randNum] += 1;
+                allChips[randNum] -= 1;
+            }
         }
         return newOffer;
     }
 
-    public boolean receiveOffer(Player p, List<Integer> offer) {
-        int currPoints = game.board.calculateScore(startingPosition, tokens, startingPosition, goalPosition);
-        int otherPoints = game.board.calculateScore(startingPosition, offer, startingPosition, goalPosition);
+    public boolean receiveOffer(Player p, int[] offer) {
+        int currPoints = game.getBoard().calculateScore(startingPosition, chips, startingPosition, goalPosition);
+        int otherPoints = game.getBoard().calculateScore(startingPosition, offer, startingPosition, goalPosition);
         System.out.println("Current points = " + currPoints + ". New points = " + otherPoints);
         if (otherPoints > currPoints) {
             // accept offer?
@@ -182,14 +230,14 @@ public abstract class Player {
         return false;
     }
 
-    public void acceptOffer(List<Integer> offer) {
-        game.offerAccepted(this, offer);
+    public void acceptOffer(int[] offer) {
+        this.game.offerAccepted(this, offer);
     }
 
-    public void sendOffer(List<Integer> offer) {
-        game.makeOffer(this, offer);
-        String offerMessage = "I offer: " + Arrays.toString(offer.toArray());
+    public void sendOffer(int[] offer) {
+        this.game.makeOffer(this, offer);
+        String offerMessage = "I offer: " + Arrays.toString(offer);
 
-        messages.add(offerMessage);
+        this.messages.add(offerMessage);
     }
 }

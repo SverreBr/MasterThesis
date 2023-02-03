@@ -6,7 +6,6 @@ import controller.GameListener;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * utilities.Game class: the two players and the coloured trails board
@@ -16,41 +15,56 @@ public class Game {
     /**
      * the initiator agent
      */
-    public Player initiator;
+    private final Player initiator;
 
-    public List<Integer> offerInit;
+    /**
+     * the last offer made by the initiator
+     */
+    private int[] offerInit;
 
     /**
      * the responding agent
      */
-    public Player responder;
+    private final Player responder;
 
-    public List<Integer> offerResp;
+    /**
+     * the last offer made by the responder
+     */
+    private int[] offerResp;
 
-    public String turn;
+    /**
+     * keeps track of whose turn it is
+     */
+    private String turn;
 
     /**
      * the board of the game
      */
-    public Board board;
+    private final Board board;
 
     /**
      * the listeners to the model game
      */
     private final Set<GameListener> listeners;
 
-    public boolean inGame;
+    /**
+     * true if the game is running; false otherwise
+     */
+    private boolean inGame;
 
-    public List<Integer> allTokens;
+    /**
+     * bin with all the chips in the game
+     */
+    private int[] allChipsInGame;
 
     /**
      * Constructor
      */
     public Game() {
         this.listeners = new HashSet<>();
-        this.board = new Board();
-        this.initiator = new PlayerToM("Initiator", this);
-        this.responder = new PlayerToM("Responder", this);
+        this.board = new Board(this);
+        this.initiator = new PlayerToM(Settings.INITIATOR_NAME, this);
+        this.responder = new PlayerToM(Settings.RESPONDER_NAME, this);
 
         initGame();
     }
@@ -66,40 +80,92 @@ public class Game {
         this.inGame = true;
         this.offerInit = null;
         this.offerResp = null;
-        this.turn = "Initiator";
+        this.turn = Settings.INITIATOR_NAME;
+        this.allChipsInGame = makeNewChipBin();
 
         // Distribute tokens to players
-        generateAndDistributeTokens();
+        int[] newChips;
+        newChips = generateNewChips();
+        this.initiator.setNewChips(newChips);
+        newChips = generateNewChips();
+        this.responder.setNewChips(newChips);
+
+        System.out.println("Initial all chips in game: " + Arrays.toString(allChipsInGame));
+
         assignStartingPositions();
-        assignGoalPosition(initiator);
-        assignGoalPosition(responder);
+        assignGoalPosition(this.initiator);
+        assignGoalPosition(this.responder);
+    }
+
+    /**
+     * Getter for whether the game is still active
+     *
+     * @return true if in game; false otherwise
+     */
+    public boolean isGameEnabled() {
+        return this.inGame;
+    }
+
+    /**
+     * Getter for board
+     *
+     * @return the board in the game model
+     */
+    public Board getBoard() {
+        return this.board;
+    }
+
+    /**
+     * Getter for initiator agent
+     *
+     * @return the agent that is the initiator
+     */
+    public Player getInitiator() {
+        return this.initiator;
+    }
+
+    /**
+     * Getter for responder agent
+     *
+     * @return the agent that is the responder
+     */
+    public Player getResponder() {
+        return this.responder;
     }
 
     /**
      * Generate and distribute tokens for the agents
      */
-    private void generateAndDistributeTokens() {
-        List<Integer> tokensInit = new ArrayList<>();
-        List<Integer> tokensResp = new ArrayList<>();
-        this.allTokens = new ArrayList<>();
+    private int[] generateNewChips() {
+        int[] chips = makeNewChipBin();
+        int newChip;
 
-        for (int i = 0; i < Settings.TOKENS_PER_PLAYER; i++) {
-            tokensInit.add((int) (Math.random() * Settings.TOKEN_DIVERSITY));
-            tokensResp.add((int) (Math.random() * Settings.TOKEN_DIVERSITY));
+        for (int i = 0; i < Settings.CHIPS_PER_PLAYER; i++) {
+            newChip = (int) (Math.random() * Settings.CHIP_DIVERSITY);
+            chips[newChip] += 1;
+            this.allChipsInGame[newChip] += 1;
         }
+        return chips;
+    }
 
-        this.initiator.obtainTokens(tokensInit);
-        this.responder.obtainTokens(tokensResp);
-        this.allTokens.addAll(tokensInit);
-        this.allTokens.addAll(tokensResp);
+    /**
+     * Make new bin for chips.
+     *
+     * @return new bin for chips initialized with zero
+     */
+    public int[] makeNewChipBin() {
+        int[] newChipBin = new int[Settings.CHIP_DIVERSITY];
+        for (int i = 0; i < Settings.CHIP_DIVERSITY; i++)
+            newChipBin[i] = 0;
+        return newChipBin;
     }
 
     /**
      * assign starting positions to both agents
      */
     public void assignStartingPositions() {
-        this.initiator.setStartingPosition(new Point(2, 2));
-        this.responder.setStartingPosition(new Point(2, 2));
+        this.initiator.setStartingPosition(Settings.STARTING_POSITION);
+        this.responder.setStartingPosition(Settings.STARTING_POSITION);
     }
 
     /**
@@ -138,7 +204,7 @@ public class Game {
             return;
         }
 
-        if (turn.equals("Initiator")) {
+        if (turn.equals(Settings.INITIATOR_NAME)) {
             // turn initiator
             this.initiator.makeOffer(responder, offerResp);
         } else {
@@ -148,20 +214,20 @@ public class Game {
         notifyListeners();
     }
 
-    public void offerAccepted(Player p, List<Integer> offer) {
+    public void offerAccepted(Player p, int[] offer) {
         // player p accepts offer
-        inGame = false;
-        List<Integer> counterOffer = new ArrayList<>(allTokens);
-        for (Integer integer : offer) {
-            counterOffer.remove(integer);
+        this.inGame = false;
+        int[] counterOffer = this.allChipsInGame.clone();
+        for (int i = 0; i < offer.length; i++) {
+            counterOffer[i] -= offer[i];
         }
 
-        if (p.name.equals("Initiator")) {
-            distributeTokensToPlayer(this.initiator, offer);
-            distributeTokensToPlayer(this.responder, counterOffer);
+        if (p.getName().equals(Settings.INITIATOR_NAME)) {
+            this.initiator.setNewChips(offer);
+            this.responder.setNewChips(counterOffer);
         } else {
-            distributeTokensToPlayer(this.initiator, counterOffer);
-            distributeTokensToPlayer(this.responder, offer);
+            this.responder.setNewChips(offer);
+            this.initiator.setNewChips(counterOffer);
         }
     }
 
@@ -170,19 +236,15 @@ public class Game {
         System.out.println("Negotiation failed.");
     }
 
-    public void distributeTokensToPlayer(Player p, List<Integer> offer) {
-        p.obtainTokens(offer);
-    }
-
-    public void makeOffer(Player p, List<Integer> offer) {
-        if (p.name.equals("Initiator")) {
+    public void makeOffer(Player p, int[] offer) {
+        if (p.getName().equals(Settings.INITIATOR_NAME)) {
             System.out.println("Initiator makes offer");
             this.offerInit = offer;
-            turn = "Responder";
+            turn = Settings.RESPONDER_NAME;
         } else {
             System.out.println("Responder makes offer");
             this.offerResp = offer;
-            turn = "Initiator";
+            turn = Settings.INITIATOR_NAME;
         }
     }
 
@@ -211,7 +273,19 @@ public class Game {
         this.listeners.add(listener);
     }
 
-    public List<Integer> getAllTokens() {
-        return allTokens;
+    public int[] getAllChipsInGame() {
+        return this.allChipsInGame;
+    }
+
+    /**
+     * Calculates the number of chips in chip array
+     * @param chips the chip array
+     * @return integer that represents the total number of chips.
+     */
+    public int calculateNumChips(int[] chips) {
+        int sum = 0;
+        for (int chip : chips)
+            sum += chip;
+        return sum;
     }
 }

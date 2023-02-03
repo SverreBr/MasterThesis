@@ -18,8 +18,14 @@ public class ButtonPanel extends JPanel implements ActionListener {
      */
     private final Game game;
 
+    /**
+     * Panel with the buttons that are located south
+     */
     private JPanel southButtons;
 
+    /**
+     * The main body of the button panel
+     */
     private JPanel body;
 
     /**

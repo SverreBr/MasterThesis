@@ -11,6 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * AgentPanel: makes the agent panel
  */
@@ -54,7 +55,14 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private final Player agent;
 
-    private List<Integer> initialTokens;
+    /**
+     * Initial chips of this agent
+     */
+    private int[] initialChips;
+
+    /**
+     * Initial points of this agent
+     */
     private int initialPoints;
 
     /**
@@ -64,7 +72,7 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     public AgentPanel(Player agent) {
         this.agent = agent;
-        this.initialTokens = agent.getTokens();
+        this.initialChips = agent.getChips().clone();
         this.initialPoints = agent.calculateCurrentScore();
 
         this.setLayout(new BorderLayout());
@@ -85,9 +93,12 @@ public class AgentPanel extends JComponent implements GameListener {
         this.add(info, BorderLayout.NORTH);
         this.add(messageScroll, BorderLayout.CENTER);
 
-        this.agent.game.addListener(this);
+        this.agent.getGame().addListener(this);
     }
 
+    /**
+     * Changes the backgrounds of this panel
+     */
     private void changeBackgrounds() {
         this.info.setBackground(Settings.getBackGroundColor());
         this.messageScroll.setBackground(Settings.getBackGroundColor());
@@ -95,6 +106,9 @@ public class AgentPanel extends JComponent implements GameListener {
         this.setBackground(Settings.getBackGroundColor());
     }
 
+    /**
+     * Creates text panel for this agent panel
+     */
     private void createTextPane() {
         info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - 20, Settings.AGENT_TEXT_HEIGHT));
         info.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_TEXT_HEIGHT));
@@ -105,6 +119,9 @@ public class AgentPanel extends JComponent implements GameListener {
         Settings.addStylesToDocument(doc);
     }
 
+    /**
+     * Creates a scroll pane for the messages of the agent
+     */
     private void createScrollMessagePane() {
         messageScroll.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
         messageScroll.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
@@ -121,13 +138,19 @@ public class AgentPanel extends JComponent implements GameListener {
         Settings.addStylesToDocument(doc);
     }
 
+    /**
+     * Adds an agent message to the messages panel
+     */
     public void addAgentMessages() {
-        for (String message : agent.messages) {
+        for (String message : agent.getMessages()) {
             this.messages.add(message);
             this.styleMessages.add("regular");
         }
     }
 
+    /**
+     * Creates new messages
+     */
     private void createMessages() {
         messages = new ArrayList<>();
         styleMessages = new ArrayList<>();
@@ -136,6 +159,9 @@ public class AgentPanel extends JComponent implements GameListener {
         styleMessages.add("italic");
     }
 
+    /**
+     * Updates messages
+     */
     private void updateMessages() {
         createMessages();
         addAgentMessages();
@@ -155,7 +181,7 @@ public class AgentPanel extends JComponent implements GameListener {
      * Method to update the information on the info text panel
      */
     private void updateInfo() {
-        content[0] = agent.name;
+        content[0] = agent.getName();
         content[1] = "initial chips:";
 
         for (int i = 2; i <= 4; i++) {
@@ -163,13 +189,13 @@ public class AgentPanel extends JComponent implements GameListener {
         }
         content[5] = "points: " + this.initialPoints;
 
-        if (!agent.game.inGame) {
+        if (!agent.getGame().isGameEnabled()) {
             content[6] = "---";
             content[7] = "final distribution chips:";
             for (int i = 8; i <= 10; i++) {
                 content[i] = "";
             }
-            content[11] = "points: " + agent.game.board.calculateScoreAgent(agent);
+            content[11] = "points: " + agent.getGame().getBoard().calculateScoreAgent(agent);
         } else {
             for (int i = 6; i <= 11; i++) {
                 content[i] = "";
@@ -208,17 +234,26 @@ public class AgentPanel extends JComponent implements GameListener {
         int offset = 30;
         int height = 70;
 
-        for (int i = 0; i < this.initialTokens.size(); i++) {
-            g2.setColor(Settings.getColor(this.initialTokens.get(i)));
-            g2.fillOval(offset + i * tokenSize, height, tokenSize, tokenSize);
+        int trackNumChips = 0;
+        for (int color = 0; color < Settings.CHIP_DIVERSITY; color++) {
+            for (int num = 0; num < this.initialChips[color]; num++) {
+                g2.setColor(Settings.getColor(color));
+                g2.fillOval(offset + trackNumChips * tokenSize, height, tokenSize, tokenSize);
+                trackNumChips += 1;
+            }
+
         }
 
-        if (!agent.game.inGame) {
-            List<Integer> tokens = agent.getTokens();
+        if (!agent.getGame().isGameEnabled()) {
+            trackNumChips = 0;
+            int[] chips = agent.getChips();
             height = 195;
-            for (int i = 0; i < tokens.size(); i++) {
-                g2.setColor(Settings.getColor(tokens.get(i)));
-                g2.fillOval(offset + i * tokenSize, height, tokenSize, tokenSize);
+            for (int color = 0; color < Settings.CHIP_DIVERSITY; color++) {
+                for (int num = 0; num < chips[color]; num++) {
+                    g2.setColor(Settings.getColor(color));
+                    g2.fillOval(offset + trackNumChips * tokenSize, height, tokenSize, tokenSize);
+                    trackNumChips += 1;
+                }
             }
         }
     }
@@ -232,7 +267,7 @@ public class AgentPanel extends JComponent implements GameListener {
 
     @Override
     public void newGame() {
-        this.initialTokens = agent.getTokens();
+        this.initialChips = agent.getChips().clone();
         this.initialPoints = agent.calculateCurrentScore();
         gameChanged();
     }

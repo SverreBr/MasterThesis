@@ -1,12 +1,11 @@
 package utilities;
 
-import utilities.Game;
-import utilities.Player;
-
 /**
  * PlayerToM: class for the theory of mind of the agent
  */
 public class PlayerToM extends Player {
+
+    private double[][] beliefsOfferType;
 
     /**
      * Constructor
@@ -16,5 +15,10 @@ public class PlayerToM extends Player {
      */
     public PlayerToM(String playerName, Game game) {
         super(playerName, game);
+    }
+
+    public void setupBeliefs() {
+        this.beliefsOfferType = new double[1][1];
+//        for (int i = 0; i < this.)
     }
 }

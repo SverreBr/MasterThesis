@@ -40,25 +40,41 @@ public class Settings {
     /**
      * number of different colors as tiles of the board
      */
-    public static final int TOKEN_DIVERSITY = 4;
+    public static final int CHIP_DIVERSITY = 4;
 
     /**
      * number of tokens an agent obtains
      */
-    public static final int TOKENS_PER_PLAYER = 4;
+    public static final int CHIPS_PER_PLAYER = 4;
 
     /**
      * minimum (manhattan) distance from start location to goal location where the goal can be placed
      */
     public static final int MIN_GOAL_DISTANCE = 3;
 
-
+    /**
+     * determines the width of the button panel
+     */
     public static final int BUTTON_PANEL_WIDTH = 300;
+
+    /**
+     * determines the height of the agent panel
+     */
     public static final int AGENT_PANEL_HEIGHT = 570;
+
+    /**
+     * determines the height of the text panel in the agent panel
+     */
     public static final int AGENT_TEXT_HEIGHT = 290;
 
 //    int BUTTON_PANEL_HEIGHT = 0;
     public static final int MAIN_PANEL_SIZE = 800;
+
+    public static final Point STARTING_POSITION = new Point(2,2);
+
+    public static final String INITIATOR_NAME = "Initiator";
+
+    public static final String RESPONDER_NAME = "Responder";
 
     public static final String START_LOCATION_SYMBOL = "X";
     public static final String START_LOCATION_SYMBOL_INITIATOR = "Xi";

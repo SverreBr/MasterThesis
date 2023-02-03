@@ -12,12 +12,25 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * LegendPanel: creates a legend for the view
+ */
 public class LegendPanel extends JPanel implements GameListener {
 
+    /**
+     * Information text pane
+     */
     private final JTextPane info;
 
+    /**
+     * The game model
+     */
     private final Game game;
 
+    /**
+     * Constructor for the legend panel
+     * @param game The game model
+     */
     public LegendPanel(Game game) {
         this.game = game;
 
@@ -30,11 +43,17 @@ public class LegendPanel extends JPanel implements GameListener {
         game.addListener(this);
     }
 
+    /**
+     * Change background of the legend panel
+     */
     private void changeBackgrounds() {
         setBackground(Settings.getBackGroundColor());
         info.setBackground(Settings.getBackGroundColor());
     }
 
+    /**
+     * Creates the text pane for the legend panel
+     */
     private void createTextPane() {
         info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - 20, Settings.MAIN_PANEL_SIZE - Settings.AGENT_PANEL_HEIGHT));
         info.setEditable(false);
@@ -44,6 +63,10 @@ public class LegendPanel extends JPanel implements GameListener {
         Settings.addStylesToDocument(doc);
     }
 
+    /**
+     * Paint the panel
+     * @param g the <code>Graphics</code> object to protect
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -64,7 +87,7 @@ public class LegendPanel extends JPanel implements GameListener {
         int betweenSpace = 11;
         int height = 75;
 
-        int numDiffTokens = Settings.TOKEN_DIVERSITY;
+        int numDiffTokens = Settings.CHIP_DIVERSITY;
 
         g2.setColor(Settings.getColor(0));
         g2.fillOval(offset, height, tokenSize, tokenSize);
@@ -74,6 +97,9 @@ public class LegendPanel extends JPanel implements GameListener {
         }
     }
 
+    /**
+     * Updates the text in the legend
+     */
     private void updateLegendText() {
         List<String> content = new ArrayList<>();
         List<String> style = new ArrayList<>();
@@ -81,13 +107,13 @@ public class LegendPanel extends JPanel implements GameListener {
         content.add("Legend");
         style.add("bold");
 
-        content.add("chips:");
+        content.add("list index of chips:");
         style.add("italic");
 
         StringBuilder chipsNumbering = new StringBuilder();
         String spaces = "    ";
         chipsNumbering.append(spaces);
-        for (int i = 0; i < Settings.TOKEN_DIVERSITY; i++) {
+        for (int i = 0; i < Settings.CHIP_DIVERSITY; i++) {
             chipsNumbering.append(spaces);
             chipsNumbering.append(i);
             chipsNumbering.append(spaces);
@@ -101,8 +127,8 @@ public class LegendPanel extends JPanel implements GameListener {
         }
 
         Point init, resp;
-        init = game.initiator.getGoalPosition();
-        resp = game.responder.getGoalPosition();
+        init = game.getInitiator().getGoalPosition();
+        resp = game.getResponder().getGoalPosition();
         if (init.equals(resp)) {
             content.add("* " + Settings.GOAL_LOCATION_SYMBOL + ": Goal location both agents.");
         } else {
@@ -112,8 +138,8 @@ public class LegendPanel extends JPanel implements GameListener {
         }
         style.add("regular");
 
-        init = game.initiator.getStartingPosition();
-        resp = game.responder.getStartingPosition();
+        init = game.getInitiator().getStartingPosition();
+        resp = game.getResponder().getStartingPosition();
         if (init.equals(resp)) {
             content.add("* " + Settings.START_LOCATION_SYMBOL + ": Start location both agents.");
         } else {
@@ -135,6 +161,9 @@ public class LegendPanel extends JPanel implements GameListener {
         }
     }
 
+    /**
+     * Updates the legend text and repaints the panel
+     */
     @Override
     public void newGame() {
         updateLegendText();
