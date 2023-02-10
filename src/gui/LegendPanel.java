@@ -127,8 +127,8 @@ public class LegendPanel extends JPanel implements GameListener {
         }
 
         Point init, resp;
-        init = game.getInitiator().getGoalPosition();
-        resp = game.getResponder().getGoalPosition();
+        init = game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME);
+        resp = game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME);
         if (init.equals(resp)) {
             content.add("* " + Settings.GOAL_LOCATION_SYMBOL + ": Goal location both agents.");
         } else {
@@ -138,15 +138,7 @@ public class LegendPanel extends JPanel implements GameListener {
         }
         style.add("regular");
 
-        init = game.getInitiator().getStartingPosition();
-        resp = game.getResponder().getStartingPosition();
-        if (init.equals(resp)) {
-            content.add("* " + Settings.START_LOCATION_SYMBOL + ": Start location both agents.");
-        } else {
-            content.add("* " + Settings.START_LOCATION_SYMBOL_INITIATOR + ": Start location initiator.");
-            content.add("* " + Settings.START_LOCATION_SYMBOL_RESPONDER + ": Start location responder.");
-            style.add("regular");
-        }
+        content.add("* " + Settings.START_LOCATION_SYMBOL + ": Start location both agents.");
         style.add("regular");
 
         // Generate agent info panel

@@ -1,6 +1,7 @@
 package gui;
 
 import controller.GameListener;
+import utilities.Chips;
 import utilities.Player;
 import utilities.Settings;
 
@@ -72,8 +73,8 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     public AgentPanel(Player agent) {
         this.agent = agent;
-        this.initialChips = agent.getChips().clone();
-        this.initialPoints = agent.calculateCurrentScore();
+        this.initialChips = agent.getChipsBin();
+        this.initialPoints = agent.getUtilityValue();
 
         this.setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -142,8 +143,11 @@ public class AgentPanel extends JComponent implements GameListener {
      * Adds an agent message to the messages panel
      */
     public void addAgentMessages() {
-        for (String message : agent.getMessages()) {
-            this.messages.add(message);
+        List<String> messages = agent.getMessages();
+        String addMessage;
+        for (int i = 0; i < messages.size(); i++) {
+            addMessage = i + ". " + messages.get(i);
+            this.messages.add(addMessage);
             this.styleMessages.add("regular");
         }
     }
@@ -189,13 +193,13 @@ public class AgentPanel extends JComponent implements GameListener {
         }
         content[5] = "points: " + this.initialPoints;
 
-        if (!agent.getGame().isGameEnabled()) {
+        if (agent.getGame().isGameDisabled()) {
             content[6] = "---";
             content[7] = "final distribution chips:";
             for (int i = 8; i <= 10; i++) {
                 content[i] = "";
             }
-            content[11] = "points: " + agent.getGame().getBoard().calculateScoreAgent(agent);
+            content[11] = "points: " + agent.getUtilityValue();
         } else {
             for (int i = 6; i <= 11; i++) {
                 content[i] = "";
@@ -244,9 +248,9 @@ public class AgentPanel extends JComponent implements GameListener {
 
         }
 
-        if (!agent.getGame().isGameEnabled()) {
+        if (agent.getGame().isGameDisabled()) {
             trackNumChips = 0;
-            int[] chips = agent.getChips();
+            int[] chips = agent.getChipsBin();
             height = 195;
             for (int color = 0; color < Settings.CHIP_DIVERSITY; color++) {
                 for (int num = 0; num < chips[color]; num++) {
@@ -267,8 +271,8 @@ public class AgentPanel extends JComponent implements GameListener {
 
     @Override
     public void newGame() {
-        this.initialChips = agent.getChips().clone();
-        this.initialPoints = agent.calculateCurrentScore();
+        this.initialChips = agent.getChipsBin();
+        this.initialPoints = agent.getUtilityValue();
         gameChanged();
     }
 }

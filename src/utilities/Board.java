@@ -111,7 +111,7 @@ public class Board {
      * @param goalLoc goal location
      * @return the score corresponding to this tile
      */
-    public int calculateTileScore(Point currLoc, int[] chips, Point startLoc, Point goalLoc) {
+    private int calculateTileScore(Point currLoc, int[] chips, Point startLoc, Point goalLoc) {
         int score = 0, stepsTowardsGoal;
         stepsTowardsGoal = Settings.manhattanDistance(startLoc, goalLoc) - Settings.manhattanDistance(currLoc, goalLoc);
 
@@ -138,7 +138,7 @@ public class Board {
 
     /**
      * Calculates the score that an agent obtains when starting on the currLoc and having goalLoc as goal location
-     * with tokens as his colored chips
+     * with chips as his colored chips
      *
      * @param currLoc starting location
      * @param chips   the colored chips
@@ -172,9 +172,5 @@ public class Board {
             }
         }
         return highestScore;
-    }
-
-    public int calculateScoreAgent(Player agent) {
-        return calculateScore(agent.getStartingPosition(), agent.getChips(), agent.getStartingPosition(), agent.getGoalPosition());
     }
 }

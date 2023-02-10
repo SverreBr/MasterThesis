@@ -10,5 +10,8 @@ public interface GameListener {
      */
     void gameChanged();
 
+    /**
+     * There is a new game.
+     */
     default void newGame() {}
 }

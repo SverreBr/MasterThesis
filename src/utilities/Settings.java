@@ -5,7 +5,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * class that contains the settings of the game
@@ -67,20 +67,44 @@ public class Settings {
      */
     public static final int AGENT_TEXT_HEIGHT = 290;
 
-//    int BUTTON_PANEL_HEIGHT = 0;
+    /**
+     * Size of the main panel
+     */
     public static final int MAIN_PANEL_SIZE = 800;
 
-    public static final Point STARTING_POSITION = new Point(2,2);
+    /**
+     * The starting position of each agent
+     */
+    public static final Point STARTING_POSITION = new Point(2, 2);
 
+    /**
+     * The name of the initiator
+     */
     public static final String INITIATOR_NAME = "Initiator";
 
+    /**
+     * The name of the responder
+     */
     public static final String RESPONDER_NAME = "Responder";
 
+    /**
+     * The symbol used to indicate the start
+     */
     public static final String START_LOCATION_SYMBOL = "X";
-    public static final String START_LOCATION_SYMBOL_INITIATOR = "Xi";
-    public static final String START_LOCATION_SYMBOL_RESPONDER = "Xr";
+
+    /**
+     * The symbol used to indicate the goal position if for both agents equal
+     */
     public static final String GOAL_LOCATION_SYMBOL = "G";
+
+    /**
+     * The symbol used to indicate the goal position of the initiator
+     */
     public static final String GOAL_LOCATION_SYMBOL_INITIATOR = "Gi";
+
+    /**
+     * The symbol used to indicate the goal position of the responder
+     */
     public static final String GOAL_LOCATION_SYMBOL_RESPONDER = "Gr";
 
     /**
@@ -105,21 +129,37 @@ public class Settings {
      *
      * @return possible goal locations
      */
-    public static ArrayList<Point> getGoalPositions(Point startLoc, int minDistance, int maxX, int maxY) {
-        ArrayList<Point> goalPositions = new ArrayList<>();
+    public static Map<Integer, Point> makeGoalPositionDictionary() {
+        Map<Integer, Point> goalPositions = new HashMap<>();
         Point point;
+        int pos = 0;
 
-        for (int x = 0; x < maxX; x++) {
-            for (int y = 0; y < maxY; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
                 point = new Point(x, y);
-                if (manhattanDistance(startLoc, point) >= minDistance) {
-                    goalPositions.add(point);
+                if (manhattanDistance(STARTING_POSITION, point) >= MIN_GOAL_DISTANCE) {
+                    goalPositions.put(pos, point);
+                    pos++;
                 }
             }
         }
 
         return goalPositions;
     }
+
+//    public static int getNumberOfGoalPositions() {
+//        int numGoalPos = 0;
+//        Point point;
+//        for (int x = 0; x < BOARD_WIDTH; x++) {
+//            for (int y = 0; y < BOARD_HEIGHT; y++) {
+//                point = new Point(x,y);
+//                if (manhattanDistance(STARTING_POSITION, point) >= MIN_GOAL_DISTANCE) {
+//                    numGoalPos += 1;
+//                }
+//            }
+//        }
+//        return numGoalPos;
+//    }
 
     /**
      * calculates the manhattan distance between two points
@@ -138,7 +178,6 @@ public class Settings {
      * @param doc the document
      */
     public static void addStylesToDocument(StyledDocument doc) {
-        // Initialize some styles.
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = doc.addStyle("regular", def);
@@ -152,6 +191,11 @@ public class Settings {
         StyleConstants.setBold(s, true);
     }
 
+    /**
+     * Gets the background color of the simulation
+     *
+     * @return the color of the background for the simulation
+     */
     public static Color getBackGroundColor() {
         return Color.decode("#fffcdf");
     }
