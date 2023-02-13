@@ -1,4 +1,8 @@
-package utilities;
+package utilities.player;
+
+import utilities.Chips;
+import utilities.Game;
+import utilities.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +51,9 @@ public abstract class Player {
 
     /**
      * Learning speed of the agent. Used to update beliefs about location and offers.
-     * TODO: change this to a non-final double and add a Setter
+     * TODO: (SELF) change this to a non-final double and add a Setter
      */
-    private double learningSpeed = 0.1;
+    private double learningSpeed;
 
     /**
      * Name of the agent
@@ -72,9 +76,10 @@ public abstract class Player {
      * @param namePlayer name of the agent
      * @param game       model of the game
      */
-    public Player(String namePlayer, Game game) {
+    public Player(String namePlayer, Game game, double learningSpeed) {
         this.name = namePlayer;
         this.game = game;
+        this.learningSpeed = learningSpeed;
     }
 
     /**
@@ -88,7 +93,7 @@ public abstract class Player {
         this.messages = new ArrayList<>();
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
-        // TODO: saveCount initialized to 0?
+        // TODO: must saveCount be initialized to 0?
         beliefOffer = new double[utilityFunction.length];
         beliefOfferSaved = new double[5][beliefOffer.length]; // TODO: Why 5?
         setupNewBeliefs();
@@ -197,7 +202,7 @@ public abstract class Player {
      * @param offerToSelf The offer with respect to the agent himself.
      */
     protected void updateBeliefsOfferRejected(int offerToSelf) {
-        // TODO: when is this method called? -> offers are instantly rejected!!
+        // TODO: when is this method called? -> offers are instantly rejected!! When accepted, beliefs are changed back.
         decreaseOfferTypeBelief(offerToSelf);
         decreaseColorBelief(offerToSelf);
     }
@@ -295,7 +300,6 @@ public abstract class Player {
     /**
      * Decreases the belief of an offer being accepted that assigns more of a particular color to this agent.
      * This is called when an offer has been made which assigns newOwnChips to this agent.
-     * TODO: does belief also increase in some cases here? E.g., when more chips of a color is given.
      *
      * @param newOwnChips The chips assigned to this agent
      */
@@ -326,7 +330,7 @@ public abstract class Player {
      * @return the expected value of this offer
      */
     protected double getExpectedValue(int offer) {
-        // TODO: ASK ABOUT THIS!! -> ?Different method than in article? See other class for another different method.
+        // TODO: ASK ABOUT THIS!! -> ?Different method than in article? See original class for another different method.
         double belief = getBelief(offer);
         return belief * utilityFunction[offer] + (1 - belief) * utilityFunction[chips] - 1;
     }
@@ -365,6 +369,13 @@ public abstract class Player {
     }
 
     /**
+     * Getter for chips
+     */
+    public int getChips() {
+        return this.chips;
+    }
+
+    /**
      * Setter for learning speed
      *
      * @param newLearningSpeed The new learning speed of the agent
@@ -388,7 +399,7 @@ public abstract class Player {
      * @return The chips of this player in the form of bins.
      */
     public int[] getChipsBin() {
-        // TODO: Is it faster to also save chipsBin in player?
+        // TODO: (SELF) Is it maybe faster to also save chipsBin in player?
         return Chips.getBins(chips, game.getBinMaxChips());
     }
 

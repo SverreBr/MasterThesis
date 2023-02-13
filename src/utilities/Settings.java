@@ -6,6 +6,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * class that contains the settings of the game
@@ -108,6 +109,16 @@ public class Settings {
     public static final String GOAL_LOCATION_SYMBOL_RESPONDER = "Gr";
 
     /**
+     * Message an agent provides when it terminates negotiation
+     */
+    public static final String TERMINATE_NEGOTIATION_MESSAGE = "I end negotiation here";
+
+    /**
+     * Message an agent provides when it accepts an offer
+     */
+    public static final String ACCEPT_OFFER_MESSAGE = "I accept your offer.";
+
+    /**
      * Returns a color given a certain integer
      *
      * @param x the integer number
@@ -115,11 +126,11 @@ public class Settings {
      */
     public static Color getColor(int x) {
         return switch (x) {
-            case 0 -> Color.decode("#0072b2");
-            case 1 -> Color.decode("#009e73");
-            case 2 -> Color.decode("#d55e00");
-            case 3 -> Color.decode("#cc79a7");
-            case 4 -> Color.decode("#f0e442");
+            case 0 -> Color.decode("#6248DA");
+            case 1 -> Color.decode("#DC267F");
+            case 2 -> Color.decode("#FE6100");
+            case 3 -> Color.decode("#96B1F7");
+            case 4 -> Color.decode("#FFB000");
             default -> Color.BLACK;
         };
     }
@@ -147,20 +158,6 @@ public class Settings {
         return goalPositions;
     }
 
-//    public static int getNumberOfGoalPositions() {
-//        int numGoalPos = 0;
-//        Point point;
-//        for (int x = 0; x < BOARD_WIDTH; x++) {
-//            for (int y = 0; y < BOARD_HEIGHT; y++) {
-//                point = new Point(x,y);
-//                if (manhattanDistance(STARTING_POSITION, point) >= MIN_GOAL_DISTANCE) {
-//                    numGoalPos += 1;
-//                }
-//            }
-//        }
-//        return numGoalPos;
-//    }
-
     /**
      * calculates the manhattan distance between two points
      *
@@ -170,6 +167,20 @@ public class Settings {
      */
     public static int manhattanDistance(Point from, Point to) {
         return (Math.abs(from.x - to.x) + Math.abs(from.y - to.y));
+    }
+
+    /**
+     * get the possible moves on the board
+     *
+     * @return a list of possible moves as points
+     */
+    public static List<Point> getPossibleMoves() {
+        return Arrays.asList(
+                new Point(-1, 0),
+                new Point(1, 0),
+                new Point(0, -1),
+                new Point(0, 1)
+        );
     }
 
     /**
@@ -197,6 +208,6 @@ public class Settings {
      * @return the color of the background for the simulation
      */
     public static Color getBackGroundColor() {
-        return Color.decode("#fffcdf");
+        return Color.decode("#DAEFF9");
     }
 }

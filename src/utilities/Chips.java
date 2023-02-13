@@ -96,6 +96,19 @@ public class Chips {
 //    }
 
     /**
+     * Calculates the number of chips in chip array
+     *
+     * @param chips the chip array
+     * @return integer that represents the total number of chips.
+     */
+    public static int getNrChips(int[] chips) {
+        int sum = 0;
+        for (int chip : chips)
+            sum += chip;
+        return sum;
+    }
+
+    /**
      * Converts an offer as index to an offer as bins
      *
      * @param index  offer as index

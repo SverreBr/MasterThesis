@@ -1,4 +1,4 @@
-package controller;
+package utilities;
 
 /**
  * Listeners to the game model
@@ -14,4 +14,9 @@ public interface GameListener {
      * There is a new game.
      */
     default void newGame() {}
+
+    /**
+     * The field in game has changed
+     */
+    default void inGameChanged() {}
 }

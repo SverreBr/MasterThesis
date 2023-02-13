@@ -1,9 +1,9 @@
 package gui;
 
-import controller.GameListener;
-import utilities.Chips;
-import utilities.Player;
+import utilities.Game;
+import utilities.GameListener;
 import utilities.Settings;
+import utilities.player.PlayerToM;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -54,7 +54,11 @@ public class AgentPanel extends JComponent implements GameListener {
     /**
      * The agent model of this panel
      */
-    private final Player agent;
+    private PlayerToM agent;
+
+    private final String agentName;
+
+    private final Game game;
 
     /**
      * Initial chips of this agent
@@ -68,13 +72,14 @@ public class AgentPanel extends JComponent implements GameListener {
 
     /**
      * Constructor of the agent panel
-     *
-     * @param agent the model of the agent
      */
-    public AgentPanel(Player agent) {
-        this.agent = agent;
+    public AgentPanel(Game game, String agentName) {
+        this.agentName = agentName;
+        this.game = game;
+        setAgent();
         this.initialChips = agent.getChipsBin();
         this.initialPoints = agent.getUtilityValue();
+        this.setForeground(Color.WHITE);
 
         this.setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -95,6 +100,14 @@ public class AgentPanel extends JComponent implements GameListener {
         this.add(messageScroll, BorderLayout.CENTER);
 
         this.agent.getGame().addListener(this);
+    }
+
+    private void setAgent() {
+        if (this.agentName.equals(Settings.INITIATOR_NAME)) {
+            this.agent = game.getInitiator();
+        } else {
+            this.agent = game.getResponder();
+        }
     }
 
     /**
@@ -185,7 +198,7 @@ public class AgentPanel extends JComponent implements GameListener {
      * Method to update the information on the info text panel
      */
     private void updateInfo() {
-        content[0] = agent.getName();
+        content[0] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + agent.getLearningSpeed() + ")";
         content[1] = "initial chips:";
 
         for (int i = 2; i <= 4; i++) {
@@ -271,6 +284,7 @@ public class AgentPanel extends JComponent implements GameListener {
 
     @Override
     public void newGame() {
+        setAgent();
         this.initialChips = agent.getChipsBin();
         this.initialPoints = agent.getUtilityValue();
         gameChanged();

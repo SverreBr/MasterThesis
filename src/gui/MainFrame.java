@@ -11,14 +11,14 @@ import static utilities.Settings.*;
 /**
  * The application window with all the panels.
  */
-public class MainPanel extends JFrame {
+public class MainFrame extends JFrame {
 
     /**
      * Makes the main panel
      *
      * @param game the game model
      */
-    public MainPanel(Game game) {
+    public MainFrame(Game game) {
         super("Colored Trails");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,10 +28,10 @@ public class MainPanel extends JFrame {
         leftBody.setLayout(new BorderLayout());
         leftBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
 
-        AgentPanel agentPanelInit = new AgentPanel(game.getInitiator());
+        AgentPanel agentPanelInit = new AgentPanel(game, INITIATOR_NAME);
         agentPanelInit.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
 
-        LegendPanel legendPanel = new LegendPanel(game);
+        LegendPanel legendPanel = new LegendPanel(game, this);
 
         leftBody.add(agentPanelInit, BorderLayout.NORTH);
         leftBody.add(legendPanel, BorderLayout.SOUTH);
@@ -44,9 +44,9 @@ public class MainPanel extends JFrame {
         rightBody.setLayout(new BorderLayout());
         rightBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
 
-        AgentPanel agentPanelResp = new AgentPanel(game.getResponder());
+        AgentPanel agentPanelResp = new AgentPanel(game, RESPONDER_NAME);
         agentPanelResp.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
-        ButtonPanel buttonPanel = new ButtonPanel(game);
+        ButtonPanel buttonPanel = new ButtonPanel(game, this);
 
         rightBody.add(agentPanelResp, BorderLayout.NORTH);
         rightBody.add(buttonPanel, BorderLayout.SOUTH);

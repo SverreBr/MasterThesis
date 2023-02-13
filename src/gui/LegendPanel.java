@@ -1,14 +1,17 @@
 package gui;
 
-import controller.GameListener;
+import controller.SettingsAction;
+import utilities.GameListener;
 import utilities.Game;
 import utilities.Settings;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,18 +31,49 @@ public class LegendPanel extends JPanel implements GameListener {
     private final Game game;
 
     /**
+     * Settings button
+     */
+    private final JButton settingsButton;
+
+    /**
+     * Panel for the settings button
+     */
+    private final JPanel buttonPanel;
+
+    /**
+     * Field for the width of the settings button
+     */
+    private final int SETTINGS_BUTTON_SIZE = 45;
+
+    private final JFrame mainFrame;
+
+    /**
      * Constructor for the legend panel
      * @param game The game model
      */
-    public LegendPanel(Game game) {
+    public LegendPanel(Game game, JFrame mainFrame) {
         this.game = game;
+        this.mainFrame = mainFrame;
 
         this.info = new JTextPane();
         createTextPane();
         updateLegendText();
 
+        this.settingsButton = new JButton();
+        buttonPanel = new JPanel();
+        createSettingsButton();
+
+        this.setLayout(new BorderLayout());
+        this.add(info, BorderLayout.CENTER);
+        this.add(buttonPanel, BorderLayout.EAST);
+
+        this.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(20, 10, 10, 10),
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5))));
+
         changeBackgrounds();
-        this.add(info, BorderLayout.NORTH);
         game.addListener(this);
     }
 
@@ -49,18 +83,42 @@ public class LegendPanel extends JPanel implements GameListener {
     private void changeBackgrounds() {
         setBackground(Settings.getBackGroundColor());
         info.setBackground(Settings.getBackGroundColor());
+        settingsButton.setBackground(Settings.getBackGroundColor());
+        buttonPanel.setBackground(Settings.getBackGroundColor());
     }
 
     /**
      * Creates the text pane for the legend panel
      */
     private void createTextPane() {
-        info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - 20, Settings.MAIN_PANEL_SIZE - Settings.AGENT_PANEL_HEIGHT));
+        info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - SETTINGS_BUTTON_SIZE,
+                Settings.MAIN_PANEL_SIZE - Settings.AGENT_PANEL_HEIGHT - 30));
         info.setEditable(false);
         info.setOpaque(false);
-        info.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0), BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED), BorderFactory.createEmptyBorder(5, 5, 5, 5))));
         StyledDocument doc = info.getStyledDocument();
         Settings.addStylesToDocument(doc);
+    }
+
+    /**
+     * Creates settings button
+     */
+    private void createSettingsButton() {
+
+        settingsButton.setAction(new SettingsAction("", game, mainFrame));
+        try {
+            Image img = ImageIO.read(new File("fig/settingsIcon.png"));
+            img = img.getScaledInstance(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE, Image.SCALE_DEFAULT);
+            settingsButton.setIcon(new ImageIcon(img));
+        } catch (Exception ex) {
+            System.out.println("Image file not found!");
+        }
+
+        settingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE));
+        settingsButton.setBorder(BorderFactory.createEmptyBorder());
+
+        buttonPanel.setLayout(new BorderLayout());
+        buttonPanel.add(settingsButton, BorderLayout.NORTH);
+        buttonPanel.add(Box.createRigidArea(new Dimension(SETTINGS_BUTTON_SIZE, 0)), BorderLayout.SOUTH);
     }
 
     /**
@@ -83,9 +141,9 @@ public class LegendPanel extends JPanel implements GameListener {
      */
     private void paintChipsLegend(Graphics2D g2) {
         int tokenSize = 30;
-        int offset = 38;
+        int offset = 41;
         int betweenSpace = 11;
-        int height = 75;
+        int height = 93;
 
         int numDiffTokens = Settings.CHIP_DIVERSITY;
 
@@ -121,7 +179,7 @@ public class LegendPanel extends JPanel implements GameListener {
         content.add(chipsNumbering.toString());
         style.add("regular");
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             content.add("");
             style.add("regular");
         }

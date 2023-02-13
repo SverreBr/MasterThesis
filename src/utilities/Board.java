@@ -1,7 +1,6 @@
 package utilities;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,11 +12,6 @@ public class Board {
      * the board as a matrix containing numbers as colors
      */
     private final int[][] board;
-
-    /**
-     * the game model
-     */
-    private final Game game;
 
     /**
      * the height of the board (y); the first entry of the board
@@ -32,10 +26,9 @@ public class Board {
     /**
      * Constructs a random square board setting according to the specified parameters
      */
-    public Board(Game game) {
+    public Board() {
         this.boardHeight = Settings.BOARD_HEIGHT;
         this.boardWidth = Settings.BOARD_WIDTH;
-        this.game = game;
         this.board = new int[boardHeight][boardWidth];
         initBoard();
     }
@@ -95,14 +88,6 @@ public class Board {
         return boardWidth;
     }
 
-//    public List<int[]> getShortestPathGivenTokens(int[] currentLoc, int[] goalLoc, int[] tokens) {
-//        int dist = distanceToGoal(currentLoc, goalLoc);
-//        int initPoints = tokens.length * Settings.SCORE_SURPLUS - dist * Settings.SCORE_STEP;
-//
-//        List<int[]> shortestPath = new ArrayList<>();
-//        return shortestPath;
-//    }
-
     /**
      * calculates the score from a current tile to a goal tile given some tokens
      *
@@ -118,23 +103,10 @@ public class Board {
         if (currLoc.equals(goalLoc))
             score += Settings.SCORE_GOAL;
         score += Settings.SCORE_STEP * Math.max(0, stepsTowardsGoal);
-        score += Settings.SCORE_SURPLUS * this.game.calculateNumChips(chips);
+        score += Settings.SCORE_SURPLUS * Chips.getNrChips(chips);
         return score;
     }
 
-    /**
-     * get the possible moves on the board
-     *
-     * @return a list of possible moves as points
-     */
-    public List<Point> getPossibleMoves() {
-        return Arrays.asList(
-                new Point(-1, 0),
-                new Point(1, 0),
-                new Point(0, -1),
-                new Point(0, 1)
-        );
-    }
 
     /**
      * Calculates the score that an agent obtains when starting on the currLoc and having goalLoc as goal location
@@ -149,7 +121,7 @@ public class Board {
         // Calculate current score.
         int currScore = this.calculateTileScore(currLoc, chips, startLoc, goalLoc);
 
-        if (currLoc.equals(goalLoc) || (this.game.calculateNumChips(chips) == 0)) { // Could be optimised
+        if (currLoc.equals(goalLoc) || (Chips.getNrChips(chips) == 0)) { // TODO: Could be optimised by providing number of chips as a parameter
             // Goal location reached or no chips to move anymore
             return currScore;
         }
@@ -157,11 +129,10 @@ public class Board {
         int tileColor, highestScore = currScore;
         Point newLoc;
         int[] newTokens;
-        List<Point> possibleMoves = this.getPossibleMoves();
+        List<Point> possibleMoves = Settings.getPossibleMoves();
         for (Point move : possibleMoves) {
             newLoc = new Point(currLoc.x + move.x, currLoc.y + move.y);
-            if ((0 <= newLoc.x) && (newLoc.x < boardWidth) &&
-                    (0 <= newLoc.y) && (newLoc.y < boardHeight)) {
+            if ((0 <= newLoc.x) && (newLoc.x < boardWidth) && (0 <= newLoc.y) && (newLoc.y < boardHeight)) {
                 tileColor = this.getTileColorNumber(newLoc);
                 if (chips[tileColor] > 0) {
                     // Move is allowed

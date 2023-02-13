@@ -1,6 +1,6 @@
 package gui;
 
-import controller.GameListener;
+import utilities.GameListener;
 import utilities.Game;
 import utilities.Settings;
 

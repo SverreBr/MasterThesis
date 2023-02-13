@@ -1,4 +1,6 @@
-package utilities;
+package utilities.player;
+
+import utilities.Game;
 
 import java.util.Arrays;
 
@@ -30,7 +32,7 @@ public class PlayerToM extends Player {
 
     /**
      * The order of theory of mind
-     * TODO: add something that can change this order, or make a new player.
+     * TODO: (SELF) add method that can change this order of theory of mind, or make a new player.
      */
     private final int orderToM;
 
@@ -39,8 +41,7 @@ public class PlayerToM extends Player {
      */
     private double confidence;
 
-    // TODO: Why lock confidence?
-//    private double dummyConfidence;
+    // TODO: Why use a field to lock confidence? (for partnermodel (but why not selfmodel))
 
     /**
      * Constructor
@@ -48,17 +49,17 @@ public class PlayerToM extends Player {
      * @param playerName name of the agent
      * @param game       the model of the game
      */
-    public PlayerToM(String playerName, Game game, int orderToM) {
-        super(playerName, game);
+    public PlayerToM(String playerName, Game game, int orderToM, double learningSpeed) {
+        super(playerName, game, learningSpeed);
         this.orderToM = orderToM;
 
         this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
         this.savedLocationBeliefs = new double[5][this.game.getNumberOfGoalPositions()]; // TODO: again, why 5?
 
         if (this.orderToM > 0) {
-            selfModel = new PlayerToM("", game, orderToM - 1);  // TODO: is it needed to give them names here?
-            partnerModel = new PlayerToM("", game, orderToM - 1);
-//            partnerModel.confidenceLocked = true; // TODO: what does this exactly do?
+            selfModel = new PlayerToM("", game, orderToM - 1, learningSpeed);  // TODO: (SELF) is it needed to give them names here?
+            partnerModel = new PlayerToM("", game, orderToM - 1, learningSpeed);
+//            partnerModel.confidenceLocked = true; // TODO: see above question? Usefulness?
         } else {
             selfModel = null;
             partnerModel = null;
@@ -78,7 +79,7 @@ public class PlayerToM extends Player {
             Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
             selfModel.reset(chipsSelf, chipsOther, utilityFunction);
             partnerModel.reset(chipsOther, chipsSelf, utilityFunction);
-            confidence = 1.0;  // starting confidence TODO: change this?
+            confidence = 1.0;  // starting confidence
         }
     }
 
@@ -95,7 +96,7 @@ public class PlayerToM extends Player {
             Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
             selfModel.initNewRound(chipsSelf, chipsOther, utilityFunction);
             partnerModel.initNewRound(chipsOther, chipsSelf, utilityFunction);
-            confidence = 1.0;  // starting confidence TODO: change this?
+            confidence = 1.0;  // starting confidence
         }
     }
 
@@ -111,7 +112,6 @@ public class PlayerToM extends Player {
 
         if (offerReceived < 0) {
             // No offer to receive
-            System.out.println("Select initial offer.");
             curOffer = selectInitialOffer();
         } else {
             receiveOffer(offerReceived);
@@ -120,7 +120,7 @@ public class PlayerToM extends Player {
         sendOffer(curOffer);
 //        dummyConfidence += confidence; TODO: What does this dummyConfidence do?
         // TODO: when/how is negotiation ended? -> when offer is the same as the one received or when same as own chips?
-        return this.game.flipOffer(curOffer); // TODO: maybe switch the return to the player itself.
+        return this.game.flipOffer(curOffer); // TODO: (SELF) maybe switch the return to the player itself.
     }
 
     /**
@@ -146,14 +146,14 @@ public class PlayerToM extends Player {
         bestOffer = this.chips;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             curValue = getValue(i);
-            if (curValue > tmpSelectOfferValue) {  // TODO: why not randomize here?
+            if (curValue > tmpSelectOfferValue) {  // TODO: selecting a best offer, why not randomize here?
                 tmpSelectOfferValue = curValue;
                 bestOffer = i;
             }
         }
         if (utilityFunction[offerReceived] - utilityFunction[chips] >= tmpSelectOfferValue ||
                 utilityFunction[offerReceived] >= utilityFunction[bestOffer]) {
-            // offerReceived is better than making new offer and TODO: what does this first condition mean?
+            // offerReceived is better than making new offer and TODO: what does this first condition exactly mean? E.g., why use tmpSelectOfferValue?
             tmpSelectOfferValue = utilityFunction[offerReceived] - utilityFunction[chips];
             bestOffer = offerReceived;
         }
@@ -207,7 +207,7 @@ public class PlayerToM extends Player {
      * @param offerToOther    offer to the other agent
      * @param currentLocation the assumed goal location of the partner
      * @return the value associated to
-     * TODO: why use change in utility and not expected utility itself?
+     * TODO: why use change in utility and not expected utility itself in these functions?
      */
     protected double getLocationValue(int offerToSelf, int offerToOther, int currentLocation) {
         int response = partnerModel.selectOffer(offerToOther);
@@ -301,9 +301,9 @@ public class PlayerToM extends Player {
                 locationBeliefs[loc] *= sumAll;
             }
         }
-        // TODO: here, confidence locked is applied
+        // TODO: here, confidence locked is applied, why?
         double learningSpeed = getLearningSpeed();
-        confidence = Math.min(1.0, Math.max(0.0, (1-learningSpeed) * confidence + learningSpeed * accuracyRating));
+        confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));
         if (this.orderToM > 1) {
             selfModel.updateLocationBeliefs(offerReceived);
         }
@@ -348,5 +348,14 @@ public class PlayerToM extends Player {
             selfModel.setLearningSpeed(newLearningSpeed);
             partnerModel.setLearningSpeed(newLearningSpeed);
         }
+    }
+
+    /**
+     * Getter for the order of theory of mind of this agent
+     *
+     * @return The order of theory of mind
+     */
+    public int getOrderToM() {
+        return this.orderToM;
     }
 }
