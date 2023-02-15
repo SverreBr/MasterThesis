@@ -78,7 +78,7 @@ public class Game {
     /**
      * true if the game is running; false otherwise
      */
-    private boolean inGame;
+    private boolean isGameFinished;
 
     /**
      * A field to check if the simulation (visuals) are on or off
@@ -139,7 +139,7 @@ public class Game {
      * Generates a new negotiation setting.
      */
     private void generateNewNegotiationSetting() {
-        setInGame(true);
+        setBooleanGameFinished(false);
         this.newOffer = -1;
         this.turn = Settings.INITIATOR_NAME;
 
@@ -232,7 +232,7 @@ public class Game {
         int tmpNewOffer, flippedOffer;
         boolean negotiationEnds = false;
 
-        if (!inGame) {
+        if (isGameFinished) {
             return;
         }
 
@@ -271,7 +271,7 @@ public class Game {
      */
     public void playTillEnd() {
         int i = 0;
-        while (i < 100 && inGame) {
+        while (i < 100 && !isGameFinished) {
             step();
             i++;
         }
@@ -330,7 +330,7 @@ public class Game {
      * @param flippedOffer The offer that has been accepted and is given to the other player
      */
     public void offerAccepted(int flippedOffer) {
-        setInGame(false);
+        setBooleanGameFinished(true);
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             // Initiator accepted offer
@@ -351,7 +351,7 @@ public class Game {
      * Method called when negotiation is terminated.
      */
     public void negotiationTerminates() {
-        setInGame(false);
+        setBooleanGameFinished(true);
         if (turn.equals(Settings.INITIATOR_NAME)) {
             this.initiator.addMessage(Settings.TERMINATE_NEGOTIATION_MESSAGE);
         } else {
@@ -406,17 +406,17 @@ public class Game {
      *
      * @return true if in game; false otherwise
      */
-    public boolean isGameDisabled() {
-        return !this.inGame;
+    public boolean isGameFinished() {
+        return this.isGameFinished;
     }
 
     /**
-     * Sets the field inGame
+     * Sets the field isGameFinished
      *
-     * @param inGame True or false
+     * @param gameFinished True or false
      */
-    public void setInGame(boolean inGame) {
-        this.inGame = inGame;
+    public void setBooleanGameFinished(boolean gameFinished) {
+        this.isGameFinished = gameFinished;
         if (simulationOn) {
             for (GameListener gameListener : this.listeners) {
                 gameListener.inGameChanged();
@@ -520,5 +520,9 @@ public class Game {
      */
     public void setSimulationOff() {
         simulationOn = false;
+    }
+
+    public boolean isSimulationOn() {
+        return simulationOn;
     }
 }

@@ -206,7 +206,7 @@ public class AgentPanel extends JComponent implements GameListener {
         }
         content[5] = "points: " + this.initialPoints;
 
-        if (agent.getGame().isGameDisabled()) {
+        if (agent.getGame().isGameFinished()) {
             content[6] = "---";
             content[7] = "final distribution chips:";
             for (int i = 8; i <= 10; i++) {
@@ -261,7 +261,7 @@ public class AgentPanel extends JComponent implements GameListener {
 
         }
 
-        if (agent.getGame().isGameDisabled()) {
+        if (agent.getGame().isGameFinished()) {
             trackNumChips = 0;
             int[] chips = agent.getChipsBin();
             height = 195;

@@ -28,7 +28,6 @@ public abstract class Player {
      * The first entry is the sum of chips assigned extra to it and
      * the second entry is the sum of chips assigned less to it
      * This field is essentially to be able to learn across games.
-     * TODO: How does pos and neg exactly work (first and second entry)?
      */
     private double[][] beliefsOfferType;
 
@@ -42,16 +41,10 @@ public abstract class Player {
     /**
      * To save the original beliefs when going to reason about possible offers.
      */
-    private double[][] beliefOfferSaved;
-
-    /**
-     * Used to keep track of index of beliefOfferSaved.
-     */
-    protected int saveCount = 0;
+    private double[] beliefOfferSaved;
 
     /**
      * Learning speed of the agent. Used to update beliefs about location and offers.
-     * TODO: (SELF) change this to a non-final double and add a Setter
      */
     private double learningSpeed;
 
@@ -93,9 +86,8 @@ public abstract class Player {
         this.messages = new ArrayList<>();
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
-        // TODO: must saveCount be initialized to 0?
         beliefOffer = new double[utilityFunction.length];
-        beliefOfferSaved = new double[5][beliefOffer.length]; // TODO: Why 5?
+        beliefOfferSaved = new double[beliefOffer.length];
         setupNewBeliefs();
     }
 
@@ -127,7 +119,7 @@ public abstract class Player {
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
         beliefOffer = new double[utilityFunction.length];
-        beliefOfferSaved = new double[5][beliefOffer.length];
+//        beliefOfferSaved = new double[beliefOffer.length];
 
         // Beliefs about specific colors are reset
         for (int i = 0; i < utilityFunction.length; i++) {
@@ -174,16 +166,14 @@ public abstract class Player {
      * Used for prediction using a "fictitious play"-like structure
      */
     protected void saveBeliefs() {
-        beliefOfferSaved[saveCount] = beliefOffer.clone();
-        saveCount++;
+        beliefOfferSaved = beliefOffer.clone();
     }
 
     /**
      * Restores previously stored beliefs
      */
     protected void restoreBeliefs() {
-        saveCount--;
-        beliefOffer = beliefOfferSaved[saveCount].clone();
+        beliefOffer = beliefOfferSaved.clone();
     }
 
     /**
@@ -202,7 +192,6 @@ public abstract class Player {
      * @param offerToSelf The offer with respect to the agent himself.
      */
     protected void updateBeliefsOfferRejected(int offerToSelf) {
-        // TODO: when is this method called? -> offers are instantly rejected!! When accepted, beliefs are changed back.
         decreaseOfferTypeBelief(offerToSelf);
         decreaseColorBelief(offerToSelf);
     }
@@ -332,7 +321,7 @@ public abstract class Player {
     protected double getExpectedValue(int offer) {
         // TODO: ASK ABOUT THIS!! -> ?Different method than in article? See original class for another different method.
         double belief = getBelief(offer);
-        return belief * utilityFunction[offer] + (1 - belief) * utilityFunction[chips] - 1;
+        return belief * utilityFunction[offer] + (1 - belief) * utilityFunction[chips] - 1;  // TODO: change this...
     }
 
 

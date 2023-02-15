@@ -1,6 +1,7 @@
 package controller;
 
 import gui.SettingsDialog;
+import gui.Popups;
 import utilities.Game;
 
 import javax.swing.*;
@@ -20,6 +21,10 @@ public class SettingsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (!game.isSimulationOn()) {
+            Popups.showSettingsButtonNotAccessible();
+            return;
+        }
         int initToM, respToM;
         double initLR, respLR;
 

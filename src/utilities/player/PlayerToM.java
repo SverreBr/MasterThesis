@@ -18,7 +18,7 @@ public class PlayerToM extends Player {
     /**
      * To save beliefs of the location.
      */
-    private final double[][] savedLocationBeliefs;
+    private double[] savedLocationBeliefs;
 
     /**
      * The model of the partner
@@ -32,7 +32,6 @@ public class PlayerToM extends Player {
 
     /**
      * The order of theory of mind
-     * TODO: (SELF) add method that can change this order of theory of mind, or make a new player.
      */
     private final int orderToM;
 
@@ -41,7 +40,10 @@ public class PlayerToM extends Player {
      */
     private double confidence;
 
-    // TODO: Why use a field to lock confidence? (for partnermodel (but why not selfmodel))
+    /**
+     * Lock the confidence in using their theory of mind capability of this agent
+     */
+    private boolean confidenceLocked;
 
     /**
      * Constructor
@@ -54,12 +56,11 @@ public class PlayerToM extends Player {
         this.orderToM = orderToM;
 
         this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
-        this.savedLocationBeliefs = new double[5][this.game.getNumberOfGoalPositions()]; // TODO: again, why 5?
 
         if (this.orderToM > 0) {
-            selfModel = new PlayerToM("", game, orderToM - 1, learningSpeed);  // TODO: (SELF) is it needed to give them names here?
+            selfModel = new PlayerToM("", game, orderToM - 1, learningSpeed);
             partnerModel = new PlayerToM("", game, orderToM - 1, learningSpeed);
-//            partnerModel.confidenceLocked = true; // TODO: see above question? Usefulness?
+            partnerModel.setConfidenceLockedTo(true);
         } else {
             selfModel = null;
             partnerModel = null;
@@ -118,8 +119,6 @@ public class PlayerToM extends Player {
             curOffer = selectOffer(offerReceived);
         }
         sendOffer(curOffer);
-//        dummyConfidence += confidence; TODO: What does this dummyConfidence do?
-        // TODO: when/how is negotiation ended? -> when offer is the same as the one received or when same as own chips?
         return this.game.flipOffer(curOffer); // TODO: (SELF) maybe switch the return to the player itself.
     }
 
@@ -146,7 +145,7 @@ public class PlayerToM extends Player {
         bestOffer = this.chips;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             curValue = getValue(i);
-            if (curValue > tmpSelectOfferValue) {  // TODO: selecting a best offer, why not randomize here?
+            if (curValue > tmpSelectOfferValue) {  // TODO: selecting a best offer, why not randomize here?  -->  Zou een list kunnen zijn.
                 tmpSelectOfferValue = curValue;
                 bestOffer = i;
             }
@@ -158,7 +157,7 @@ public class PlayerToM extends Player {
             bestOffer = offerReceived;
         }
         if (tmpSelectOfferValue < 0 || utilityFunction[bestOffer] < utilityFunction[chips]) {
-            // TODO: what is the difference between these two conditions?
+            // TODO: what is the difference between these two conditions?  --> tweede kan weg
             bestOffer = chips;
         }
         return bestOffer;
@@ -177,9 +176,8 @@ public class PlayerToM extends Player {
             // ToM0 uses only expected value
             return getExpectedValue(offerToSelf);
         }
-        if (this.confidence > 0) {
+        if (this.confidence > 0 || this.confidenceLocked) {
             offerToOther = this.game.flipOffer(offerToSelf);
-            // TODO: I left out simulateBeliefChange -> what does this do?
             this.partnerModel.saveBeliefs();
             this.partnerModel.receiveOffer(offerToOther);
             for (loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
@@ -190,7 +188,7 @@ public class PlayerToM extends Player {
             }
             this.partnerModel.restoreBeliefs();
         }
-        if (this.confidence >= 1) {
+        if (this.confidence >= 1 || confidenceLocked) {
             // fully confident in own theory of mind capabilities
             return curValue;
         }
@@ -271,19 +269,17 @@ public class PlayerToM extends Player {
         accuracyRating = 0.0;
         for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
             partnerModel.utilityFunction = game.getUtilityFunction(loc);
-            // TODO: since partnerModels are confidenceLocked, this need not be applied to lower ToM levels??? -> what does not need to be applied?
-            partnerAlternative = partnerModel.selectOffer(0); // TODO: why offer 0 here? -> in order to get best offer. Place this later in if-statement.
+            partnerAlternative = partnerModel.selectOffer(0); // 0 since worst possible offer
             // Agent's guess for partner's best option given location l
             curExpVal = partnerModel.getValue(offerPartnerChips);
             // Agent's guess for partner's value of offerReceived
 
             // TODO: Ask why curExpVal < 0?? --> to avoid else??
             if (partnerModel.utilityFunction[offerPartnerChips] > partnerModel.utilityFunction[partnerModel.chips] ||
-                    curExpVal < 0) {
+                    curExpVal < 0) {  // Partner does not have a better alternative
                 // Given loc, offerReceived gives the partner a higher score than the initial situation and withdrawing
                 maxExpVal = partnerModel.getValue(partnerAlternative);
                 if (maxExpVal > -1) {  // TODO: why -1 and not 0?
-                    // TODO: why here Math.min and Math.max?
                     newBelief = (1 + curExpVal) / (1 + maxExpVal);
                     locationBeliefs[loc] *= Math.max(0.0, Math.min(1.0, newBelief));
                     accuracyRating += locationBeliefs[loc];
@@ -301,11 +297,12 @@ public class PlayerToM extends Player {
                 locationBeliefs[loc] *= sumAll;
             }
         }
-        // TODO: here, confidence locked is applied, why?
-        double learningSpeed = getLearningSpeed();
-        confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));
-        if (this.orderToM > 1) {
-            selfModel.updateLocationBeliefs(offerReceived);
+        if (!confidenceLocked) {
+            double learningSpeed = getLearningSpeed();
+            confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));
+            if (this.orderToM > 1) {
+                selfModel.updateLocationBeliefs(offerReceived);
+            }
         }
     }
 
@@ -315,7 +312,7 @@ public class PlayerToM extends Player {
     public void saveBeliefs() {
         super.saveBeliefs();
         if (orderToM > 0) {
-            savedLocationBeliefs[saveCount - 1] = locationBeliefs.clone();
+            savedLocationBeliefs = locationBeliefs.clone();
             partnerModel.saveBeliefs();
             selfModel.saveBeliefs();
         }
@@ -327,7 +324,7 @@ public class PlayerToM extends Player {
     public void restoreBeliefs() {
         super.restoreBeliefs();
         if (orderToM > 0) {
-            locationBeliefs = savedLocationBeliefs[saveCount].clone();
+            locationBeliefs = savedLocationBeliefs.clone();
             partnerModel.restoreBeliefs();
             selfModel.restoreBeliefs();
         }
@@ -357,5 +354,12 @@ public class PlayerToM extends Player {
      */
     public int getOrderToM() {
         return this.orderToM;
+    }
+
+    /**
+     * Sets the confidence of this agent locked or not
+     */
+    public void setConfidenceLockedTo(boolean confidenceLocked) {
+        this.confidenceLocked = confidenceLocked;
     }
 }

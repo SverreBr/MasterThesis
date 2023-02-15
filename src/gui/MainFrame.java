@@ -46,7 +46,7 @@ public class MainFrame extends JFrame {
 
         AgentPanel agentPanelResp = new AgentPanel(game, RESPONDER_NAME);
         agentPanelResp.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
-        ButtonPanel buttonPanel = new ButtonPanel(game, this);
+        ButtonPanel buttonPanel = new ButtonPanel(game);
 
         rightBody.add(agentPanelResp, BorderLayout.NORTH);
         rightBody.add(buttonPanel, BorderLayout.SOUTH);

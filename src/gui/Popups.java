@@ -40,4 +40,15 @@ public class Popups extends JOptionPane {
                         "For now, no changes have been made to the game.",
                 "Invalid input", JOptionPane.ERROR_MESSAGE);
     }
+
+    public static void showSettingsButtonNotAccessible() {
+        showMessageDialog((Component) null,
+                "The simulation is running. Please try later again.", "Cannot change settings",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void showForwardingCancelled() {
+        showMessageDialog((Component) null,
+                "The forwarding has been canceled. However, all changes that have been made up until now are still there.");
+    }
 }
