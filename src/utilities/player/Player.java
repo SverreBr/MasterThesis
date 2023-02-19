@@ -240,8 +240,8 @@ public abstract class Player {
      * @param offerMade The offer made by this player.
      */
     public void processOfferAccepted(int offerMade) {
-        setNewChips(offerMade);
         increaseOfferTypeBelief(offerMade);
+        setNewChips(offerMade);
     }
 
     /**
@@ -312,16 +312,14 @@ public abstract class Player {
 
 
     /**
-     * The belief of the offer being accepted times the utility plus the expected value of the offer being rejected - 1
-     * for the offer being made.
+     * The expected value the ToM0 agent assigns to making offer.
      *
      * @param offer offer the player wants to keep
      * @return the expected value of this offer
      */
     protected double getExpectedValue(int offer) {
-        // TODO: ASK ABOUT THIS!! -> ?Different method than in article? See original class for another different method.
         double belief = getBelief(offer);
-        return belief * utilityFunction[offer] + (1 - belief) * utilityFunction[chips] - 1;  // TODO: change this...
+        return belief * utilityFunction[offer] + (1 - belief) * utilityFunction[chips] - 1;
     }
 
 
@@ -341,6 +339,10 @@ public abstract class Player {
      */
     public int getUtilityValue() {
         return utilityFunction[chips];
+    }
+
+    public int getFinalPoints() {
+        return utilityFunction[chips] + game.getNrOffers() * Settings.SCORE_NEGOTIATION_STEP;
     }
 
 

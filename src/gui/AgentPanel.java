@@ -31,15 +31,7 @@ public class AgentPanel extends JComponent implements GameListener {
      * Content of the info text pane
      */
     private final String[] content = new String[12];
-
-    /**
-     * The style of the content of the text pane
-     */
-    private final String[] style = {
-            "bold", "regular", "regular", "regular", "regular",
-            "regular", "regular", "regular", "regular", "regular",
-            "regular", "regular"
-    };
+    private final String[] style = new String[12];
 
     /**
      * Content of the messages text pane
@@ -198,25 +190,30 @@ public class AgentPanel extends JComponent implements GameListener {
      * Method to update the information on the info text panel
      */
     private void updateInfo() {
-        content[0] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + agent.getLearningSpeed() + ")";
-        content[1] = "initial chips:";
+        int idx = 0;
+        style[idx] = "bold";
+        content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + agent.getLearningSpeed() + ")";
+        content[idx++] = "initial chips:";
+        content[idx++] = "";
+        content[idx++] = "";
+        content[idx++] = "initial points: " + this.initialPoints;
 
-        for (int i = 2; i <= 4; i++) {
-            content[i] = "";
+        for (int i = 1; i < idx; i++) {
+            style[i] = "regular";
         }
-        content[5] = "points: " + this.initialPoints;
 
         if (agent.getGame().isGameFinished()) {
-            content[6] = "---";
-            content[7] = "final distribution chips:";
-            for (int i = 8; i <= 10; i++) {
-                content[i] = "";
-            }
-            content[11] = "points: " + agent.getUtilityValue();
-        } else {
-            for (int i = 6; i <= 11; i++) {
-                content[i] = "";
-            }
+            style[idx] = "regular"; content[idx++] = "---";
+            style[idx] = "regular"; content[idx++] = "final distribution chips:";
+            style[idx] = "regular"; content[idx++] = "";
+            style[idx] = "regular"; content[idx++] = "";
+            style[idx] = "regular"; content[idx++] = "total nr. offers: " + game.getNrOffers();
+            style[idx] = "regular"; content[idx++] = "";
+            style[idx] = "italic"; content[idx++] = "final points: " + agent.getFinalPoints();
+        }
+        while (idx < content.length) {
+            style[idx] = "regular";
+            content[idx++] = "";
         }
         generateAgentInfo();
     }
@@ -247,9 +244,9 @@ public class AgentPanel extends JComponent implements GameListener {
      * @param g2 graphics
      */
     private void paintChips(Graphics2D g2) {
-        int tokenSize = 40;
+        int tokenSize = 30;
         int offset = 30;
-        int height = 70;
+        int height = 65;
 
         int trackNumChips = 0;
         for (int color = 0; color < Settings.CHIP_DIVERSITY; color++) {
@@ -264,7 +261,7 @@ public class AgentPanel extends JComponent implements GameListener {
         if (agent.getGame().isGameFinished()) {
             trackNumChips = 0;
             int[] chips = agent.getChipsBin();
-            height = 195;
+            height = 170;
             for (int color = 0; color < Settings.CHIP_DIVERSITY; color++) {
                 for (int num = 0; num < chips[color]; num++) {
                     g2.setColor(Settings.getColor(color));

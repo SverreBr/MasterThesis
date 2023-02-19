@@ -55,6 +55,8 @@ public class Game {
      */
     private int newOffer;
 
+    private int nrOffers;
+
     /**
      * the responding agent
      */
@@ -141,6 +143,7 @@ public class Game {
     private void generateNewNegotiationSetting() {
         setBooleanGameFinished(false);
         this.newOffer = -1;
+        this.nrOffers = 0;
         this.turn = Settings.INITIATOR_NAME;
 
         // Distribute tokens to players
@@ -254,7 +257,8 @@ public class Game {
             negotiationTerminates();
         } else if (flippedOffer == newOffer) { // Offer is accepted
             offerAccepted(tmpNewOffer);
-        } else { // Negotiation continues
+        } else { // Negotiation continues with new offer
+            nrOffers++;
             newOffer = tmpNewOffer;
             addOfferMessage();
             switchTurn();
@@ -262,8 +266,6 @@ public class Game {
 
         if (simulationOn)
             notifyListeners();
-        // TODO: When is an offer accepted, what is returned? -> when responder makes same offer?
-        // TODO: How does one retreat from negotiations? -> Make offer similar to your chips.
     }
 
     /**
@@ -390,6 +392,15 @@ public class Game {
     ///////////////////////////////
     //--- Setters and getters ---//
     ///////////////////////////////
+
+    /**
+     * Gets the number of offers made in this game.
+     *
+     * @return The number of offers made in this game.
+     */
+    public int getNrOffers() {
+        return this.nrOffers;
+    }
 
     /**
      * gets the size of board

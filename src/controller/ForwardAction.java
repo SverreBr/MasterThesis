@@ -1,23 +1,17 @@
 package controller;
 
-import gui.Popups;
 import utilities.Game;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 public class ForwardAction implements ForwardListener {
 
     private final JPanel pane;
-
-    private JButton cancel;
 
     private JProgressBar pbProgress;
     private ProgressWorker pw;
@@ -51,15 +45,11 @@ public class ForwardAction implements ForwardListener {
         pbProgress = new JProgressBar();
         pbProgress.setPreferredSize(new Dimension(300, 50));
         pbProgress.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        pbProgress.setStringPainted(true);
         pane.add(pbProgress, BorderLayout.NORTH);
 
-        cancel = new JButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pw.cancelExecution();
-            }
-        });
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(e -> pw.cancelExecution());
         pane.add(cancel, BorderLayout.CENTER);
     }
 
@@ -70,6 +60,7 @@ public class ForwardAction implements ForwardListener {
             if (name.equals("progress")) {
                 int progress = (int) evt.getNewValue();
                 pbProgress.setValue(progress);
+//                pbProgress.setString(progress + " / " + pbProgress.getMaximum());
                 pane.repaint();
             } else if (name.equals("state")) {
                 SwingWorker.StateValue state = (SwingWorker.StateValue) evt.getNewValue();
@@ -103,69 +94,69 @@ public class ForwardAction implements ForwardListener {
         frame.setVisible(false);
         frame.dispose();
     }
+}
 
-    public class ProgressWorker extends SwingWorker<Object, Object> {
+class ProgressWorker extends SwingWorker<Object, Object> {
 
-        private final int rounds;
-        private final Game game;
-        private final Set<ForwardListener> listeners;
+    private final int rounds;
+    private final Game game;
+    private final Set<ForwardListener> listeners;
 
-        private boolean cancel = false;
+    private boolean cancel = false;
 
-        public ProgressWorker(Game game, int rounds) {
-            this.rounds = rounds;
-            this.game = game;
-            this.listeners = new HashSet<>();
+    public ProgressWorker(Game game, int rounds) {
+        this.rounds = rounds;
+        this.game = game;
+        this.listeners = new HashSet<>();
+    }
+
+    public void addListener(ForwardListener listener) {
+        listeners.add(listener);
+    }
+
+    public void startExecution() {
+        for (ForwardListener listener : listeners) {
+            listener.executionStarted();
         }
+    }
 
-        public void addListener(ForwardListener listener) {
-            listeners.add(listener);
-        }
+    public void cancelExecution() {
+        this.cancel = true;
+    }
 
-        public void startExecution() {
-            for (ForwardListener listener : listeners) {
-                listener.executionStarted();
-            }
-        }
-
-        public void cancelExecution() {
-            this.cancel = true;
-        }
-
-        @Override
-        protected Object doInBackground() throws Exception {
-            int progress;
-            for (int i = 0; i < rounds; i++) {
-                if (this.cancel) {
-                    break;
-                }
-                game.playTillEnd();
-                game.newRound();
-                progress = (int) ((i+1.0) / rounds * 100);
-                setProgress(progress);
-            }
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            super.done();
-            try {
-                get();
-            } catch (InterruptedException | ExecutionException ex) {
-                ex.printStackTrace();
-                System.out.println("Bad: " + ex.getMessage());
-            }
+    @Override
+    protected Object doInBackground() {
+        int progress;
+        for (int i = 0; i < rounds; i++) {
             if (this.cancel) {
-                for (ForwardListener listener : listeners) {
-                    listener.executionAborted();
-                }
-            } else {
-                for (ForwardListener listener : listeners) {
-                    listener.forwardActionDone(rounds);
-                }
+                break;
             }
-
+            game.playTillEnd();
+            game.newRound();
+            progress = (int) ((i+1.0) / rounds * 100);
+            setProgress(progress);
         }
+        return null;
+    }
+
+    @Override
+    protected void done() {
+        super.done();
+        try {
+            get();
+        } catch (InterruptedException | ExecutionException ex) {
+            ex.printStackTrace();
+            System.out.println("Bad: " + ex.getMessage());
+        }
+        if (this.cancel) {
+            for (ForwardListener listener : listeners) {
+                listener.executionAborted();
+            }
+        } else {
+            for (ForwardListener listener : listeners) {
+                listener.forwardActionDone(rounds);
+            }
+        }
+
     }
 }

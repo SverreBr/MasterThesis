@@ -29,6 +29,11 @@ public class Settings {
     public static final int SCORE_SURPLUS = 5;
 
     /**
+     * Score added for every offer made in the game
+     */
+    public static final int SCORE_NEGOTIATION_STEP = -1;
+
+    /**
      * number of tiles as the width of the board
      */
     public static final int BOARD_WIDTH = 5;
