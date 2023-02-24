@@ -1,6 +1,7 @@
 package utilities.player;
 
 import utilities.Game;
+import utilities.Settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,7 +153,7 @@ public class PlayerToM extends Player {
                 tmpSelectOfferValue = curValue;
                 bestOffers = new ArrayList<>();
                 bestOffers.add(i);
-            } else if (curValue == tmpSelectOfferValue){
+            } else if (curValue == tmpSelectOfferValue) {
                 bestOffers.add(i);
             }
         }
@@ -207,8 +208,8 @@ public class PlayerToM extends Player {
     /**
      * Gets the value of making an offer.
      *
-     * @param offerToSelf     offer to agent self
-     * @param offerToOther    offer to the other agent
+     * @param offerToSelf  offer to agent self
+     * @param offerToOther offer to the other agent
      * @return the value associated to
      */
     protected double getLocationValue(int offerToSelf, int offerToOther) {
@@ -224,7 +225,7 @@ public class PlayerToM extends Player {
             // Offer is not equal to partner its chips, so new offer has been made
             response = game.flipOffer(response);
             curValue = Math.max(utilityFunction[response], utilityFunction[this.chips]) - 2;
-                // one for current offer and one for offer from partner
+            // one for current offer and one for offer from partner
         }
         return curValue;
     }
@@ -270,7 +271,7 @@ public class PlayerToM extends Player {
      * @param offerReceived The offer received by the partner
      */
     private void updateLocationBeliefs(int offerReceived) {
-        int loc, partnerAlternative, offerPartnerChips;
+        int loc, partnerAlternative, offerPartnerChips, utilityOffer;
         double sumAll, maxExpVal, curExpVal, accuracyRating, newBelief;
 
         offerPartnerChips = game.flipOffer(offerReceived);
@@ -278,13 +279,14 @@ public class PlayerToM extends Player {
         accuracyRating = 0.0;
         for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
             partnerModel.utilityFunction = game.getUtilityFunction(loc);
-            if (partnerModel.utilityFunction[offerPartnerChips] > partnerModel.utilityFunction[partnerModel.chips]) {
+            utilityOffer = partnerModel.utilityFunction[offerPartnerChips] - Settings.SCORE_NEGOTIATION_STEP;
+            if (utilityOffer > partnerModel.utilityFunction[partnerModel.chips]) {
                 // Given loc, offerReceived gives the partner a higher score than the initial situation
                 partnerAlternative = partnerModel.selectOffer(0); // 0 since worst possible offer
-                    // Agent's guess for partner's best option given location l
+                // Agent's guess for partner's best option given location l
                 maxExpVal = partnerModel.getValue(partnerAlternative);
                 curExpVal = partnerModel.getValue(offerPartnerChips);
-                    // Agent's guess for partner's value of offerReceived
+                // Agent's guess for partner's value of offerReceived
                 if (maxExpVal > -1) {
                     newBelief = (1 + curExpVal) / (1 + maxExpVal);
                     locationBeliefs[loc] *= Math.max(0.0, Math.min(1.0, newBelief));
@@ -369,5 +371,9 @@ public class PlayerToM extends Player {
      */
     public void setConfidenceLockedTo(boolean confidenceLocked) {
         this.confidenceLocked = confidenceLocked;
+    }
+
+    public double getConfidence() {  // TODO: confidence is 1 at each initialization, is that correct?
+        return confidence;
     }
 }

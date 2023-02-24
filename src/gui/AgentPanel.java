@@ -30,8 +30,8 @@ public class AgentPanel extends JComponent implements GameListener {
     /**
      * Content of the info text pane
      */
-    private final String[] content = new String[12];
-    private final String[] style = new String[12];
+    private final String[] content = new String[13];
+    private final String[] style = new String[13];
 
     /**
      * Content of the messages text pane
@@ -203,14 +203,26 @@ public class AgentPanel extends JComponent implements GameListener {
         }
 
         if (agent.getGame().isGameFinished()) {
-            style[idx] = "regular"; content[idx++] = "---";
-            style[idx] = "regular"; content[idx++] = "final distribution chips:";
-            style[idx] = "regular"; content[idx++] = "";
-            style[idx] = "regular"; content[idx++] = "";
-            style[idx] = "regular"; content[idx++] = "total nr. offers: " + game.getNrOffers();
-            style[idx] = "regular"; content[idx++] = "";
-            style[idx] = "italic"; content[idx++] = "final points: " + agent.getFinalPoints();
+            style[idx] = "regular";
+            content[idx++] = "---";
+            style[idx] = "regular";
+            content[idx++] = "final distribution chips:";
+            style[idx] = "regular";
+            content[idx++] = "";
+            style[idx] = "regular";
+            content[idx++] = "";
+//            style[idx] = "regular"; content[idx++] = "final points: " + agent.getUtilityValue();
+            style[idx] = "regular";
+            content[idx++] = "total nr. offers: " + game.getNrOffers();
+            style[idx] = "italic";
+            content[idx++] = "final (total) points: " + agent.getUtilityValue() + " (" + agent.getFinalPoints() + ")";
         }
+
+        if (agent.getOrderToM() > 0) {
+            style[idx] = "regular";
+            content[idx++] = "confidence: " + agent.getConfidence();
+        }
+
         while (idx < content.length) {
             style[idx] = "regular";
             content[idx++] = "";

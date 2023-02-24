@@ -48,13 +48,9 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
 
     private JButton restart;
 
-    private JButton exit;
-
     private JButton newNeg;
 
     private JButton forward;
-
-    private ForwardAction forwardAction;
 
 
     /**
@@ -84,7 +80,7 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         restart.setToolTipText("Click to reset the agents completely.");
         restart.addActionListener(this);
 
-        exit = new JButton("Exit");
+        JButton exit = new JButton("Exit");
         exit.setActionCommand("exit");
         exit.setToolTipText("Click to exit the game.");
         exit.addActionListener(this);
@@ -162,11 +158,17 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
             return;
         }
 
-
         game.setSimulationOff();
-        forwardAction = new ForwardAction(game, rounds);
+        ForwardAction forwardAction = new ForwardAction(game, rounds);
         forwardAction.addListenerToProgressWorker(this);
         forwardAction.execute();
+    }
+
+    private void restart() {
+        game.reset(game.getInitiator().getOrderToM(),
+                game.getResponder().getOrderToM(),
+                game.getInitiator().getLearningSpeed(),
+                game.getResponder().getLearningSpeed());
     }
 
 
@@ -178,11 +180,7 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "restart" -> game.reset(
-                    game.getInitiator().getOrderToM(),
-                    game.getResponder().getOrderToM(),
-                    game.getInitiator().getLearningSpeed(),
-                    game.getResponder().getLearningSpeed()); // TODO: (SELF) could be optimized.
+            case "restart" -> restart();
             case "new round" -> game.newRound();
             case "exit" -> System.exit(0);
             case "step" -> game.step();
@@ -192,7 +190,8 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
     }
 
     @Override
-    public void gameChanged() {}
+    public void gameChanged() {
+    }
 
     @Override
     public void newGame() {

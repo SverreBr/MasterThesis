@@ -41,10 +41,10 @@ public class ForwardAction implements ForwardListener {
     }
 
     private void makePane() {
-        pane.setPreferredSize(new Dimension(300,100));
+        pane.setPreferredSize(new Dimension(300, 100));
         pbProgress = new JProgressBar();
         pbProgress.setPreferredSize(new Dimension(300, 50));
-        pbProgress.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        pbProgress.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         pbProgress.setStringPainted(true);
         pane.add(pbProgress, BorderLayout.NORTH);
 
@@ -81,7 +81,8 @@ public class ForwardAction implements ForwardListener {
     }
 
     @Override
-    public void executionStarted() {}
+    public void executionStarted() {
+    }
 
     @Override
     public void forwardActionDone(int rounds) {
@@ -133,7 +134,7 @@ class ProgressWorker extends SwingWorker<Object, Object> {
             }
             game.playTillEnd();
             game.newRound();
-            progress = (int) ((i+1.0) / rounds * 100);
+            progress = (int) ((i + 1.0) / rounds * 100);
             setProgress(progress);
         }
         return null;
