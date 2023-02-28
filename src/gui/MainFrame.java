@@ -38,7 +38,7 @@ public class MainFrame extends JFrame {
         leftBody.setBackground(Settings.getBackGroundColor());
 
         BoardPanel boardPanel = new BoardPanel(game);
-        boardPanel.setPreferredSize(new Dimension(MAIN_PANEL_SIZE, MAIN_PANEL_SIZE));
+        boardPanel.setPreferredSize(new Dimension(BOARD_PANEL_SIZE, BOARD_PANEL_SIZE));
 
         JPanel rightBody = new JPanel();
         rightBody.setLayout(new BorderLayout());

@@ -46,7 +46,7 @@ public class Settings {
     /**
      * number of different colors as tiles of the board
      */
-    public static final int CHIP_DIVERSITY = 4;
+    public static final int CHIP_DIVERSITY = 5;
 
     /**
      * number of tokens an agent obtains
@@ -66,7 +66,7 @@ public class Settings {
     /**
      * determines the height of the agent panel
      */
-    public static final int AGENT_PANEL_HEIGHT = 570;
+    public static final int AGENT_PANEL_HEIGHT = 540;
 
     /**
      * determines the height of the text panel in the agent panel
@@ -76,7 +76,12 @@ public class Settings {
     /**
      * Size of the main panel
      */
-    public static final int MAIN_PANEL_SIZE = 800;
+    public static final int MAIN_PANEL_SIZE = 750;
+
+    /**
+     * Size of the board panel
+     */
+    public static final int BOARD_PANEL_SIZE = 700;
 
     /**
      * The starting position of each agent
@@ -135,7 +140,8 @@ public class Settings {
             case 1 -> Color.decode("#DC267F");
             case 2 -> Color.decode("#FE6100");
             case 3 -> Color.decode("#96B1F7");
-            case 4 -> Color.decode("#FFB000");
+//            case 4 -> Color.decode("#FFB000");
+            case 4 -> Color.decode("#fccc60");
             default -> Color.BLACK;
         };
     }

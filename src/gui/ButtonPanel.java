@@ -123,7 +123,7 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         body.add(step);
         body.add(play);
         body.add(newNeg);
-        body.add(Box.createRigidArea(new Dimension(1, 1)));
+//        body.add(Box.createRigidArea(new Dimension(1, 1)));
         body.add(forwardPanel);
 
         changeBackgrounds();

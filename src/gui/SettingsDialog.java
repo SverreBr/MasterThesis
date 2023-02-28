@@ -6,8 +6,6 @@ import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class SettingsDialog extends JDialog {
 
@@ -30,21 +28,11 @@ public class SettingsDialog extends JDialog {
         JPanel btnPanel = new JPanel();
 
         JButton okBtn = new JButton("Accept");
-        okBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okButton();
-            }
-        });
+        okBtn.addActionListener(e -> okButton());
         btnPanel.add(okBtn);
 
         JButton noBtn = new JButton("Cancel");
-        noBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                noButton();
-            }
-        });
+        noBtn.addActionListener(e -> noButton());
         btnPanel.add(noBtn);
 
         optionPanel = new JPanel();

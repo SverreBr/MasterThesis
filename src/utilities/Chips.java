@@ -79,22 +79,6 @@ public class Chips {
         return outCode;
     }
 
-//    /**
-//     * Gets the total number of tokens in a given offer
-//     *
-//     * @param index  offer
-//     * @param binMax maximum amount per bin
-//     * @return number of tokens across all bins
-//     */
-//    public static int getNrChips(int index, int[] binMax) {
-//        int nrTokens = 0;
-//        for (int i = 0; i < Settings.CHIP_DIVERSITY; i++) {
-//            nrTokens += index % (binMax[i] + 1);
-//            index /= (binMax[i] + 1);
-//        }
-//        return nrTokens;
-//    }
-
     /**
      * Calculates the number of chips in chip array
      *

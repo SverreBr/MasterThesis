@@ -43,7 +43,7 @@ public class LegendPanel extends JPanel implements GameListener {
     /**
      * Field for the width of the settings button
      */
-    private final int SETTINGS_BUTTON_SIZE = 45;
+    private final int SETTINGS_BUTTON_SIZE = 40;
 
     private final JFrame mainFrame;
 
@@ -68,7 +68,7 @@ public class LegendPanel extends JPanel implements GameListener {
         this.add(buttonPanel, BorderLayout.EAST);
 
         this.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(20, 10, 10, 10),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                         BorderFactory.createEmptyBorder(5, 5, 5, 5))));
@@ -143,7 +143,7 @@ public class LegendPanel extends JPanel implements GameListener {
         int tokenSize = 30;
         int offset = 41;
         int betweenSpace = 11;
-        int height = 93;
+        int height = 85;
 
         int numDiffTokens = Settings.CHIP_DIVERSITY;
 
@@ -169,12 +169,10 @@ public class LegendPanel extends JPanel implements GameListener {
         style.add("italic");
 
         StringBuilder chipsNumbering = new StringBuilder();
-        String spaces = "    ";
-        chipsNumbering.append(spaces);
+        String spaces = "        ";
         for (int i = 0; i < Settings.CHIP_DIVERSITY; i++) {
             chipsNumbering.append(spaces);
             chipsNumbering.append(i);
-            chipsNumbering.append(spaces);
         }
         content.add(chipsNumbering.toString());
         style.add("regular");

@@ -46,9 +46,6 @@ public class BoardPanel extends JComponent implements GameListener {
         paintStartLocation(g2);
         paintGoalLocation(g2);
 
-//        if (selected != null)
-//            paintSelection(g2);
-
         g2.dispose();
     }
 
