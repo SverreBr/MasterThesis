@@ -140,7 +140,6 @@ public class Settings {
             case 1 -> Color.decode("#DC267F");
             case 2 -> Color.decode("#FE6100");
             case 3 -> Color.decode("#96B1F7");
-//            case 4 -> Color.decode("#FFB000");
             case 4 -> Color.decode("#fccc60");
             default -> Color.BLACK;
         };

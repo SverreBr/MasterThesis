@@ -45,6 +45,9 @@ public class LegendPanel extends JPanel implements GameListener {
      */
     private final int SETTINGS_BUTTON_SIZE = 40;
 
+    /**
+     * The main frame of the visuals
+     */
     private final JFrame mainFrame;
 
     /**
@@ -103,7 +106,6 @@ public class LegendPanel extends JPanel implements GameListener {
      * Creates settings button
      */
     private void createSettingsButton() {
-
         settingsButton.setAction(new SettingsAction("", game, mainFrame));
         try {
             Image img = ImageIO.read(new File("fig/settingsIcon.png"));
@@ -115,6 +117,7 @@ public class LegendPanel extends JPanel implements GameListener {
 
         settingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE));
         settingsButton.setBorder(BorderFactory.createEmptyBorder());
+        settingsButton.setToolTipText("Click here to change the settings of the agents.");
 
         buttonPanel.setLayout(new BorderLayout());
         buttonPanel.add(settingsButton, BorderLayout.NORTH);
@@ -197,7 +200,6 @@ public class LegendPanel extends JPanel implements GameListener {
         content.add("* " + Settings.START_LOCATION_SYMBOL + ": Start location both agents.");
         style.add("regular");
 
-        // Generate agent info panel
         StyledDocument doc = info.getStyledDocument();
         try {
             doc.remove(0, doc.getLength());

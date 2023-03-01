@@ -7,12 +7,27 @@ import utilities.Game;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * SettingsAction class: deals with changing settings via the settings button
+ */
 public class SettingsAction extends AbstractAction {
 
+    /**
+     * The game model
+     */
     private final Game game;
 
+    /**
+     * The main frame of the visuals
+     */
     private final JFrame mainFrame;
 
+    /**
+     * Constructor
+     * @param description Name of the action
+     * @param game Game model
+     * @param mainFrame Main frame of the visuals
+     */
     public SettingsAction(String description, Game game, JFrame mainFrame) {
         super(description);
         this.game = game;

@@ -252,7 +252,7 @@ public abstract class Player {
      *
      * @param newOwnChips The offer to this agent self.
      */
-    private void increaseOfferTypeBelief(int newOwnChips, boolean revokeRejection) {  // TODO: check this with decreaseOfferTypeBelief
+    private void increaseOfferTypeBelief(int newOwnChips, boolean revokeRejection) {
         int pos, neg;
         int[] diff = Chips.getDifference(chips, newOwnChips, game.getBinMaxChips());
         pos = Chips.getPositiveAmount(diff);
@@ -263,7 +263,7 @@ public abstract class Player {
             }
             countBeliefsOfferType[pos][neg]++;
         } else {
-            beliefsOfferType[pos][neg] = beliefsOfferType[pos][neg] * (1 - learningSpeed) + learningSpeed;
+            beliefsOfferType[pos][neg] = beliefsOfferType[pos][neg] * (1 - learningSpeed) + learningSpeed;  // TODO: check this
         }
     }
 
@@ -377,6 +377,11 @@ public abstract class Player {
         return utilityFunction[chips];
     }
 
+    /**
+     * returns the final score of this agent given its current chips and the number of offers that has been made
+     *
+     * @return the final score of this agent after negotiation
+     */
     public int getFinalPoints() {
         return utilityFunction[chips] + game.getNrOffers() * Settings.SCORE_NEGOTIATION_STEP;
     }
@@ -426,7 +431,7 @@ public abstract class Player {
      * @return The chips of this player in the form of bins.
      */
     public int[] getChipsBin() {
-        // TODO: (SELF) Is it maybe faster to also save chipsBin in player?
+        // TODO: Is it maybe faster to also save chipsBin in player?
         return Chips.getBins(chips, game.getBinMaxChips());
     }
 

@@ -17,6 +17,7 @@ public class Popups extends JOptionPane {
 
     /**
      * Popup to be shown when forwarding was a success
+     *
      * @param rounds The number of rounds forwarded
      */
     public static void showForwardSuccess(int rounds) {
@@ -24,14 +25,24 @@ public class Popups extends JOptionPane {
                 "Forwarding rounds", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Popup to be shown when an invalid order of theory of mind has been chosen
+     *
+     * @param name Name of the agent for which an invalid order of ToM has been chosen
+     */
     public static void showInvalidOrderToM(String name) {
         showMessageDialog(null,
                 "Provided an invalid order for theory of mind for the " + name + ".\n" +
-                "Please insert a number from the set {0, 1, 2}.\n" +
-                "For now, no changes have been made to the game.",
+                        "Please insert a number from the set {0, 1, 2}.\n" +
+                        "For now, no changes have been made to the game.",
                 "Invalid input", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Popup to be shown when an invalid learning rate has been chosen
+     *
+     * @param name Name of the agent for which an invalid learning rate has been chosen
+     */
     public static void showInvalidLR(String name) {
         showMessageDialog(null,
                 "Provided an invalid learning rate for the " + name + ".\n" +
@@ -40,12 +51,18 @@ public class Popups extends JOptionPane {
                 "Invalid input", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Popup to be shown when settings cannot be changed (maybe during forwarding of rounds).
+     */
     public static void showSettingsButtonNotAccessible() {
         showMessageDialog(null,
                 "The simulation is running. Please try later again.", "Cannot change settings",
                 JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Popup to be shown when forwarding has been canceled.
+     */
     public static void showForwardingCancelled() {
         showMessageDialog(null,
                 "The forwarding has been canceled. However, all changes that have been made up until now are still there.");

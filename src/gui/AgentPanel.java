@@ -23,8 +23,14 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private final JTextPane info;
 
+    /**
+     * Pane with messages of the agent
+     */
     private final JTextPane messagePane;
 
+    /**
+     * Scroll pane with the messages of the agent
+     */
     private final JScrollPane messageScroll;
 
     /**
@@ -48,8 +54,14 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private PlayerToM agent;
 
+    /**
+     * The name of the agent
+     */
     private final String agentName;
 
+    /**
+     * The game model
+     */
     private final Game game;
 
     /**
@@ -67,8 +79,9 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     public AgentPanel(Game game, String agentName) {
         this.agentName = agentName;
-        this.game = game;
         setAgent();
+        this.game = game;
+
         this.initialChips = agent.getChipsBin();
         this.initialPoints = agent.getUtilityValue();
         this.setForeground(Color.WHITE);
@@ -94,8 +107,11 @@ public class AgentPanel extends JComponent implements GameListener {
         this.agent.getGame().addListener(this);
     }
 
+    /**
+     * Sets the agent with the corresponding name to this panel
+     */
     private void setAgent() {
-        if (this.agentName.equals(Settings.INITIATOR_NAME)) {
+        if (agentName.equals(Settings.INITIATOR_NAME)) {
             this.agent = game.getInitiator();
         } else {
             this.agent = game.getResponder();
@@ -163,7 +179,6 @@ public class AgentPanel extends JComponent implements GameListener {
     private void createMessages() {
         messages = new ArrayList<>();
         styleMessages = new ArrayList<>();
-
         messages.add("Messages:");
         styleMessages.add("italic");
     }
@@ -174,7 +189,7 @@ public class AgentPanel extends JComponent implements GameListener {
     private void updateMessages() {
         createMessages();
         addAgentMessages();
-        // Generate agent info panel
+
         StyledDocument doc = messagePane.getStyledDocument();
         try {
             doc.remove(0, doc.getLength());
@@ -230,6 +245,9 @@ public class AgentPanel extends JComponent implements GameListener {
         generateAgentInfo();
     }
 
+    /**
+     * Adds the information of the agent to the document
+     */
     private void generateAgentInfo() {
         StyledDocument doc = info.getStyledDocument();
         try {

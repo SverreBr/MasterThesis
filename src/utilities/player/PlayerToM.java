@@ -122,7 +122,7 @@ public class PlayerToM extends Player {
             curOffer = selectOffer(offerReceived);
         }
         sendOffer(curOffer);
-        return this.game.flipOffer(curOffer); // TODO: (SELF) maybe switch the return to the player itself.
+        return this.game.flipOffer(curOffer); // TODO: maybe switch the return to the player itself.
     }
 
     /**
@@ -373,6 +373,11 @@ public class PlayerToM extends Player {
         this.confidenceLocked = confidenceLocked;
     }
 
+    /**
+     * Getter for the confidence of this agent in its theory of mind
+     *
+     * @return Confidence in its theory of mind
+     */
     public double getConfidence() {  // TODO: confidence is 1 at each initialization, is that correct?
         return confidence;
     }

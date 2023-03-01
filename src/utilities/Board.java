@@ -121,7 +121,8 @@ public class Board {
         // Calculate current score.
         int currScore = this.calculateTileScore(currLoc, chips, startLoc, goalLoc);
 
-        if (currLoc.equals(goalLoc) || (Chips.getNrChips(chips) == 0)) { // TODO: Could be optimised by providing number of chips as a parameter
+        // TODO: Could be optimised by providing number of chips as a parameter?
+        if (currLoc.equals(goalLoc) || (Chips.getNrChips(chips) == 0)) {
             // Goal location reached or no chips to move anymore
             return currScore;
         }

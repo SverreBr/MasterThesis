@@ -55,6 +55,9 @@ public class Game {
      */
     private int newOffer;
 
+    /**
+     * Total number of offers made in negotiation
+     */
     private int nrOffers;
 
     /**
@@ -310,8 +313,7 @@ public class Game {
      * Adds an offer message to an offer
      */
     public void addOfferMessage() {
-        int offerSelf = flipOffer(newOffer);
-        String message = "I offer you: " + Arrays.toString(Chips.getBins(newOffer, binMaxChips)) + "; (" + offerSelf + "-" + newOffer + ")";
+        String message = "I offer you: " + Arrays.toString(Chips.getBins(newOffer, binMaxChips)) + ";";
         if (turn.equals(Settings.INITIATOR_NAME)) {
             this.initiator.addMessage(message);
         } else {
@@ -533,6 +535,11 @@ public class Game {
         simulationOn = false;
     }
 
+    /**
+     * Checks if the simulation (visuals) is on or off
+     *
+     * @return True if simulation is on, false otherwise
+     */
     public boolean isSimulationOn() {
         return simulationOn;
     }

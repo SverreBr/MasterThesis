@@ -7,22 +7,67 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 
+/**
+ * SettingsDialog class: shown when changing the settings
+ */
 public class SettingsDialog extends JDialog {
 
+    /**
+     * Panel to choose the options
+     */
     private final JPanel optionPanel;
 
+    /**
+     * Text field containing the ToM of the initiator
+     */
     private JTextField initiatorToMField;
+
+    /**
+     * Value of the text field containing the ToM of the initiator
+     */
     private int initiatorToMFieldValue;
+
+    /**
+     * Text field containing the learning speed of the initiator
+     */
     private JTextField initiatorLRField;
+
+    /**
+     * Value of the text field containing the learning speed of the initiator
+     */
     private double initiatorLRFieldValue;
 
+    /**
+     * Text field containing the ToM of the responder
+     */
     private JTextField responderToMField;
+
+    /**
+     * Value of the text field containing the ToM of the responder
+     */
     private int responderToMFieldValue;
+
+    /**
+     * Text field containing the learning speed of the responder
+     */
     private JTextField responderLRField;
+
+    /**
+     * Value of the text field containing the learning speed of the responder
+     */
     private double responderLRFieldValue;
 
+    /**
+     * Boolean to check if the game has changed
+     */
     public boolean gameHasChanged = false;
 
+    /**
+     * Constructor
+     *
+     * @param mainFrame Mainframe of the visuals
+     * @param title     Title given to this dialog
+     */
     public SettingsDialog(JFrame mainFrame, String title) {
         super(mainFrame, title, true);
         JPanel btnPanel = new JPanel();
@@ -43,24 +88,27 @@ public class SettingsDialog extends JDialog {
         pack();
     }
 
+    /**
+     * Creates the options panel
+     */
     private void createOptionPanel() {
-        optionPanel.setLayout(new GridLayout(0,2));
+        optionPanel.setLayout(new GridLayout(0, 2));
 
         JTextPane initiatorToMText = new JTextPane();
         addStylesToDoc(initiatorToMText, "Initiator ToM: ");
-        initiatorToMField = new JTextField("0",0);
+        initiatorToMField = new JTextField("0", 0);
 
         JTextPane initiatorLRText = new JTextPane();
         addStylesToDoc(initiatorLRText, "Initiator learning rate: ");
-        initiatorLRField = new JTextField("0.1",0);
+        initiatorLRField = new JTextField("0.1", 0);
 
         JTextPane responderToMText = new JTextPane();
         addStylesToDoc(responderToMText, "Responder ToM: ");
-        responderToMField = new JTextField("0",0);
+        responderToMField = new JTextField("0", 0);
 
         JTextPane responderLRText = new JTextPane();
         addStylesToDoc(responderLRText, "Responder learning rate: ");
-        responderLRField = new JTextField("0.1",0);
+        responderLRField = new JTextField("0.1", 0);
 
         optionPanel.add(initiatorToMText);
         optionPanel.add(initiatorToMField);
@@ -73,6 +121,12 @@ public class SettingsDialog extends JDialog {
         optionPanel.add(responderLRField);
     }
 
+    /**
+     * Adds the styles to the document
+     *
+     * @param pane the pane to be styled
+     * @param text the text to add to the pane
+     */
     private void addStylesToDoc(JTextPane pane, String text) {
         StyledDocument doc = pane.getStyledDocument();
         Settings.addStylesToDocument(doc);
@@ -86,8 +140,9 @@ public class SettingsDialog extends JDialog {
         pane.setOpaque(false);
     }
 
-
-
+    /**
+     * Action performed when clicked on OK
+     */
     private void okButton() {
         this.gameHasChanged = true;
         try {
@@ -109,7 +164,6 @@ public class SettingsDialog extends JDialog {
             Popups.showInvalidLR(Settings.INITIATOR_NAME);
             this.gameHasChanged = false;
         }
-
 
         try {
             responderToMFieldValue = Integer.parseInt(responderToMField.getText());
@@ -134,26 +188,48 @@ public class SettingsDialog extends JDialog {
         setVisible(false);
     }
 
+    /**
+     * Action performed when clicked on Cancel
+     */
+    private void noButton() {
+        initiatorToMFieldValue = -1;
+        responderToMFieldValue = -1;
+        setVisible(false);
+    }
+
+    /**
+     * Getter for initiator ToM
+     *
+     * @return ToM for the initiator
+     */
     public int getInitiatorToMFieldValue() {
         return this.initiatorToMFieldValue;
     }
 
+    /**
+     * Getter for initiator learning speed
+     *
+     * @return learning speed for the initiator
+     */
     public double getInitiatorLRFieldValue() {
         return this.initiatorLRFieldValue;
     }
 
+    /**
+     * Getter for responder ToM
+     *
+     * @return ToM for the responder
+     */
     public int getResponderToMFieldValue() {
         return this.responderToMFieldValue;
     }
 
+    /**
+     * Getter for responder learning speed
+     *
+     * @return learning speed for the responder
+     */
     public double getResponderLRFieldValue() {
         return this.responderLRFieldValue;
-    }
-
-    private void noButton() {
-        initiatorToMFieldValue = -1;
-        responderToMFieldValue = -1;
-
-        setVisible(false);
     }
 }

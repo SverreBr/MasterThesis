@@ -46,12 +46,20 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
      */
     private JButton step;
 
+    /**
+     * Button to restart the game completely with fresh agents
+     */
     private JButton restart;
 
+    /**
+     * Button to begin new negotiation round
+     */
     private JButton newNeg;
 
+    /**
+     * Button to forward a specified number of rounds
+     */
     private JButton forward;
-
 
     /**
      * Constructor: creates the button panel
@@ -164,6 +172,9 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         forwardAction.execute();
     }
 
+    /**
+     * Restarts the game with new agents
+     */
     private void restart() {
         game.reset(game.getInitiator().getOrderToM(),
                 game.getResponder().getOrderToM(),
@@ -181,10 +192,10 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "restart" -> restart();
-            case "new round" -> game.newRound();
+            case "new round" -> this.game.newRound();
             case "exit" -> System.exit(0);
-            case "step" -> game.step();
-            case "play" -> game.playTillEnd();
+            case "step" -> this.game.step();
+            case "play" -> this.game.playTillEnd();
             case "forward" -> forward();
         }
     }
