@@ -48,21 +48,25 @@ public class PlayerToM extends Player {
      */
     private boolean confidenceLocked;
 
+    private final int initialPoints;
+
     /**
      * Constructor
      *
      * @param playerName name of the agent
      * @param game       the model of the game
      */
-    public PlayerToM(String playerName, Game game, int orderToM, double learningSpeed) {
-        super(playerName, game, learningSpeed);
+    public PlayerToM(String playerName, Game game, int orderToM, double learningSpeed, int chipsSelf, int chipsOther, int[] utilityFunction) {
+        super(playerName, game, learningSpeed, chipsSelf, utilityFunction);
         this.orderToM = orderToM;
-
         this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
+        this.initialPoints = getUtilityValue();
 
         if (this.orderToM > 0) {
-            selfModel = new PlayerToM("", game, orderToM - 1, learningSpeed);
-            partnerModel = new PlayerToM("", game, orderToM - 1, learningSpeed);
+            Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
+            confidence = 1.0;  // starting confidence
+            selfModel = new PlayerToM("", game, orderToM - 1, learningSpeed, chipsSelf, chipsOther, utilityFunction);
+            partnerModel = new PlayerToM("", game, orderToM - 1, learningSpeed, chipsOther, chipsSelf, utilityFunction);
             partnerModel.setConfidenceLockedTo(true);
         } else {
             selfModel = null;
@@ -70,22 +74,22 @@ public class PlayerToM extends Player {
         }
     }
 
-    /**
-     * Resets the agent for a full new round of play, without any learned behaviour.
-     *
-     * @param chipsSelf       The chips to himself
-     * @param chipsOther      The chips to the other player
-     * @param utilityFunction The utility function for this player.
-     */
-    public void reset(int chipsSelf, int chipsOther, int[] utilityFunction) {
-        super.reset(chipsSelf, chipsOther, utilityFunction);
-        if (this.orderToM > 0) {
-            Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
-            selfModel.reset(chipsSelf, chipsOther, utilityFunction);
-            partnerModel.reset(chipsOther, chipsSelf, utilityFunction);
-            confidence = 1.0;  // starting confidence
-        }
-    }
+//    /**
+//     * Resets the agent for a full new round of play, without any learned behaviour.
+//     *
+//     * @param chipsSelf       The chips to himself
+//     * @param chipsOther      The chips to the other player
+//     * @param utilityFunction The utility function for this player.
+//     */
+//    public void reset(int chipsSelf, int chipsOther, int[] utilityFunction) {
+//        super.reset(chipsSelf, chipsOther, utilityFunction);
+//        if (this.orderToM > 0) {
+//            Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
+//            selfModel.reset(chipsSelf, chipsOther, utilityFunction);
+//            partnerModel.reset(chipsOther, chipsSelf, utilityFunction);
+//            confidence = 1.0;  // starting confidence
+//        }
+//    }
 
     /**
      * Initializes the agent for a new round, but learning from other games is kept.
@@ -380,5 +384,9 @@ public class PlayerToM extends Player {
      */
     public double getConfidence() {  // TODO: confidence is 1 at each initialization, is that correct?
         return confidence;
+    }
+
+    public int getInitialPoints() {
+        return initialPoints;
     }
 }

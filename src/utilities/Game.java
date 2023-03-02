@@ -115,14 +115,17 @@ public class Game {
      * Initializes a fully new game, where the agents are also fully reset
      */
     private void initNewGame(int initToM, int respToM, double initLR, double respLR) {
-        this.initiator = new PlayerToM(Settings.INITIATOR_NAME, this, initToM, initLR);
-        this.responder = new PlayerToM(Settings.RESPONDER_NAME, this, respToM, respLR);
         generateNewNegotiationSetting();
-
         int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
         int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
-        this.initiator.reset(chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
-        this.responder.reset(chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
+
+        this.initiator = new PlayerToM(Settings.INITIATOR_NAME, this, initToM, initLR,
+                chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
+        this.responder = new PlayerToM(Settings.RESPONDER_NAME, this, respToM, respLR,
+                chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
+
+//        this.initiator.reset();
+//        this.responder.reset(chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
     }
 
     /**

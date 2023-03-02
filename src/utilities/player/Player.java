@@ -94,20 +94,11 @@ public abstract class Player {
      * @param namePlayer name of the agent
      * @param game       model of the game
      */
-    public Player(String namePlayer, Game game, double learningSpeed) {
+    public Player(String namePlayer, Game game, double learningSpeed, int chipsSelf, int[] utilityFunction) {
         this.name = namePlayer;
         this.game = game;
         this.learningSpeed = learningSpeed;
-    }
 
-    /**
-     * Resets the player completely. That is, all beliefs are reset.
-     *
-     * @param chipsSelf       The chips to himself
-     * @param chipsOther      The chips to the other player
-     * @param utilityFunction The utility function for this player.
-     */
-    public void reset(int chipsSelf, int chipsOther, int[] utilityFunction) {
         this.messages = new ArrayList<>();
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
@@ -115,6 +106,22 @@ public abstract class Player {
         beliefOfferSaved = new double[beliefOffer.length];
         setupNewBeliefs();
     }
+
+//    /**
+//     * Resets the player completely. That is, all beliefs are reset.
+//     *
+//     * @param chipsSelf       The chips to himself
+//     * @param chipsOther      The chips to the other player
+//     * @param utilityFunction The utility function for this player.
+//     */
+//    public void reset(int chipsSelf, int chipsOther, int[] utilityFunction) {
+//        this.messages = new ArrayList<>();
+//        this.chips = chipsSelf;
+//        this.utilityFunction = utilityFunction.clone();
+//        beliefOffer = new double[utilityFunction.length];
+//        beliefOfferSaved = new double[beliefOffer.length];
+//        setupNewBeliefs();
+//    }
 
     /**
      * Set up new beliefs. The player starts with full belief that an offer of any type will work.
