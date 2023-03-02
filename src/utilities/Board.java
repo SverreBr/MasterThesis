@@ -1,10 +1,7 @@
 package utilities;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Board class: the game board of the colored trails
@@ -32,7 +29,7 @@ public class Board {
     public Board() {
         this.boardHeight = Settings.BOARD_HEIGHT;
         this.boardWidth = Settings.BOARD_WIDTH;
-        board = new int[boardHeight][boardWidth];
+        this.board = new int[boardHeight][boardWidth];
         initBoard();
     }
 
@@ -49,7 +46,7 @@ public class Board {
     private void initBoard() {
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
-                board[i][j] = (int) (Math.random() * Settings.TOKEN_DIVERSITY);
+                board[i][j] = (int) (Math.random() * Settings.CHIP_DIVERSITY);
             }
         }
     }
@@ -91,86 +88,61 @@ public class Board {
         return boardWidth;
     }
 
-//    public List<int[]> getShortestPathGivenTokens(int[] currentLoc, int[] goalLoc, int[] tokens) {
-//        int dist = distanceToGoal(currentLoc, goalLoc);
-//        int initPoints = tokens.length * Settings.SCORE_SURPLUS - dist * Settings.SCORE_STEP;
-//
-//        List<int[]> shortestPath = new ArrayList<>();
-//        return shortestPath;
-//    }
-
     /**
      * calculates the score from a current tile to a goal tile given some tokens
      *
      * @param currLoc current location
-     * @param tokens  the tokens
+     * @param chips   the colored chips
      * @param goalLoc goal location
      * @return the score corresponding to this tile
      */
-    public int calculateTileScore(Point currLoc, List<Integer> tokens, Point startLoc, Point goalLoc) {
+    private int calculateTileScore(Point currLoc, int[] chips, Point startLoc, Point goalLoc) {
         int score = 0, stepsTowardsGoal;
         stepsTowardsGoal = Settings.manhattanDistance(startLoc, goalLoc) - Settings.manhattanDistance(currLoc, goalLoc);
 
         if (currLoc.equals(goalLoc))
             score += Settings.SCORE_GOAL;
         score += Settings.SCORE_STEP * Math.max(0, stepsTowardsGoal);
-        score += Settings.SCORE_SURPLUS * tokens.size();
+        score += Settings.SCORE_SURPLUS * Chips.getNrChips(chips);
         return score;
     }
 
-    /**
-     * get the possible moves on the board
-     *
-     * @return a list of possible moves as points
-     */
-    public List<Point> getPossibleMoves() {
-        return Arrays.asList(
-                new Point(-1, 0),
-                new Point(1, 0),
-                new Point(0, -1),
-                new Point(0, 1)
-        );
-    }
 
     /**
      * Calculates the score that an agent obtains when starting on the currLoc and having goalLoc as goal location
-     * with tokens as his colored chips
+     * with chips as his colored chips
      *
      * @param currLoc starting location
-     * @param tokens  the colored chips
+     * @param chips   the colored chips
      * @param goalLoc goal location
      * @return the score as an integer
      */
-    public int calculateScore(Point currLoc, List<Integer> tokens, Point startLoc, Point goalLoc) {
+    public int calculateScore(Point currLoc, int[] chips, Point startLoc, Point goalLoc) {
         // Calculate current score.
-        int currScore = this.calculateTileScore(currLoc, tokens, startLoc, goalLoc);
+        int currScore = this.calculateTileScore(currLoc, chips, startLoc, goalLoc);
 
-        if (currLoc.equals(goalLoc) || (tokens.size() == 0)) {
-            // Goal location reached or no possible moves anymore
+        // TODO: Could be optimised by providing number of chips as a parameter?
+        if (currLoc.equals(goalLoc) || (Chips.getNrChips(chips) == 0)) {
+            // Goal location reached or no chips to move anymore
             return currScore;
         }
 
         int tileColor, highestScore = currScore;
         Point newLoc;
-        List<Integer> newTokens;
-        List<Point> possibleMoves = this.getPossibleMoves();
+        int[] newTokens;
+        List<Point> possibleMoves = Settings.getPossibleMoves();
         for (Point move : possibleMoves) {
             newLoc = new Point(currLoc.x + move.x, currLoc.y + move.y);
-            if ((0 <= newLoc.x) && (newLoc.x < boardWidth) &&
-                    (0 <= newLoc.y) && (newLoc.y < boardHeight)) {
+            if ((0 <= newLoc.x) && (newLoc.x < boardWidth) && (0 <= newLoc.y) && (newLoc.y < boardHeight)) {
                 tileColor = this.getTileColorNumber(newLoc);
-                if (tokens.contains(tileColor)) {
+                if (chips[tileColor] > 0) {
                     // Move is allowed
-                    newTokens = new ArrayList<>(tokens);
-                    newTokens.remove(Integer.valueOf(tileColor));
+                    newTokens = chips.clone();
+                    newTokens[tileColor] -= 1;
                     highestScore = Math.max(highestScore, calculateScore(newLoc, newTokens, startLoc, goalLoc));
                 }
             }
         }
         return highestScore;
-    }
-
-    public int calculateScoreAgent(Player agent) {
-        return calculateScore(agent.startingPosition, agent.getTokens(), agent.startingPosition, agent.goalPosition);
     }
 }

@@ -1,6 +1,6 @@
 package gui;
 
-import controller.GameListener;
+import utilities.GameListener;
 import utilities.Game;
 import utilities.Settings;
 
@@ -46,9 +46,6 @@ public class BoardPanel extends JComponent implements GameListener {
         paintStartLocation(g2);
         paintGoalLocation(g2);
 
-//        if (selected != null)
-//            paintSelection(g2);
-
         g2.dispose();
     }
 
@@ -78,7 +75,7 @@ public class BoardPanel extends JComponent implements GameListener {
         int offset = 1;
         for (int x = 0; x < simulationSize.width; x++) {
             for (int y = 0; y < simulationSize.height; y++) {
-                g2.setColor(game.board.getTileColor(new Point(x, y)));
+                g2.setColor(game.getBoard().getTileColor(new Point(x, y)));
                 g2.fillRect(
                         x * siteSize.width + offset, y * siteSize.height + offset,
                         siteSize.width - offset, siteSize.height - offset);
@@ -106,25 +103,13 @@ public class BoardPanel extends JComponent implements GameListener {
         Dimension siteSize = getTileSize();
         int offset = 1;
 
-        Point startInit, startResp;
-
-        startInit = game.initiator.getStartingPosition();
-        startResp = game.responder.getStartingPosition();
+        Point start = Settings.STARTING_POSITION;
 
         g2.setColor(Color.WHITE);
         g2.fillRect(
-                startInit.x * siteSize.width + offset, startInit.y * siteSize.height + offset,
+                start.x * siteSize.width + offset, start.y * siteSize.height + offset,
                 siteSize.width - offset, siteSize.height - offset);
-        g2.fillRect(
-                startResp.x * siteSize.width + offset, startResp.y * siteSize.height + offset,
-                siteSize.width - offset, siteSize.height - offset);
-
-        if (startInit.equals(startResp)) {
-            drawSymbol(Settings.START_LOCATION_SYMBOL, g2, startInit);
-        } else {
-            drawSymbol(Settings.START_LOCATION_SYMBOL_INITIATOR, g2, startInit);
-            drawSymbol(Settings.START_LOCATION_SYMBOL_RESPONDER, g2, startResp);
-        }
+        drawSymbol(Settings.START_LOCATION_SYMBOL, g2, start);
     }
 
     /**
@@ -135,8 +120,8 @@ public class BoardPanel extends JComponent implements GameListener {
     private void paintGoalLocation(Graphics2D g2) {
         Point goalInit, goalResp;
 
-        goalInit = game.initiator.getGoalPosition();
-        goalResp = game.responder.getGoalPosition();
+        goalInit = game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME);
+        goalResp = game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME);
 
         if (goalInit.equals(goalResp)) {
             drawSymbol(Settings.GOAL_LOCATION_SYMBOL, g2, goalInit);
@@ -172,5 +157,6 @@ public class BoardPanel extends JComponent implements GameListener {
     }
 
     @Override
-    public void gameChanged() {}
+    public void gameChanged() {
+    }
 }
