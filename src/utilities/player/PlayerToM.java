@@ -48,7 +48,7 @@ public class PlayerToM extends Player {
      */
     private boolean confidenceLocked;
 
-    private final int initialPoints;
+    private int initialPoints;
 
     /**
      * Constructor
@@ -100,6 +100,7 @@ public class PlayerToM extends Player {
      */
     public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
         super.initNewRound(chipsSelf, chipsOther, utilityFunction);
+        this.initialPoints = getUtilityValue();
         if (orderToM > 0) {
             Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
             selfModel.initNewRound(chipsSelf, chipsOther, utilityFunction);

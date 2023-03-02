@@ -31,3 +31,6 @@ bin/
 ### workspace ###
 /.idea/
 .idea/
+
+py_src/myenv/
+/src/code_hw/
