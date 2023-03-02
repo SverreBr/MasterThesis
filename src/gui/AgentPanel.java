@@ -78,9 +78,10 @@ public class AgentPanel extends JComponent implements GameListener {
      * Constructor of the agent panel
      */
     public AgentPanel(Game game, String agentName) {
+        this.game = game;
         this.agentName = agentName;
         setAgent();
-        this.game = game;
+
 
         this.initialChips = agent.getChipsBin();
         this.initialPoints = agent.getUtilityValue();
