@@ -13,8 +13,8 @@ public class ResultSettings {
             "nr_offers");
     public static final List<Integer> initTomList = Arrays.asList(0, 1, 2);
     public static final List<Integer> respTomList = Arrays.asList(0, 1, 2);
-    public static final List<Double> initLRList = Arrays.asList(0.1, 0.5, 0.9);
-    public static final List<Double> respLRList = Arrays.asList(0.1, 0.5, 0.9);
+    public static final List<Double> initLRList = List.of(0.5);
+    public static final List<Double> respLRList = List.of(0.5);
     public static final int NUM_REP = 2;
     public static final int WARMUP_ROUNDS = 1;
     public static final int KEEP_RESULTS_NR_ROUNDS = 1;

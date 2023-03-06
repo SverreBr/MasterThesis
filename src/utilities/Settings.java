@@ -16,17 +16,17 @@ public class Settings {
     /**
      * Score for reaching goal
      */
-    public static final int SCORE_GOAL = 50;
+    public static final int SCORE_GOAL = 500;
 
     /**
      * Score subtracted when goal not reached
      */
-    public static final int SCORE_STEP = 10;
+    public static final int SCORE_STEP = 100;
 
     /**
      * Score added when tokens left over
      */
-    public static final int SCORE_SURPLUS = 5;
+    public static final int SCORE_SURPLUS = 50;
 
     /**
      * Score added for every offer made in the game

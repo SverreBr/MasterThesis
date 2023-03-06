@@ -100,7 +100,7 @@ public class SettingsDialog extends JDialog {
 
         JTextPane initiatorLRText = new JTextPane();
         addStylesToDoc(initiatorLRText, "Initiator learning rate: ");
-        initiatorLRField = new JTextField("0.1", 0);
+        initiatorLRField = new JTextField("0.5", 0);
 
         JTextPane responderToMText = new JTextPane();
         addStylesToDoc(responderToMText, "Responder ToM: ");
@@ -108,7 +108,7 @@ public class SettingsDialog extends JDialog {
 
         JTextPane responderLRText = new JTextPane();
         addStylesToDoc(responderLRText, "Responder learning rate: ");
-        responderLRField = new JTextField("0.1", 0);
+        responderLRField = new JTextField("0.5", 0);
 
         optionPanel.add(initiatorToMText);
         optionPanel.add(initiatorToMField);
