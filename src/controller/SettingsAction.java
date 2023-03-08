@@ -2,7 +2,7 @@ package controller;
 
 import gui.SettingsDialog;
 import gui.Popups;
-import utilities.Game;
+import model.Game;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -42,6 +42,7 @@ public class SettingsAction extends AbstractAction {
         }
         int initToM, respToM;
         double initLR, respLR;
+        boolean initCanLie, respCanLie;
 
         SettingsDialog sd = new SettingsDialog(mainFrame,"Game settings");
         sd.setVisible(true);
@@ -49,9 +50,14 @@ public class SettingsAction extends AbstractAction {
         if (sd.gameHasChanged) {
             initToM = sd.getInitiatorToMFieldValue();
             initLR = sd.getInitiatorLRFieldValue();
+            initCanLie = sd.isInitiatorLieFieldValue();
             respToM = sd.getResponderToMFieldValue();
             respLR = sd.getResponderLRFieldValue();
-            game.reset(initToM, respToM, initLR, respLR);
+            respCanLie = sd.isResponderLieFieldValue();
+
+
+
+            game.reset(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
         }
     }
 }

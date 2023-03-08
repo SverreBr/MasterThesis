@@ -2,8 +2,9 @@ package gui;
 
 import controller.ForwardAction;
 import controller.ForwardListener;
-import utilities.Game;
-import utilities.GameListener;
+import model.Game;
+import model.GameListener;
+import model.player.PlayerLying;
 import utilities.Settings;
 
 import javax.swing.*;
@@ -176,10 +177,14 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
      * Restarts the game with new agents
      */
     private void restart() {
-        game.reset(game.getInitiator().getOrderToM(),
-                game.getResponder().getOrderToM(),
-                game.getInitiator().getLearningSpeed(),
-                game.getResponder().getLearningSpeed());
+        PlayerLying init = game.getInitiator();
+        PlayerLying resp = game.getResponder();
+        game.reset(init.getOrderToM(),
+                resp.getOrderToM(),
+                init.getLearningSpeed(),
+                resp.getLearningSpeed(),
+                init.isCanLie(),
+                resp.isCanLie());
     }
 
 

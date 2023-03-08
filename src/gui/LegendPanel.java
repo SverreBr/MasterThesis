@@ -1,8 +1,8 @@
 package gui;
 
 import controller.SettingsAction;
-import utilities.GameListener;
-import utilities.Game;
+import model.GameListener;
+import model.Game;
 import utilities.Settings;
 
 import javax.imageio.ImageIO;
@@ -95,7 +95,7 @@ public class LegendPanel extends JPanel implements GameListener {
      */
     private void createTextPane() {
         info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - SETTINGS_BUTTON_SIZE,
-                Settings.MAIN_PANEL_SIZE - Settings.AGENT_PANEL_HEIGHT - 30));
+                Settings.LEGEND_PANEL_HEIGHT - 30));
         info.setEditable(false);
         info.setOpaque(false);
         StyledDocument doc = info.getStyledDocument();

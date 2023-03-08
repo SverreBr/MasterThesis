@@ -1,4 +1,4 @@
-package utilities;
+package model;
 
 /**
  * Listeners to the game model

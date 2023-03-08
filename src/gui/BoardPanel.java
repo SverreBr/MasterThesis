@@ -1,7 +1,7 @@
 package gui;
 
-import utilities.GameListener;
-import utilities.Game;
+import model.GameListener;
+import model.Game;
 import utilities.Settings;
 
 import javax.swing.*;

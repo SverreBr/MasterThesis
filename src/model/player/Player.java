@@ -1,7 +1,7 @@
-package utilities.player;
+package model.player;
 
 import utilities.Chips;
-import utilities.Game;
+import model.Game;
 import utilities.Settings;
 
 import java.util.ArrayList;
@@ -13,8 +13,8 @@ import java.util.List;
 public abstract class Player {
 
     /**
-     * The set of chips is represented as an index, the score resulting from the set of
-     * chips is represented as an entry in the utilityFunction array
+     * The set of offer is represented as an index, the score resulting from the set of
+     * offer is represented as an entry in the utilityFunction array
      */
     protected int chips;
 
@@ -32,8 +32,8 @@ public abstract class Player {
     /**
      * RELATIVE
      * The belief that an offer of a particular kind will be accepted.
-     * The first entry is the sum of chips assigned extra to it and
-     * the second entry is the sum of chips assigned less to it
+     * The first entry is the sum of offer assigned extra to it and
+     * the second entry is the sum of offer assigned less to it
      * This field is essentially to be able to learn across games.
      */
     private double[][] beliefsOfferType;
@@ -41,8 +41,8 @@ public abstract class Player {
     /**
      * ABSOLUTE (offer accepted count)
      * The belief that an offer of a particular kind will be accepted.
-     * The first entry is the sum of chips assigned extra to it and
-     * the second entry is the sum of chips assigned less to it
+     * The first entry is the sum of offer assigned extra to it and
+     * the second entry is the sum of offer assigned less to it
      * This field is essentially to be able to learn across games.
      */
     private int[][] countBeliefsOfferType;
@@ -50,8 +50,8 @@ public abstract class Player {
     /**
      * ABSOLUTE (total offers count)
      * The belief that an offer of a particular kind will be accepted.
-     * The first entry is the sum of chips assigned extra to it and
-     * the second entry is the sum of chips assigned less to it
+     * The first entry is the sum of offer assigned extra to it and
+     * the second entry is the sum of offer assigned less to it
      * This field is essentially to be able to learn across games.
      */
     private int[][] countTotalOfferType;
@@ -66,7 +66,7 @@ public abstract class Player {
     /**
      * To save the original beliefs when going to reason about possible offers.
      */
-    private double[] beliefOfferSaved;
+    private double[][] beliefOfferSaved;
 
     /**
      * Learning speed of the agent. Used to update beliefs about location and offers.
@@ -88,6 +88,10 @@ public abstract class Player {
      */
     private List<String> messages;
 
+    private int messageCnt = 0;
+
+    protected int saveCount = 0;
+
     /**
      * Constructor
      *
@@ -103,25 +107,9 @@ public abstract class Player {
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
         beliefOffer = new double[utilityFunction.length];
-        beliefOfferSaved = new double[beliefOffer.length];
+        beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
         setupNewBeliefs();
     }
-
-//    /**
-//     * Resets the player completely. That is, all beliefs are reset.
-//     *
-//     * @param chipsSelf       The chips to himself
-//     * @param chipsOther      The chips to the other player
-//     * @param utilityFunction The utility function for this player.
-//     */
-//    public void reset(int chipsSelf, int chipsOther, int[] utilityFunction) {
-//        this.messages = new ArrayList<>();
-//        this.chips = chipsSelf;
-//        this.utilityFunction = utilityFunction.clone();
-//        beliefOffer = new double[utilityFunction.length];
-//        beliefOfferSaved = new double[beliefOffer.length];
-//        setupNewBeliefs();
-//    }
 
     /**
      * Set up new beliefs. The player starts with full belief that an offer of any type will work.
@@ -155,16 +143,18 @@ public abstract class Player {
     /**
      * Prepares the player for a new round of negotiation. Only the beliefs of types of offers are kept.
      *
-     * @param chipsSelf       The chips to himself
-     * @param chipsOther      The chips to the other player
+     * @param chipsSelf       The offer to himself
+     * @param chipsOther      The offer to the other player
      * @param utilityFunction The utility function for this player
      */
     public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
         this.messages = new ArrayList<>();
+        this.messageCnt = 0;
+        this.saveCount = 0;
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
         beliefOffer = new double[utilityFunction.length];
-        beliefOfferSaved = new double[beliefOffer.length];
+        beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
 
         // Beliefs about specific colors are reset
         for (int i = 0; i < utilityFunction.length; i++) {
@@ -198,8 +188,8 @@ public abstract class Player {
      *
      * @param offerReceived the offer made by Player p from the perspective of this agent.
      *                      That is, if accepted, the agent gets offer
-     * @return the counter-offer to Player p from the perspective of Player p.
-     * That is, if accepted, Player p gets the returned value.
+     * @return the counter-offer to Player p from the perspective of this agent.
+     * That is, if accepted, this player gets the returned value.
      */
     abstract public int makeOffer(int offerReceived);
 
@@ -212,19 +202,23 @@ public abstract class Player {
      */
     abstract public int selectOffer(int offerReceived);
 
+    abstract public void receiveMessage(String message);
+
     /**
      * Stores the current beliefs for later retrieval.
      * Used for prediction using a "fictitious play"-like structure
      */
     protected void saveBeliefs() {
-        beliefOfferSaved = beliefOffer.clone();
+        beliefOfferSaved[saveCount] = beliefOffer.clone();
+        saveCount++;
     }
 
     /**
      * Restores previously stored beliefs
      */
     protected void restoreBeliefs() {
-        beliefOffer = beliefOfferSaved.clone();
+        saveCount--;
+        beliefOffer = beliefOfferSaved[saveCount].clone();
     }
 
     /**
@@ -277,7 +271,7 @@ public abstract class Player {
     /**
      * Decreases the belief of a specific offer being accepted.
      *
-     * @param newOwnChips The new set of chips that has been offered.
+     * @param newOwnChips The new set of offer that has been offered.
      */
     private void decreaseColorBeliefRejected(int newOwnChips) {
         int i, j;
@@ -288,7 +282,7 @@ public abstract class Player {
             curOffer = Chips.getBins(i, game.getBinMaxChips());
             for (j = 0; j < Settings.CHIP_DIVERSITY; j++) {
                 if (curOffer[j] >= newOwnBins[j]) {
-                    // curOffer demands at least as much chips of color j
+                    // curOffer demands at least as much offer of color j
                     // as the offer newOwnChips of the trading partner.
                     // It's likely to be rejected as well
                     beliefOffer[i] *= (1 - learningSpeed);
@@ -301,7 +295,7 @@ public abstract class Player {
      * Decreases the belief of an offer being accepted that assigns more of a particular color to this agent.
      * This is called when an offer has been made which assigns newOwnChips to this agent.
      *
-     * @param newOwnChips The chips assigned to this agent
+     * @param newOwnChips The offer assigned to this agent
      */
     private void decreaseColorBeliefReceived(int newOwnChips) {
         int i, j;
@@ -312,7 +306,7 @@ public abstract class Player {
             curOffer = Chips.getBins(i, game.getBinMaxChips());
             for (j = 0; j < Settings.CHIP_DIVERSITY; j++) {
                 if (curOffer[j] > newOwnBins[j]) {
-                    // curOffer demands more chips of color j than the
+                    // curOffer demands more offer of color j than the
                     // offer newOwnChips of the trading partner.
                     // It's less likely to be accepted.
                     beliefOffer[i] *= (1 - learningSpeed);
@@ -353,7 +347,6 @@ public abstract class Player {
         decreaseColorBeliefRejected(offerToSelf);
     }
 
-
     /**
      * The expected value the ToM0 agent assigns to making offer.
      *
@@ -371,12 +364,18 @@ public abstract class Player {
      *
      * @param message The message to add.
      */
-    public void addMessage(String message) {
+    public void addMessage(String message, boolean isOffer) {
+        if (isOffer) {
+            message = messageCnt + ". " + message;
+            messageCnt += 1;
+        } else {
+            message = "  - " + message;
+        }
         messages.add(message);
     }
 
     /**
-     * returns the utility score of this agent given its current chips
+     * returns the utility score of this agent given its current offer
      *
      * @return the utility score of this agent
      */
@@ -385,7 +384,7 @@ public abstract class Player {
     }
 
     /**
-     * returns the final score of this agent given its current chips and the number of offers that has been made
+     * returns the final score of this agent given its current offer and the number of offers that has been made
      *
      * @return the final score of this agent after negotiation
      */
@@ -399,16 +398,16 @@ public abstract class Player {
     ///////////////////////////////
 
     /**
-     * Setter for new chips
+     * Setter for new offer
      *
-     * @param newChips The new chips this agent will possess
+     * @param newChips The new offer this agent will possess
      */
     public void setNewChips(int newChips) {
         this.chips = newChips;
     }
 
     /**
-     * Getter for chips
+     * Getter for offer
      */
     public int getChips() {
         return this.chips;
@@ -433,9 +432,9 @@ public abstract class Player {
     }
 
     /**
-     * Getter for the chips in the form of bins.
+     * Getter for the offer in the form of bins.
      *
-     * @return The chips of this player in the form of bins.
+     * @return The offer of this player in the form of bins.
      */
     public int[] getChipsBin() {
         // TODO: Is it maybe faster to also save chipsBin in player?

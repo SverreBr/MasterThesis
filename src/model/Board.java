@@ -1,4 +1,7 @@
-package utilities;
+package model;
+
+import utilities.Chips;
+import utilities.Settings;
 
 import java.awt.*;
 import java.util.List;

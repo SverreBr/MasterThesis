@@ -1,6 +1,7 @@
 package results;
 
-import utilities.Game;
+import model.Game;
+import model.player.PlayerLying;
 
 public class ResultElement {
 
@@ -9,6 +10,10 @@ public class ResultElement {
 
     private final double initLR;
     private final double respLR;
+
+    private final boolean initCanLie;
+    private final boolean respCanLie;
+
 
     private final int initFinalPoints;
     private final int respFinalPoints;
@@ -19,15 +24,20 @@ public class ResultElement {
     private final int nrOffers;
 
     public ResultElement(Game game) {
-        initToM = game.getInitiator().getOrderToM();
-        initLR = game.getInitiator().getLearningSpeed();
-        initFinalPoints = game.getInitiator().getFinalPoints();
-        initInitialPoints = game.getInitiator().getInitialPoints();
+        PlayerLying init = game.getInitiator();
+        PlayerLying resp = game.getResponder();
 
-        respToM = game.getResponder().getOrderToM();
-        respLR = game.getResponder().getLearningSpeed();
-        respFinalPoints = game.getResponder().getFinalPoints();
-        respInitialPoints = game.getResponder().getInitialPoints();
+        initToM = init.getOrderToM();
+        initLR = init.getLearningSpeed();
+        initCanLie = init.isCanLie();
+        initFinalPoints = init.getFinalPoints();
+        initInitialPoints = init.getInitialPoints();
+
+        respToM = resp.getOrderToM();
+        respLR = resp.getLearningSpeed();
+        respCanLie = resp.isCanLie();
+        respFinalPoints = resp.getFinalPoints();
+        respInitialPoints = resp.getInitialPoints();
 
         nrOffers = game.getNrOffers();
     }
@@ -75,5 +85,13 @@ public class ResultElement {
 
     public int getNrOffers() {
         return nrOffers;
+    }
+
+    public boolean isInitCanLie() {
+        return initCanLie;
+    }
+
+    public boolean isRespCanLie() {
+        return respCanLie;
     }
 }

@@ -1,6 +1,6 @@
 package controller;
 
-import utilities.Game;
+import model.Game;
 
 import java.awt.*;
 import java.util.HashSet;

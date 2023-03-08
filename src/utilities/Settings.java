@@ -61,7 +61,7 @@ public class Settings {
     /**
      * determines the width of the button panel
      */
-    public static final int BUTTON_PANEL_WIDTH = 300;
+    public static final int BUTTON_PANEL_WIDTH = 320;
 
     /**
      * determines the height of the agent panel
@@ -73,10 +73,7 @@ public class Settings {
      */
     public static final int AGENT_TEXT_HEIGHT = 290;
 
-    /**
-     * Size of the main panel
-     */
-    public static final int MAIN_PANEL_SIZE = 750;
+    public static final int LEGEND_PANEL_HEIGHT = 210;
 
     /**
      * Size of the board panel
@@ -127,6 +124,8 @@ public class Settings {
      * Message an agent provides when it accepts an offer
      */
     public static final String ACCEPT_OFFER_MESSAGE = "I accept your offer.";
+
+    public static final int SAVE_NUMBER = 3;
 
     /**
      * Returns a color given a certain integer

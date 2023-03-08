@@ -1,6 +1,7 @@
-package utilities.player;
+package model.player;
 
-import utilities.Game;
+import model.Game;
+import utilities.Messages;
 import utilities.Settings;
 
 import java.util.ArrayList;
@@ -21,17 +22,17 @@ public class PlayerToM extends Player {
     /**
      * To save beliefs of the location.
      */
-    private double[] savedLocationBeliefs;
+    private final double[][] savedLocationBeliefs;
 
     /**
      * The model of the partner
      */
-    private final PlayerToM partnerModel;
+    protected final PlayerToM partnerModel;
 
     /**
      * The model of itself for using lower orders of mind
      */
-    private final PlayerToM selfModel;
+    protected final PlayerToM selfModel;
 
     /**
      * The order of theory of mind
@@ -51,15 +52,19 @@ public class PlayerToM extends Player {
     private int initialPoints;
 
     /**
-     * Constructor
-     *
-     * @param playerName name of the agent
-     * @param game       the model of the game
+     * @param playerName      name of the player
+     * @param game            game model
+     * @param orderToM        order of theory of mind
+     * @param learningSpeed   learning speed
+     * @param chipsSelf       offer that are for this player
+     * @param chipsOther      offer that are for the other player
+     * @param utilityFunction utility function for this player
      */
     public PlayerToM(String playerName, Game game, int orderToM, double learningSpeed, int chipsSelf, int chipsOther, int[] utilityFunction) {
         super(playerName, game, learningSpeed, chipsSelf, utilityFunction);
         this.orderToM = orderToM;
         this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
+        this.savedLocationBeliefs = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
         this.initialPoints = getUtilityValue();
 
         if (this.orderToM > 0) {
@@ -74,28 +79,11 @@ public class PlayerToM extends Player {
         }
     }
 
-//    /**
-//     * Resets the agent for a full new round of play, without any learned behaviour.
-//     *
-//     * @param chipsSelf       The chips to himself
-//     * @param chipsOther      The chips to the other player
-//     * @param utilityFunction The utility function for this player.
-//     */
-//    public void reset(int chipsSelf, int chipsOther, int[] utilityFunction) {
-//        super.reset(chipsSelf, chipsOther, utilityFunction);
-//        if (this.orderToM > 0) {
-//            Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
-//            selfModel.reset(chipsSelf, chipsOther, utilityFunction);
-//            partnerModel.reset(chipsOther, chipsSelf, utilityFunction);
-//            confidence = 1.0;  // starting confidence
-//        }
-//    }
-
     /**
      * Initializes the agent for a new round, but learning from other games is kept.
      *
-     * @param chipsSelf       The chips to himself
-     * @param chipsOther      The chips to the other player
+     * @param chipsSelf       The offer to himself
+     * @param chipsOther      The offer to the other player
      * @param utilityFunction The utility function for this player
      */
     public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
@@ -110,28 +98,28 @@ public class PlayerToM extends Player {
     }
 
     /**
-     * Makes an offer when agent receives offerReceived
+     * Gives the agent's counter-offer for a specific offer
      *
      * @param offerReceived the offer made by Player p from the perspective of this agent.
      *                      That is, if accepted, the agent gets offer
-     * @return the offer that this agent makes as a response to offerReceived.
+     * @return the counter-offer to Player p from the perspective of this agent.
+     * That is, if accepted, this player gets the returned value.
      */
     public int makeOffer(int offerReceived) {
         int curOffer;
 
         if (offerReceived < 0) {
-            // No offer to receive
             curOffer = selectInitialOffer();
         } else {
             receiveOffer(offerReceived);
             curOffer = selectOffer(offerReceived);
         }
         sendOffer(curOffer);
-        return this.game.flipOffer(curOffer); // TODO: maybe switch the return to the player itself.
+        return curOffer;
     }
 
     /**
-     * Makes an initial offer. In this case, it is as if the other agent made the offer to keep chips.
+     * Makes an initial offer. In this case, it is as if the other agent made the offer to keep offer.
      *
      * @return the offer that this agent makes as an initial offer
      */
@@ -224,10 +212,10 @@ public class PlayerToM extends Player {
             // Partner accepts.
             curValue = utilityFunction[offerToSelf] - 1;
         } else if (response == partnerModel.chips) {
-            // Offer equals partner its chips, so partner has withdrawn from negotiation
+            // Offer equals partner its offer, so partner has withdrawn from negotiation
             curValue = utilityFunction[this.chips] - 1;
         } else {
-            // Offer is not equal to partner its chips, so new offer has been made
+            // Offer is not equal to partner its offer, so new offer has been made
             response = game.flipOffer(response);
             curValue = Math.max(utilityFunction[response], utilityFunction[this.chips]) - 2;
             // one for current offer and one for offer from partner
@@ -327,7 +315,7 @@ public class PlayerToM extends Player {
     public void saveBeliefs() {
         super.saveBeliefs();
         if (orderToM > 0) {
-            savedLocationBeliefs = locationBeliefs.clone();
+            savedLocationBeliefs[saveCount-1] = locationBeliefs.clone();
             partnerModel.saveBeliefs();
             selfModel.saveBeliefs();
         }
@@ -339,7 +327,7 @@ public class PlayerToM extends Player {
     public void restoreBeliefs() {
         super.restoreBeliefs();
         if (orderToM > 0) {
-            locationBeliefs = savedLocationBeliefs.clone();
+            locationBeliefs = savedLocationBeliefs[saveCount].clone();
             partnerModel.restoreBeliefs();
             selfModel.restoreBeliefs();
         }
@@ -389,5 +377,37 @@ public class PlayerToM extends Player {
 
     public int getInitialPoints() {
         return initialPoints;
+    }
+
+    /////////////////
+    ////  LYING  ////
+    /////////////////
+
+    private void receiveLocationMessage(int location) {
+        int loc;
+        if (this.orderToM > 0) {
+            for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
+                locationBeliefs[loc] = 0;
+            }
+            locationBeliefs[location] = 1;
+        }
+    }
+
+    public void receiveMessage(String message) {
+        int loc;
+        String messageType = Messages.getMessageType(message);
+        if (messageType.equals(Messages.LOCATION_MESSAGE)) {
+            loc = Messages.getLocationFromMessage(message);
+            receiveLocationMessage(loc);
+        }
+    }
+
+    public void sendMessage(String message) {
+        addMessage(message, false);
+        this.game.sendMessage(this, message);
+        partnerModel.receiveMessage(message);
+        if (selfModel.getOrderToM() > 1) {
+            selfModel.sendMessage(message);
+        }
     }
 }

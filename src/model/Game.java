@@ -1,12 +1,15 @@
-package utilities;
+package model;
 
-import utilities.player.PlayerToM;
+import model.player.PlayerLying;
+import model.player.PlayerToM;
+import utilities.Chips;
+import utilities.Settings;
 
 import java.awt.*;
 import java.util.*;
 
 /**
- * utilities.Game class: the two players and the coloured trails board
+ * model.Game class: the two players and the coloured trails board
  */
 public class Game {
 
@@ -48,7 +51,7 @@ public class Game {
     /**
      * the initiator agent
      */
-    private PlayerToM initiator;
+    private PlayerLying initiator;
 
     /**
      * the last offer made
@@ -63,7 +66,7 @@ public class Game {
     /**
      * the responding agent
      */
-    private PlayerToM responder;
+    private PlayerLying responder;
 
     /**
      * keeps track of whose turn it is
@@ -93,20 +96,20 @@ public class Game {
     /**
      * Constructor
      */
-    public Game(int initToM, int respToM, double initLR, double respLR) {
+    public Game(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
         this.listeners = new HashSet<>();
         this.board = new Board();
         this.goalPositionsDict = Settings.makeGoalPositionDictionary();
         this.nrGoalPositions = this.goalPositionsDict.size();
-        initNewGame(initToM, respToM, initLR, respLR);
+        initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
     }
 
     /**
      * resets the board to a new initialization
      */
-    public void reset(int initToM, int respToM, double initLR, double respLR) {
+    public void reset(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
         this.board.resetBoard();
-        this.initNewGame(initToM, respToM, initLR, respLR);
+        this.initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
         if (simulationOn)
             notifyListenersNewGame();
     }
@@ -114,18 +117,15 @@ public class Game {
     /**
      * Initializes a fully new game, where the agents are also fully reset
      */
-    private void initNewGame(int initToM, int respToM, double initLR, double respLR) {
+    private void initNewGame(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
         generateNewNegotiationSetting();
         int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
         int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
 
-        this.initiator = new PlayerToM(Settings.INITIATOR_NAME, this, initToM, initLR,
-                chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
-        this.responder = new PlayerToM(Settings.RESPONDER_NAME, this, respToM, respLR,
-                chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
-
-//        this.initiator.reset();
-//        this.responder.reset(chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
+        this.initiator = new PlayerLying(Settings.INITIATOR_NAME, this, initToM, initLR,
+                chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]], initCanLie);
+        this.responder = new PlayerLying(Settings.RESPONDER_NAME, this, respToM, respLR,
+                chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]], respCanLie);
     }
 
     /**
@@ -241,32 +241,26 @@ public class Game {
         int tmpNewOffer, flippedOffer;
         boolean negotiationEnds = false;
 
-        if (isGameFinished) {
-            return;
-        }
+        if (isGameFinished) return;
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
-            // turn initiator
             tmpNewOffer = this.initiator.makeOffer(newOffer);
-
-            // negotiation ends when agent offers original distribution
-            if (tmpNewOffer == this.responder.getChips()) negotiationEnds = true;
-        } else {
-            // turn responder
-            tmpNewOffer = this.responder.makeOffer(newOffer);
-
             if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
+                // negotiation ends when agent offers original distribution
+        } else {
+            tmpNewOffer = this.responder.makeOffer(newOffer);
+            if (tmpNewOffer == this.responder.getChips()) negotiationEnds = true;
         }
 
         flippedOffer = flipOffer(tmpNewOffer);
         if (negotiationEnds) { // Negotiation terminated
             negotiationTerminates();
-        } else if (flippedOffer == newOffer) { // Offer is accepted
-            offerAccepted(tmpNewOffer);
+        } else if (tmpNewOffer == newOffer) { // Offer is accepted
+            offerAccepted(flippedOffer);
         } else { // Negotiation continues with new offer
             nrOffers++;
-            newOffer = tmpNewOffer;
-            addOfferMessage();
+            newOffer = flippedOffer;
+            addOfferMessage(tmpNewOffer);
             switchTurn();
         }
 
@@ -286,6 +280,11 @@ public class Game {
         if (i >= 100) {
             System.out.println("one hundred steps performed.");
         }
+    }
+
+    public void sendMessage(PlayerToM agentMessenger, String message) {
+        PlayerToM agentReceiver = agentMessenger.getName().equals(Settings.INITIATOR_NAME) ? responder : initiator;
+        agentReceiver.receiveMessage(message);
     }
 
     //////////////////////////////
@@ -315,12 +314,16 @@ public class Game {
     /**
      * Adds an offer message to an offer
      */
-    public void addOfferMessage() {
-        String message = "I offer you: " + Arrays.toString(Chips.getBins(newOffer, binMaxChips)) + ";";
+    public void addOfferMessage(int flippedOffer) {
+        String message;
         if (turn.equals(Settings.INITIATOR_NAME)) {
-            this.initiator.addMessage(message);
+            message = "I offer: " + Arrays.toString(Chips.getBins(flippedOffer, binMaxChips)) + " - " +
+                    Arrays.toString(Chips.getBins(newOffer, binMaxChips));
+            this.initiator.addMessage(message, true);
         } else {
-            this.responder.addMessage(message);
+            message = "I offer: " + Arrays.toString(Chips.getBins(newOffer, binMaxChips)) + " - " +
+                    Arrays.toString(Chips.getBins(flippedOffer, binMaxChips));
+            this.responder.addMessage(message, true);
         }
     }
 
@@ -344,13 +347,13 @@ public class Game {
             initiator.processOfferAccepted(newOffer);
             responder.processOfferAccepted(flippedOffer);
             setNewChips(newOffer, flippedOffer);
-            this.initiator.addMessage(Settings.ACCEPT_OFFER_MESSAGE);
+            this.initiator.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         } else {
             // Responder accepted offer
             responder.processOfferAccepted(newOffer);
             initiator.processOfferAccepted(flippedOffer);
             setNewChips(flippedOffer, newOffer);
-            this.responder.addMessage(Settings.ACCEPT_OFFER_MESSAGE);
+            this.responder.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         }
     }
 
@@ -360,9 +363,9 @@ public class Game {
     public void negotiationTerminates() {
         setBooleanGameFinished(true);
         if (turn.equals(Settings.INITIATOR_NAME)) {
-            this.initiator.addMessage(Settings.TERMINATE_NEGOTIATION_MESSAGE);
+            this.initiator.addMessage(Settings.TERMINATE_NEGOTIATION_MESSAGE, false);
         } else {
-            this.responder.addMessage(Settings.TERMINATE_NEGOTIATION_MESSAGE);
+            this.responder.addMessage(Settings.TERMINATE_NEGOTIATION_MESSAGE, false);
         }
     }
 
@@ -454,7 +457,7 @@ public class Game {
      *
      * @return the agent that is the initiator
      */
-    public PlayerToM getInitiator() {
+    public PlayerLying getInitiator() {
         return this.initiator;
     }
 
@@ -463,7 +466,7 @@ public class Game {
      *
      * @return the agent that is the responder
      */
-    public PlayerToM getResponder() {
+    public PlayerLying getResponder() {
         return this.responder;
     }
 
@@ -522,6 +525,11 @@ public class Game {
     public Point getGoalPositionPointPlayer(String player) {
         int playerIdx = getPlayerIdx(player);
         return goalPositionsDict.get(goalPositions[playerIdx]);
+    }
+
+    public int getGoalPositionPlayer(String player) {
+        int playerIdx = getPlayerIdx(player);
+        return goalPositions[playerIdx];
     }
 
     /**

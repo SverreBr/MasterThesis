@@ -51,6 +51,15 @@ public class Popups extends JOptionPane {
                 "Invalid input", JOptionPane.ERROR_MESSAGE);
     }
 
+    public static void showInvalidCanLieToM(String name, int tom) {
+        showMessageDialog(null,
+                "Provided an invalid boolean value that the " + name + " can lie.\n" +
+                        "Only an agent with a higher-order theory of mind can lie (2+), but you provided " + tom + ".\n" +
+                        "For now, no changes have been made to the game.",
+                "Invalid input", JOptionPane.ERROR_MESSAGE);
+    }
+
+
     /**
      * Popup to be shown when settings cannot be changed (maybe during forwarding of rounds).
      */

@@ -1,14 +1,15 @@
 package gui;
 
-import utilities.Game;
-import utilities.GameListener;
+import model.Game;
+import model.GameListener;
+import model.player.PlayerLying;
 import utilities.Settings;
-import utilities.player.PlayerToM;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.*;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import java.util.List;
  * AgentPanel: makes the agent panel
  */
 public class AgentPanel extends JComponent implements GameListener {
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     /**
      * Text pane with info about the agent
@@ -52,7 +55,7 @@ public class AgentPanel extends JComponent implements GameListener {
     /**
      * The agent model of this panel
      */
-    private PlayerToM agent;
+    private PlayerLying agent;
 
     /**
      * The name of the agent
@@ -166,10 +169,8 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     public void addAgentMessages() {
         List<String> messages = agent.getMessages();
-        String addMessage;
-        for (int i = 0; i < messages.size(); i++) {
-            addMessage = i + ". " + messages.get(i);
-            this.messages.add(addMessage);
+        for (String message : messages) {
+            this.messages.add(message);
             this.styleMessages.add("regular");
         }
     }
@@ -208,7 +209,7 @@ public class AgentPanel extends JComponent implements GameListener {
     private void updateInfo() {
         int idx = 0;
         style[idx] = "bold";
-        content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + agent.getLearningSpeed() + ")";
+        content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanLie() + ")";
         content[idx++] = "initial chips:";
         content[idx++] = "";
         content[idx++] = "";

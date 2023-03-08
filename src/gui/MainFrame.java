@@ -1,6 +1,6 @@
 package gui;
 
-import utilities.Game;
+import model.Game;
 import utilities.Settings;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ public class MainFrame extends JFrame {
 
         JPanel leftBody = new JPanel();
         leftBody.setLayout(new BorderLayout());
-        leftBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
+        leftBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT + LEGEND_PANEL_HEIGHT));
 
         AgentPanel agentPanelInit = new AgentPanel(game, INITIATOR_NAME);
         agentPanelInit.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
 
         JPanel rightBody = new JPanel();
         rightBody.setLayout(new BorderLayout());
-        rightBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, MAIN_PANEL_SIZE));
+        rightBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT + LEGEND_PANEL_HEIGHT));
 
         AgentPanel agentPanelResp = new AgentPanel(game, RESPONDER_NAME);
         agentPanelResp.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));

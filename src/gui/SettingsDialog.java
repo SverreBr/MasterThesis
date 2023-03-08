@@ -37,6 +37,9 @@ public class SettingsDialog extends JDialog {
      */
     private double initiatorLRFieldValue;
 
+    private JTextField initiatorLieField;
+    private boolean initiatorLieFieldValue;
+
     /**
      * Text field containing the ToM of the responder
      */
@@ -56,6 +59,9 @@ public class SettingsDialog extends JDialog {
      * Value of the text field containing the learning speed of the responder
      */
     private double responderLRFieldValue;
+
+    private JTextField responderLieField;
+    private boolean responderLieFieldValue;
 
     /**
      * Boolean to check if the game has changed
@@ -102,6 +108,10 @@ public class SettingsDialog extends JDialog {
         addStylesToDoc(initiatorLRText, "Initiator learning rate: ");
         initiatorLRField = new JTextField("0.5", 0);
 
+        JTextPane initiatorLieText = new JTextPane();
+        addStylesToDoc(initiatorLieText, "Initiator can lie: ");
+        initiatorLieField = new JTextField("false", 0);
+
         JTextPane responderToMText = new JTextPane();
         addStylesToDoc(responderToMText, "Responder ToM: ");
         responderToMField = new JTextField("0", 0);
@@ -110,15 +120,23 @@ public class SettingsDialog extends JDialog {
         addStylesToDoc(responderLRText, "Responder learning rate: ");
         responderLRField = new JTextField("0.5", 0);
 
+        JTextPane responderLieText = new JTextPane();
+        addStylesToDoc(responderLieText, "Responder can lie: ");
+        responderLieField = new JTextField("false", 0);
+
         optionPanel.add(initiatorToMText);
         optionPanel.add(initiatorToMField);
         optionPanel.add(initiatorLRText);
         optionPanel.add(initiatorLRField);
+        optionPanel.add(initiatorLieText);
+        optionPanel.add(initiatorLieField);
 
         optionPanel.add(responderToMText);
         optionPanel.add(responderToMField);
         optionPanel.add(responderLRText);
         optionPanel.add(responderLRField);
+        optionPanel.add(responderLieText);
+        optionPanel.add(responderLieField);
     }
 
     /**
@@ -165,6 +183,13 @@ public class SettingsDialog extends JDialog {
             this.gameHasChanged = false;
         }
 
+
+        initiatorLieFieldValue = Boolean.parseBoolean(initiatorLieField.getText());
+        if (this.gameHasChanged && initiatorLieFieldValue && (initiatorToMFieldValue < 2)) {
+            Popups.showInvalidCanLieToM(Settings.INITIATOR_NAME, initiatorToMFieldValue);
+            this.gameHasChanged = false;
+        }
+
         try {
             responderToMFieldValue = Integer.parseInt(responderToMField.getText());
         } catch (NumberFormatException ex) {
@@ -182,6 +207,12 @@ public class SettingsDialog extends JDialog {
         }
         if (responderLRFieldValue < 0 || responderLRFieldValue > 1) {
             Popups.showInvalidLR(Settings.RESPONDER_NAME);
+            this.gameHasChanged = false;
+        }
+
+        responderLieFieldValue = Boolean.parseBoolean(responderLieField.getText());
+        if (this.gameHasChanged && responderLieFieldValue && (responderToMFieldValue < 2)) {
+            Popups.showInvalidCanLieToM(Settings.RESPONDER_NAME, responderToMFieldValue);
             this.gameHasChanged = false;
         }
 
@@ -231,5 +262,13 @@ public class SettingsDialog extends JDialog {
      */
     public double getResponderLRFieldValue() {
         return this.responderLRFieldValue;
+    }
+
+    public boolean isInitiatorLieFieldValue() {
+        return initiatorLieFieldValue;
+    }
+
+    public boolean isResponderLieFieldValue() {
+        return responderLieFieldValue;
     }
 }
