@@ -36,7 +36,7 @@ public class SettingsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!game.isSimulationOn()) {
+        if (game.isSimulationOff()) {
             Popups.showSettingsButtonNotAccessible();
             return;
         }
@@ -54,8 +54,6 @@ public class SettingsAction extends AbstractAction {
             respToM = sd.getResponderToMFieldValue();
             respLR = sd.getResponderLRFieldValue();
             respCanLie = sd.isResponderLieFieldValue();
-
-
 
             game.reset(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
         }

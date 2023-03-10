@@ -13,7 +13,7 @@ public interface GameListener {
     /**
      * There is a new game.
      */
-    default void newGame() {}
+    void newGame();
 
     /**
      * The field in game has changed

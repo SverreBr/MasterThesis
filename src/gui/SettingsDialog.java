@@ -92,6 +92,7 @@ public class SettingsDialog extends JDialog {
         getContentPane().add(optionPanel);
         getContentPane().add(btnPanel, BorderLayout.SOUTH);
         pack();
+        this.setLocationRelativeTo(null);
     }
 
     /**

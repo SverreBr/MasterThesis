@@ -31,12 +31,10 @@ public class PlayerLying extends PlayerToM {
         super(playerName, game, orderToM, learningSpeed, chipsSelf, chipsOther, utilityFunction);
         if (agentCanLie && (orderToM < 2)) {
             System.out.println("Agent cannot lie if not theory of mind greater than 1.");
-            System.exit(1);
+            agentCanLie = false;
         }
         this.canLie = agentCanLie;
     }
-
-
 
     public int makeOffer(int offerReceived) {
         int curOffer;
@@ -66,13 +64,12 @@ public class PlayerLying extends PlayerToM {
         addOffers(-1);  // send no message
 
         // Choose offer without message if at least as good as with a message.
+        List<LyingOfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
         bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
-        bestOffer = bestLyingOfferType.offer();
-        bestLoc = bestLyingOfferType.loc();
         noMessageOfferValue = tmpSelectOfferValue;
         thereIsBestOfferWithoutMessage = true;
 
-        if (getOrderToM() > 0) {  // agent models goal and beliefs of trading partner
+        if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
             if (canLie) {
                 for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
                     partnerModel.saveBeliefs();
@@ -89,18 +86,31 @@ public class PlayerLying extends PlayerToM {
             }
         }
         if (!thereIsBestOfferWithoutMessage) {
+            System.out.println("There are offers that give " + this.getName() + " a better value than using no message.");
+            System.out.println("-> Offers that are optimal without message:");
+            for (LyingOfferType smt : bestOffersWithoutMessage) {
+                System.out.println("\t- value=" + noMessageOfferValue + ", offer to self=" +
+                        Arrays.toString(Chips.getBins(smt.offer(), game.getBinMaxChips())));
+            }
+            System.out.println("\t- Chosen is offer to self: " +
+                    Arrays.toString(Chips.getBins(bestLyingOfferType.offer(), game.getBinMaxChips())));
+
+            // choose offer with message
             bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
-            bestOffer = bestLyingOfferType.offer();
-            bestLoc = bestLyingOfferType.loc();
-            System.out.println("There are offers that give " + this.getName() + " a better value than using no message: " +
-                    "value=" + noMessageOfferValue + ", offer to self=" +
-                    Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())));
+            System.out.println("-> Offers that are optimal with message are:");
             for (LyingOfferType something : bestOffers) {
-                System.out.println("\t\t- value=" + tmpSelectOfferValue + ", offer to self=" +
+                System.out.println("\t- value=" + tmpSelectOfferValue + ", offer to self=" +
                         Arrays.toString(Chips.getBins(something.offer(), game.getBinMaxChips())) +
                         ", loc=" + something.loc());
             }
+            System.out.println("\t- Chosen is offer to self: " +
+                    Arrays.toString(Chips.getBins(bestLyingOfferType.offer(), game.getBinMaxChips())) +
+                    ", loc=" + bestLyingOfferType.loc());
         }
+
+        bestOffer = bestLyingOfferType.offer();
+        bestLoc = bestLyingOfferType.loc();
+
 
         if (utilityFunction[offerReceived] >= tmpSelectOfferValue &&
                 utilityFunction[offerReceived] > utilityFunction[this.chips]) {

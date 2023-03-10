@@ -28,7 +28,7 @@ public class MainFrame extends JFrame {
         leftBody.setLayout(new BorderLayout());
         leftBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT + LEGEND_PANEL_HEIGHT));
 
-        AgentPanel agentPanelInit = new AgentPanel(game, INITIATOR_NAME);
+        AgentPanel agentPanelInit = new AgentPanel(game, INITIATOR_NAME, this);
         agentPanelInit.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
 
         LegendPanel legendPanel = new LegendPanel(game, this);
@@ -44,7 +44,7 @@ public class MainFrame extends JFrame {
         rightBody.setLayout(new BorderLayout());
         rightBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT + LEGEND_PANEL_HEIGHT));
 
-        AgentPanel agentPanelResp = new AgentPanel(game, RESPONDER_NAME);
+        AgentPanel agentPanelResp = new AgentPanel(game, RESPONDER_NAME, this);
         agentPanelResp.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
         ButtonPanel buttonPanel = new ButtonPanel(game);
 

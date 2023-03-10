@@ -78,7 +78,7 @@ public class Settings {
     /**
      * Size of the board panel
      */
-    public static final int BOARD_PANEL_SIZE = 700;
+    public static final int BOARD_PANEL_SIZE = 701;
 
     /**
      * The starting position of each agent

@@ -1,5 +1,6 @@
 package gui;
 
+import controller.AgentInformationAction;
 import model.Game;
 import model.GameListener;
 import model.player.PlayerLying;
@@ -35,6 +36,12 @@ public class AgentPanel extends JComponent implements GameListener {
      * Scroll pane with the messages of the agent
      */
     private final JScrollPane messageScroll;
+
+    private final JPanel buttonPanel;
+
+    private final JFrame mainFrame;
+
+    private static final int INFORMATION_BUTTON_SIZE = 40;
 
     /**
      * Content of the info text pane
@@ -80,11 +87,11 @@ public class AgentPanel extends JComponent implements GameListener {
     /**
      * Constructor of the agent panel
      */
-    public AgentPanel(Game game, String agentName) {
+    public AgentPanel(Game game, String agentName, JFrame mainFrame) {
         this.game = game;
         this.agentName = agentName;
         setAgent();
-
+        this.mainFrame = mainFrame;
 
         this.initialChips = agent.getChipsBin();
         this.initialPoints = agent.getUtilityValue();
@@ -97,6 +104,9 @@ public class AgentPanel extends JComponent implements GameListener {
         createTextPane();
         updateInfo();
 
+        this.buttonPanel = new JPanel();
+        createInformationButton();
+
         this.messagePane = new JTextPane();
         this.messageScroll = new JScrollPane(this.messagePane);
         createScrollMessagePane();
@@ -106,9 +116,23 @@ public class AgentPanel extends JComponent implements GameListener {
         changeBackgrounds();
 
         this.add(info, BorderLayout.NORTH);
-        this.add(messageScroll, BorderLayout.CENTER);
+        this.add(buttonPanel, BorderLayout.CENTER);
+        this.add(messageScroll, BorderLayout.SOUTH);
 
         this.agent.getGame().addListener(this);
+    }
+
+    private void createInformationButton() {
+        JButton informationButton = new JButton();
+        informationButton.setAction(new AgentInformationAction(agentName, game, mainFrame));
+
+        informationButton.setPreferredSize(new Dimension(INFORMATION_BUTTON_SIZE, 0));
+//        informationButton.setBorder(BorderFactory.createEmptyBorder());
+        informationButton.setToolTipText("Click here to see information about the " + this.agentName + ".");
+
+        buttonPanel.setLayout(new BorderLayout());
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        buttonPanel.add(informationButton, BorderLayout.CENTER);
     }
 
     /**
@@ -127,6 +151,7 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private void changeBackgrounds() {
         this.info.setBackground(Settings.getBackGroundColor());
+        this.buttonPanel.setBackground(Settings.getBackGroundColor());
         this.messageScroll.setBackground(Settings.getBackGroundColor());
         this.messagePane.setBackground(Settings.getBackGroundColor());
         this.setBackground(Settings.getBackGroundColor());
@@ -140,7 +165,9 @@ public class AgentPanel extends JComponent implements GameListener {
         info.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_TEXT_HEIGHT));
         info.setEditable(false);
         info.setOpaque(false);
-        info.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0), BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED), BorderFactory.createEmptyBorder(5, 5, 5, 5))));
+        info.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0),
+                BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5))));
         StyledDocument doc = info.getStyledDocument();
         Settings.addStylesToDocument(doc);
     }
@@ -149,10 +176,11 @@ public class AgentPanel extends JComponent implements GameListener {
      * Creates a scroll pane for the messages of the agent
      */
     private void createScrollMessagePane() {
-        messageScroll.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
-        messageScroll.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
+        messageScroll.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH,
+                Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT - INFORMATION_BUTTON_SIZE - 20));
+//        messageScroll.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
         messageScroll.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createEmptyBorder(5, 0, 0, 0),
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                         BorderFactory.createEmptyBorder(5, 5, 5, 5))));

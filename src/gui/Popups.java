@@ -69,6 +69,12 @@ public class Popups extends JOptionPane {
                 JOptionPane.ERROR_MESSAGE);
     }
 
+    public static void showAgentInformationButtonNotAccessible() {
+        showMessageDialog(null,
+                "The simulation is running. Please try later again.", "Cannot view agent information",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
     /**
      * Popup to be shown when forwarding has been canceled.
      */

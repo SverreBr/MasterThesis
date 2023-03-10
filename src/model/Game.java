@@ -132,6 +132,7 @@ public class Game {
      * Initializes a new round of play, where agents keep learnt behaviour across games.
      */
     public void newRound() {
+        System.out.println("\n--- NEW ROUND ---");
         this.board.resetBoard();
         generateNewNegotiationSetting();
 
@@ -551,7 +552,11 @@ public class Game {
      *
      * @return True if simulation is on, false otherwise
      */
-    public boolean isSimulationOn() {
-        return simulationOn;
+    public boolean isSimulationOff() {
+        return !simulationOn;
+    }
+
+    public Map<Integer, Point> getGoalPositionsDict() {
+        return goalPositionsDict;
     }
 }

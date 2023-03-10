@@ -379,17 +379,27 @@ public class PlayerToM extends Player {
         return initialPoints;
     }
 
+    public double[] getLocationBeliefs() {
+        return locationBeliefs;
+    }
+
+    public PlayerToM getPartnerModel() {
+        return partnerModel;
+    }
+
     /////////////////
     ////  LYING  ////
     /////////////////
 
     private void receiveLocationMessage(int location) {
         int loc;
-        if (this.orderToM > 0) {
-            for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
-                locationBeliefs[loc] = 0;
-            }
-            locationBeliefs[location] = 1;
+        if (this.orderToM > 0) { // Models goal location of trading partner
+            if (locationBeliefs[location] > 0.0) {
+                for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
+                    locationBeliefs[loc] = 0;
+                }
+                locationBeliefs[location] = 1;
+            } // else agent does not believe the other agent.
         }
     }
 
@@ -406,7 +416,7 @@ public class PlayerToM extends Player {
         addMessage(message, false);
         this.game.sendMessage(this, message);
         partnerModel.receiveMessage(message);
-        if (selfModel.getOrderToM() > 1) {
+        if (selfModel.getOrderToM() > 1) { // TODO: check this
             selfModel.sendMessage(message);
         }
     }
