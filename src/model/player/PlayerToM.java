@@ -51,6 +51,10 @@ public class PlayerToM extends Player {
 
     private int initialPoints;
 
+    private boolean receivedMessage = false;
+
+    private double[] savedLocationBeliefsWithoutMessage;
+
     /**
      * @param playerName      name of the player
      * @param game            game model
@@ -65,6 +69,7 @@ public class PlayerToM extends Player {
         this.orderToM = orderToM;
         this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
         this.savedLocationBeliefs = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
+        this.savedLocationBeliefsWithoutMessage = new double[this.game.getNumberOfGoalPositions()];
         this.initialPoints = getUtilityValue();
 
         if (this.orderToM > 0) {
@@ -115,6 +120,7 @@ public class PlayerToM extends Player {
             curOffer = selectOffer(offerReceived);
         }
         sendOffer(curOffer);
+        receivedMessage = false;
         return curOffer;
     }
 
@@ -233,12 +239,25 @@ public class PlayerToM extends Player {
         super.receiveOffer(offerReceived);
         if (this.orderToM > 0) {
             updateLocationBeliefs(offerReceived);
+            if (receivedMessage && !(getSumLocationBeliefs() > 0)) { // offer is not consistent with what is offered...
+                System.out.println("\tOffer not consistent with message. Restore...");
+                restoreLocationBeliefsDueToMessage();
+                updateLocationBeliefs(offerReceived);
+            }
             this.selfModel.receiveOffer(offerReceived);
 
-            // Update partner model for the fact that they sent the offer that was just received
+            // Update partner model for the fact that they had send the offer that was just received
             inverseOffer = this.game.flipOffer(offerReceived);
             this.partnerModel.sendOffer(inverseOffer);
         }
+    }
+
+    private double getSumLocationBeliefs() {
+        double sum = 0.0;
+        for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
+            sum += locationBeliefs[loc];
+        }
+        return sum;
     }
 
     /**
@@ -300,12 +319,13 @@ public class PlayerToM extends Player {
                 locationBeliefs[loc] *= sumAll;
             }
         }
+
         if (!confidenceLocked) {
             double learningSpeed = getLearningSpeed();
             confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));
-            if (orderToM > 1) {  // self model must have theory of mind order higher than 0
-                selfModel.updateLocationBeliefs(offerReceived);
-            }
+//            if (orderToM > 1) {  // self model must have theory of mind order higher than 0
+//                selfModel.updateLocationBeliefs(offerReceived);
+//            } // TODO: (ASK) this is double right?
         }
     }
 
@@ -395,15 +415,19 @@ public class PlayerToM extends Player {
         int loc;
         if (this.orderToM > 0) { // Models goal location of trading partner
             if (locationBeliefs[location] > 0.0) {
+                saveLocationBeliefsDueToMessage();
                 for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
                     locationBeliefs[loc] = 0;
                 }
                 locationBeliefs[location] = 1;
-            } // else agent does not believe the other agent.
+            } else {
+                System.out.println("\tLocation not considered by the agent.");
+            }
         }
     }
 
     public void receiveMessage(String message) {
+//        System.out.println("\tMessage received!");
         int loc;
         String messageType = Messages.getMessageType(message);
         if (messageType.equals(Messages.LOCATION_MESSAGE)) {
@@ -413,11 +437,21 @@ public class PlayerToM extends Player {
     }
 
     public void sendMessage(String message) {
-        addMessage(message, false);
-        this.game.sendMessage(this, message);
         partnerModel.receiveMessage(message);
-        if (selfModel.getOrderToM() > 1) { // TODO: check this
+        if (selfModel.getOrderToM() > 1) { // TODO: check this (selfModel is playerTom, not lying)
             selfModel.sendMessage(message);
         }
+    }
+
+    private void restoreLocationBeliefsDueToMessage() {
+//        System.out.println("\tRestore location beliefs.");
+        this.receivedMessage = false;
+        locationBeliefs = savedLocationBeliefsWithoutMessage.clone();
+    }
+
+    private void saveLocationBeliefsDueToMessage() {
+//        System.out.println("\tSave location beliefs.");
+        this.receivedMessage = true;
+        savedLocationBeliefsWithoutMessage = locationBeliefs.clone();
     }
 }

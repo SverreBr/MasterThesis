@@ -1,7 +1,6 @@
 package model;
 
 import model.player.PlayerLying;
-import model.player.PlayerToM;
 import utilities.Chips;
 import utilities.Settings;
 
@@ -92,6 +91,10 @@ public class Game {
      * A field to check if the simulation (visuals) are on or off
      */
     private boolean simulationOn = true;
+
+    private boolean isMessageSend = false;
+
+    private String messageSend;
 
     /**
      * Constructor
@@ -245,13 +248,23 @@ public class Game {
         if (isGameFinished) return;
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
+            if (isMessageSend) {
+                System.out.println("initiator receives message.");
+                this.initiator.receiveMessage(messageSend);
+                isMessageSend = false;
+            }
             tmpNewOffer = this.initiator.makeOffer(newOffer);
             if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
                 // negotiation ends when agent offers original distribution
         } else {
+            if (isMessageSend) {
+                this.responder.receiveMessage(messageSend);
+                isMessageSend = false;
+            }
             tmpNewOffer = this.responder.makeOffer(newOffer);
             if (tmpNewOffer == this.responder.getChips()) negotiationEnds = true;
         }
+
 
         flippedOffer = flipOffer(tmpNewOffer);
         if (negotiationEnds) { // Negotiation terminated
@@ -283,9 +296,11 @@ public class Game {
         }
     }
 
-    public void sendMessage(PlayerToM agentMessenger, String message) {
-        PlayerToM agentReceiver = agentMessenger.getName().equals(Settings.INITIATOR_NAME) ? responder : initiator;
-        agentReceiver.receiveMessage(message);
+    public void sendMessage(String message) {
+        isMessageSend = true;
+        this.messageSend = message;
+//        PlayerToM agentReceiver = agentMessenger.getName().equals(Settings.INITIATOR_NAME) ? responder : initiator;
+//        agentReceiver.receiveMessage(message);
     }
 
     //////////////////////////////

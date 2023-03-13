@@ -141,6 +141,12 @@ public class PlayerLying extends PlayerToM {
         }
     }
 
+    public void sendMessage(String message) {
+        super.sendMessage(message);
+        addMessage(message, false);
+        this.game.sendMessage(message);
+    }
+
     public boolean isCanLie() {
         return canLie;
     }
