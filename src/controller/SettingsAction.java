@@ -1,6 +1,6 @@
 package controller;
 
-import gui.SettingsDialog;
+import gui.settings.SettingsDialog;
 import gui.Popups;
 import model.Game;
 
@@ -44,7 +44,7 @@ public class SettingsAction extends AbstractAction {
         double initLR, respLR;
         boolean initCanLie, respCanLie;
 
-        SettingsDialog sd = new SettingsDialog(mainFrame,"Game settings");
+        SettingsDialog sd = new SettingsDialog(mainFrame,"Game player settings");
         sd.setVisible(true);
 
         if (sd.gameHasChanged) {

@@ -54,6 +54,12 @@ public class Board {
         }
     }
 
+    public void makeBoard(int[][] newBoard) {
+        for (int i = 0; i < boardHeight; i++) {
+            if (boardWidth >= 0) System.arraycopy(newBoard[i], 0, board[i], 0, boardWidth);
+        }
+    }
+
     /**
      * gets the number (corresponding to a color) of a tile of the board
      *

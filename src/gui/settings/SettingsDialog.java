@@ -1,5 +1,6 @@
-package gui;
+package gui.settings;
 
+import gui.Popups;
 import utilities.Settings;
 
 import javax.swing.*;
@@ -91,6 +92,7 @@ public class SettingsDialog extends JDialog {
 
         getContentPane().add(optionPanel);
         getContentPane().add(btnPanel, BorderLayout.SOUTH);
+        setResizable(false);
         pack();
         this.setLocationRelativeTo(null);
     }

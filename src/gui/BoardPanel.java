@@ -37,6 +37,7 @@ public class BoardPanel extends JComponent implements GameListener {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g.create();
+        // TODO: remove renderingHints?
         Map<RenderingHints.Key, Object> rh = new HashMap<>();
         rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         rh.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

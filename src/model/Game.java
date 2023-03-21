@@ -161,7 +161,6 @@ public class Game {
         int[] chipsResp = generateNewChips();  // will be stored in chipSets[1] as index
         calculateSetting(chipsInit, chipsResp);
         assignGoalPositions();
-        System.out.println("utility functions length: " + utilityFunctions[0].length);
     }
 
     /**
@@ -234,6 +233,19 @@ public class Game {
         return chips;
     }
 
+    public void newBoard(int[][] newBoard, int[] goalPositions) { // TODO: add reset agents?
+        board.makeBoard(newBoard);
+        generateNewNegotiationSetting();
+        System.arraycopy(goalPositions, 0, this.goalPositions, 0, goalPositions.length);
+
+        int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
+        int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
+        this.initiator.initNewRound(chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
+        this.responder.initNewRound(chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
+        if (simulationOn)
+            notifyListenersNewGame();
+    }
+
     //////////////////////////////
     // --- Playing the game --- //
     //////////////////////////////
@@ -300,8 +312,6 @@ public class Game {
     public void sendMessage(String message) {
         isMessageSend = true;
         this.messageSend = message;
-//        PlayerToM agentReceiver = agentMessenger.getName().equals(Settings.INITIATOR_NAME) ? responder : initiator;
-//        agentReceiver.receiveMessage(message);
     }
 
     //////////////////////////////

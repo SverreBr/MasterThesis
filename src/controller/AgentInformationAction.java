@@ -56,6 +56,5 @@ public class AgentInformationAction extends AbstractAction implements GameListen
     @Override
     public void newGame() {
         setAgent();
-        System.out.println("New agent has been set in agentInformationAction.");
     }
 }

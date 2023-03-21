@@ -1,5 +1,6 @@
 package gui;
 
+import controller.BoardSettingsAction;
 import controller.SettingsAction;
 import model.GameListener;
 import model.Game;
@@ -35,6 +36,8 @@ public class LegendPanel extends JPanel implements GameListener {
      */
     private final JButton settingsButton;
 
+    private final JButton boardSettingsButton;
+
     /**
      * Panel for the settings button
      */
@@ -63,8 +66,10 @@ public class LegendPanel extends JPanel implements GameListener {
         updateLegendText();
 
         this.settingsButton = new JButton();
+        this.boardSettingsButton = new JButton();
         buttonPanel = new JPanel();
-        createSettingsButton();
+        createButtonPanel();
+
 
         this.setLayout(new BorderLayout());
         this.add(info, BorderLayout.CENTER);
@@ -87,6 +92,7 @@ public class LegendPanel extends JPanel implements GameListener {
         setBackground(Settings.getBackGroundColor());
         info.setBackground(Settings.getBackGroundColor());
         settingsButton.setBackground(Settings.getBackGroundColor());
+        boardSettingsButton.setBackground(Settings.getBackGroundColor());
         buttonPanel.setBackground(Settings.getBackGroundColor());
     }
 
@@ -102,6 +108,24 @@ public class LegendPanel extends JPanel implements GameListener {
         Settings.addStylesToDocument(doc);
     }
 
+    private void createButtonPanel() {
+        createSettingsButton();
+        createBoardSettingsButton();
+
+        buttonPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTH;
+        buttonPanel.add(settingsButton, gbc);
+        gbc.gridy++;
+        buttonPanel.add(boardSettingsButton, gbc);
+        gbc.gridy++;
+        gbc.weighty = 1.0;
+//        gbc.ipady = 40;
+        buttonPanel.add(Box.createRigidArea(new Dimension(SETTINGS_BUTTON_SIZE, 0)), gbc);
+    }
+
     /**
      * Creates settings button
      */
@@ -112,16 +136,27 @@ public class LegendPanel extends JPanel implements GameListener {
             img = img.getScaledInstance(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE, Image.SCALE_DEFAULT);
             settingsButton.setIcon(new ImageIcon(img));
         } catch (Exception ex) {
-            System.out.println("Image file not found!");
+            System.err.println("Image file not found!");
         }
 
-        settingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE));
-        settingsButton.setBorder(BorderFactory.createEmptyBorder());
+        settingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE + 5));
+        settingsButton.setBorder(BorderFactory.createEmptyBorder(0,0,5,0));
         settingsButton.setToolTipText("Click here to change the settings of the agents.");
+    }
 
-        buttonPanel.setLayout(new BorderLayout());
-        buttonPanel.add(settingsButton, BorderLayout.NORTH);
-        buttonPanel.add(Box.createRigidArea(new Dimension(SETTINGS_BUTTON_SIZE, 0)), BorderLayout.SOUTH);
+    private void createBoardSettingsButton() {
+        boardSettingsButton.setAction(new BoardSettingsAction("", game, mainFrame));
+        try {
+            Image img = ImageIO.read(new File("fig/boardSettingsIcon.png"));
+            img = img.getScaledInstance(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE, Image.SCALE_DEFAULT);
+            boardSettingsButton.setIcon(new ImageIcon(img));
+        } catch (Exception ex) {
+            System.err.println("Image file not found!");
+        }
+
+        boardSettingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE + 10));
+        boardSettingsButton.setBorder(BorderFactory.createEmptyBorder(5,0,5,0));
+        boardSettingsButton.setToolTipText("Click here to change the settings of the board.");
     }
 
     /**
