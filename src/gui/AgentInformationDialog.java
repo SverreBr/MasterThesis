@@ -12,6 +12,7 @@ import java.text.DecimalFormat;
 public class AgentInformationDialog extends JDialog {
     private final JPanel mainPanel;
     private final PlayerLying agent;
+
     public AgentInformationDialog(Frame owner, String title, PlayerLying agent) {
         super(owner, title, true);
         this.agent = agent;
@@ -25,10 +26,12 @@ public class AgentInformationDialog extends JDialog {
     }
 
     private void createMainPanel() {
-        mainPanel.setLayout(new GridLayout(0,2));
+        mainPanel.setLayout(new GridLayout(0, 2));
 
-        addLocationBeliefs();
-        addLocationBeliefsPartner();
+        if (agent.getOrderToM() > 0)
+            addLocationBeliefs();
+        if (agent.getOrderToM() > 1)
+            addLocationBeliefsPartner();
     }
 
     private void addLocationBeliefs() {
@@ -53,8 +56,9 @@ public class AgentInformationDialog extends JDialog {
         DecimalFormat df = new DecimalFormat("####0.00");
 
         JTextPane locationBeliefsPane1 = new JTextPane();
-        addStylesToDoc(locationBeliefsPane1, "Location beliefs partner model (order=" + agent.getPartnerModel().getOrderToM() + "): ");
+        addStylesToDoc(locationBeliefsPane1, "Modelled location beliefs trading partner (order=" + agent.getPartnerModel().getOrderToM() + "): ");
         mainPanel.add(locationBeliefsPane1);
+
 
         JTextPane locationBeliefsPane2 = new JTextPane();
         double[] locationBeliefs = agent.getPartnerModel().getLocationBeliefs();

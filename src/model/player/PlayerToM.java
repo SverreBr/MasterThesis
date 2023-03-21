@@ -240,9 +240,11 @@ public class PlayerToM extends Player {
         if (this.orderToM > 0) {
             updateLocationBeliefs(offerReceived);
             if (receivedMessage && !(getSumLocationBeliefs() > 0)) { // offer is not consistent with what is offered...
-                System.out.println("\tOffer not consistent with message. Restore...");
                 restoreLocationBeliefsDueToMessage();
                 updateLocationBeliefs(offerReceived);
+                if (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME)) {
+                    System.out.println(getName() + " does not believe trading partner.");
+                }
             }
             this.selfModel.receiveOffer(offerReceived);
 
@@ -421,7 +423,9 @@ public class PlayerToM extends Player {
                 }
                 locationBeliefs[location] = 1;
             } else {
-                System.out.println("\tLocation not considered by the agent.");
+                if (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME)) {
+                    System.out.println(getName() + " does not believe trading partner.");
+                }
             }
         }
     }
@@ -433,6 +437,9 @@ public class PlayerToM extends Player {
         if (messageType.equals(Messages.LOCATION_MESSAGE)) {
             loc = Messages.getLocationFromMessage(message);
             receiveLocationMessage(loc);
+        }
+        if (orderToM > 0) {
+            selfModel.receiveMessage(message);
         }
     }
 

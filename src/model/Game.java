@@ -161,6 +161,7 @@ public class Game {
         int[] chipsResp = generateNewChips();  // will be stored in chipSets[1] as index
         calculateSetting(chipsInit, chipsResp);
         assignGoalPositions();
+        System.out.println("utility functions length: " + utilityFunctions[0].length);
     }
 
     /**

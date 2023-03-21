@@ -23,6 +23,7 @@ public class AgentInformationAction extends AbstractAction implements GameListen
         super(agentName + " information");
         this.agentName = agentName;
         this.game = game;
+        this.game.addListener(this);
         setAgent();
         this.mainFrame = mainFrame;
     }
@@ -37,14 +38,14 @@ public class AgentInformationAction extends AbstractAction implements GameListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("button clicked.");
         if (game.isSimulationOff()) {
             Popups.showAgentInformationButtonNotAccessible();
             return;
         }
 
-        AgentInformationDialog aid = new AgentInformationDialog(mainFrame,"Agent information", agent);
+        AgentInformationDialog aid = new AgentInformationDialog(mainFrame,agentName + " information", agent);
         aid.setVisible(true);
+        aid.dispose();
     }
 
     @Override
@@ -55,5 +56,6 @@ public class AgentInformationAction extends AbstractAction implements GameListen
     @Override
     public void newGame() {
         setAgent();
+        System.out.println("New agent has been set in agentInformationAction.");
     }
 }
