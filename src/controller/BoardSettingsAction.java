@@ -1,9 +1,9 @@
 package controller;
 
-import gui.settings.BoardSettingsDialog;
+import view.settings.BoardSettingsDialog;
+import view.settings.GameSetting;
 import model.Game;
-import gui.Popups;
-import utilities.Settings;
+import view.Popups;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -29,15 +29,12 @@ public class BoardSettingsAction extends AbstractAction {
         BoardSettingsDialog bsd = new BoardSettingsDialog(mainFrame, "Game settings");
         bsd.setVisible(true);
         if (bsd.isGameHasChanged()) {
-            int[][] board = new int[Settings.BOARD_HEIGHT][Settings.BOARD_WIDTH];
-            System.out.println("game changed.");
 
-            for (int row = 0; row < Settings.BOARD_WIDTH; row++) {
-                for (int col = 0; col < Settings.BOARD_HEIGHT; col++) {
-                    board[col][row] = bsd.getIntColorTile(row, col);
-                }
-            }
-            game.newBoard(board, bsd.getGoalPositions());
+
+            GameSetting gameSetting = new GameSetting();
+            gameSetting.getSettingsFromDialog(bsd);
+            game.newGameSettings(gameSetting);
+
         }
         bsd.dispose();
     }

@@ -1,4 +1,4 @@
-package gui.settings;
+package view.settings;
 
 import utilities.Settings;
 
@@ -37,7 +37,7 @@ public class BoardSettingsBoard extends JComponent {
 
         for (int row = 0; row < Settings.BOARD_WIDTH; row++) {
             for (int column = 0; column < Settings.BOARD_HEIGHT; column++) {
-                textField = new JTextField("0", 1);
+                textField = new JTextField("", 1);
 
                 // Listen for changes in the text
                 textField.getDocument().addDocumentListener(new DocumentListener() {
@@ -59,7 +59,6 @@ public class BoardSettingsBoard extends JComponent {
         }
 
         gbc.gridx = 0;
-        gbc.gridy = 0;
         gbc.ipadx = 10;
 
         int offsetWidth = 21;
@@ -67,12 +66,12 @@ public class BoardSettingsBoard extends JComponent {
         gbc.insets = new Insets(offsetHeight, offsetWidth, offsetHeight, offsetWidth);
 
         for (int row = 0; row < Settings.BOARD_WIDTH; row++) {
-            gbc.gridx++;
             gbc.gridy = 0;
             for (int column = 0; column < Settings.BOARD_HEIGHT; column++) {
                 add(boardTextMap.get(row * Settings.BOARD_WIDTH + column), gbc);
                 gbc.gridy++;
             }
+            gbc.gridx++;
         }
     }
 
@@ -115,14 +114,13 @@ public class BoardSettingsBoard extends JComponent {
         for (int x = 0; x < simulationSize.width; x++) {
             for (int y = 0; y < simulationSize.height; y++) {
                 textField = boardTextMap.get(x * Settings.BOARD_WIDTH + y);
-                textFieldValue = parseIntTextField(textField);
+                textFieldValue = Miscellaneous.parseIntTextField(textField, false);
                 g2.setColor(Settings.getColor(textFieldValue));
                 g2.fillRect(
                         x * siteSize.width + OFFSET + BORDER_OFFSET, y * siteSize.height + OFFSET + BORDER_OFFSET,
                         siteSize.width - OFFSET, siteSize.height - OFFSET);
             }
         }
-
     }
 
     /**
@@ -142,17 +140,6 @@ public class BoardSettingsBoard extends JComponent {
 
     public int getIntColorTile(int row, int col) {
         JTextField textField = boardTextMap.get(row * Settings.BOARD_WIDTH + col);
-        return parseIntTextField(textField);
-    }
-
-    private int parseIntTextField(JTextField textField) {
-        int textFieldValue = 0;
-        try {
-            textFieldValue = Integer.parseInt(textField.getText());
-        } catch (NumberFormatException ignored) {
-        } finally {
-            textFieldValue = ((textFieldValue >= 0) && (textFieldValue < Settings.CHIP_DIVERSITY)) ? textFieldValue : 0;
-        }
-        return textFieldValue;
+        return Miscellaneous.parseIntTextField(textField, true);
     }
 }

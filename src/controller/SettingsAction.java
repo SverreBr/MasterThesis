@@ -1,7 +1,7 @@
 package controller;
 
-import gui.settings.SettingsDialog;
-import gui.Popups;
+import view.settings.SettingsDialog;
+import view.Popups;
 import model.Game;
 
 import javax.swing.*;

@@ -1,4 +1,4 @@
-package gui;
+package view;
 
 import controller.AgentInformationAction;
 import model.Game;

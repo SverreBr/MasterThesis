@@ -1,5 +1,6 @@
 package model;
 
+import view.settings.GameSetting;
 import model.player.PlayerLying;
 import utilities.Chips;
 import utilities.Settings;
@@ -233,15 +234,20 @@ public class Game {
         return chips;
     }
 
-    public void newBoard(int[][] newBoard, int[] goalPositions) { // TODO: add reset agents?
-        board.makeBoard(newBoard);
-        generateNewNegotiationSetting();
-        System.arraycopy(goalPositions, 0, this.goalPositions, 0, goalPositions.length);
+    public void newGameSettings(GameSetting gameSetting) {
+        setBooleanGameFinished(false);
+        this.newOffer = -1;
+        this.nrOffers = 0;
+        this.turn = Settings.INITIATOR_NAME;
+        board.makeBoard(gameSetting.getBoard());
 
         int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
         int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
-        this.initiator.initNewRound(chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
-        this.responder.initNewRound(chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
+
+        calculateSetting(gameSetting.getChipSets()[initIdx], gameSetting.getChipSets()[respIdx]);
+        System.arraycopy(gameSetting.getGoalPositions(), 0, this.goalPositions, 0, this.goalPositions.length);
+        this.initiator.initNewRound(this.chipSets[initIdx], this.chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
+        this.responder.initNewRound(this.chipSets[respIdx], this.chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
         if (simulationOn)
             notifyListenersNewGame();
     }
@@ -479,6 +485,14 @@ public class Game {
         return this.board;
     }
 
+    public int[][] getChipSets() {
+        int[][] binChipSets = new int[2][Settings.CHIP_DIVERSITY];
+        for (int i = 0; i < chipSets.length; i++) {
+            binChipSets[i] = Chips.getBins(chipSets[i], binMaxChips);
+        }
+        return binChipSets;
+    }
+
     /**
      * Getter for initiator agent
      *
@@ -559,6 +573,10 @@ public class Game {
         return goalPositions[playerIdx];
     }
 
+    public int[] getGoalPositions() {
+        return goalPositions;
+    }
+
     /**
      * Sets the simulation (visuals) on so that listeners get notified
      */
@@ -584,5 +602,11 @@ public class Game {
 
     public Map<Integer, Point> getGoalPositionsDict() {
         return goalPositionsDict;
+    }
+
+    public GameSetting getGameSetting() {
+        GameSetting gameSetting = new GameSetting();
+        gameSetting.getSettingsFromGame(this);
+        return gameSetting;
     }
 }

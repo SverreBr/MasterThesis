@@ -1,5 +1,7 @@
-package gui;
+package view;
 
+import controller.saveload.LoadAction;
+import controller.saveload.SaveAction;
 import model.Game;
 import utilities.Settings;
 
@@ -52,11 +54,26 @@ public class MainFrame extends JFrame {
         rightBody.add(buttonPanel, BorderLayout.SOUTH);
         rightBody.setBackground(Settings.getBackGroundColor());
 
+        addMenuBar(game);
+
         getContentPane().setLayout(new FlowLayout());
         getContentPane().add(leftBody);
         getContentPane().add(boardPanel);
         getContentPane().add(rightBody);
         getContentPane().setBackground(Settings.getBackGroundColor());
         pack();
+    }
+
+    private void addMenuBar(Game game) {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+        JMenuItem saveMenuItem = new JMenuItem(new SaveAction("Save game setting", this, game));
+        fileMenu.add(saveMenuItem);
+
+        JMenuItem loadMenuItem = new JMenuItem(new LoadAction("Load game setting", this, game));
+        fileMenu.add(loadMenuItem);
+
+        menuBar.add(fileMenu);
+        this.setJMenuBar(menuBar);
     }
 }

@@ -1,7 +1,7 @@
 package controller;
 
-import gui.AgentInformationDialog;
-import gui.Popups;
+import view.AgentInformationDialog;
+import view.Popups;
 import model.Game;
 import model.GameListener;
 import model.player.PlayerLying;

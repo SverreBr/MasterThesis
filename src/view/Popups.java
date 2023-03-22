@@ -1,4 +1,4 @@
-package gui;
+package view;
 
 import javax.swing.*;
 
@@ -81,5 +81,12 @@ public class Popups extends JOptionPane {
     public static void showForwardingCancelled() {
         showMessageDialog(null,
                 "The forwarding has been canceled. However, all changes that have been made up until now are still there.");
+    }
+
+    public static void showInvalidGoalPosition(String name, int numGoalPositions) {
+        showMessageDialog(null,
+                "An invalid goal position has been provided to the " + name + ".\n" +
+                        "Please insert an integer in the set {0,...," + numGoalPositions + "}.",
+                "Invalid Goal position.", JOptionPane.ERROR_MESSAGE);
     }
 }

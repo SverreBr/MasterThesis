@@ -154,4 +154,8 @@ public class Board {
         }
         return highestScore;
     }
+
+    public int[][] getBoard() {
+        return board;
+    }
 }

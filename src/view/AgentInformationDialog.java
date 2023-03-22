@@ -1,4 +1,4 @@
-package gui;
+package view;
 
 import model.player.PlayerLying;
 import utilities.Settings;

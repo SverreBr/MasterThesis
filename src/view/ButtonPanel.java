@@ -1,4 +1,4 @@
-package gui;
+package view;
 
 import controller.ForwardAction;
 import controller.ForwardListener;

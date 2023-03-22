@@ -1,6 +1,6 @@
-package gui.settings;
+package view.settings;
 
-import gui.Popups;
+import view.Popups;
 import utilities.Settings;
 
 import javax.swing.*;

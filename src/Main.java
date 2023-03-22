@@ -1,4 +1,4 @@
-import gui.MainFrame;
+import view.MainFrame;
 import model.Game;
 
 /**

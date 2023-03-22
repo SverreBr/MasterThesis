@@ -1,4 +1,4 @@
-package gui;
+package view;
 
 import model.GameListener;
 import model.Game;

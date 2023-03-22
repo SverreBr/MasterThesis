@@ -167,6 +167,21 @@ public class Settings {
         return goalPositions;
     }
 
+    public static int getNumberOfGoalPositions() {
+        int sum = 0;
+        Point point;
+
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
+                point = new Point(x, y);
+                if (manhattanDistance(STARTING_POSITION, point) >= MIN_GOAL_DISTANCE) {
+                    sum++;
+                }
+            }
+        }
+        return sum;
+    }
+
     /**
      * calculates the manhattan distance between two points
      *
@@ -209,6 +224,10 @@ public class Settings {
 
         s = doc.addStyle("bold", regular);
         StyleConstants.setBold(s, true);
+
+        s = doc.addStyle("boldalic", regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setItalic(s, true);
     }
 
     /**
