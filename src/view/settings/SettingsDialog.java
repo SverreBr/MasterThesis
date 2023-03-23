@@ -140,6 +140,9 @@ public class SettingsDialog extends JDialog {
         optionPanel.add(responderLRField);
         optionPanel.add(responderLieText);
         optionPanel.add(responderLieField);
+        
+        // TODO: when incorrect entries, return to settings dialog.
+        // TODO: options instead of letting the user choose itself.
     }
 
     /**

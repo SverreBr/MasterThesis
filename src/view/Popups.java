@@ -66,13 +66,13 @@ public class Popups extends JOptionPane {
     public static void showSettingsButtonNotAccessible() {
         showMessageDialog(null,
                 "The simulation is running. Please try later again.", "Cannot change settings",
-                JOptionPane.ERROR_MESSAGE);
+                JOptionPane.WARNING_MESSAGE);
     }
 
     public static void showAgentInformationButtonNotAccessible() {
         showMessageDialog(null,
                 "The simulation is running. Please try later again.", "Cannot view agent information",
-                JOptionPane.ERROR_MESSAGE);
+                JOptionPane.WARNING_MESSAGE);
     }
 
     /**
@@ -87,6 +87,48 @@ public class Popups extends JOptionPane {
         showMessageDialog(null,
                 "An invalid goal position has been provided to the " + name + ".\n" +
                         "Please insert an integer in the set {0,...," + numGoalPositions + "}.",
-                "Invalid Goal position.", JOptionPane.ERROR_MESSAGE);
+                "Invalid Goal Position.", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void showSuccessfulLoading() {
+        showMessageDialog(null, "Loading the game setting was successful.",
+                "Successful Loading", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void showCancelledLoading() {
+        showMessageDialog(null, "Loading a game setting was cancelled.",
+                "Cancelled Loading", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void showIOExceptionLoading() {
+        showMessageDialog(null,
+                "Something went wrong loading the game. Please select only files with .ser extension.",
+                "Unsuccessful Loading", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void showGeneralException() {
+        showMessageDialog(null, "Hmm... I don't know what went wrong, but don't do that again please.",
+                "Some Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void showSuccessfulSaving() {
+        showMessageDialog(null, "Saving the game setting was successful.",
+                "Successful Saving", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void showCancelledSaving() {
+        showMessageDialog(null, "Saving the game setting was cancelled.",
+                "Cancelled Saving", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void showErrorSaving(String description) {
+        showMessageDialog(null, description, "Error Saving Game Setting",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static boolean showFileNameAlreadyExistsError(String description) {
+        int returnVal = showOptionDialog(null, description, "Filename Already Exists Error",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,null, null);
+        return returnVal == JOptionPane.YES_OPTION;
     }
 }

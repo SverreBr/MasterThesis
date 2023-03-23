@@ -5,6 +5,7 @@ import controller.saveload.exceptions.ForbiddenCharacterException;
 import controller.saveload.exceptions.NameTooLongException;
 import controller.saveload.exceptions.NameTooShortException;
 import model.Game;
+import view.Popups;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -17,7 +18,7 @@ public class SaveAction extends AbstractAction {
     private final JFrame frame;
     private final Game game;
 
-    private static final String SAVE_DIRECTORY_NAME = "saved_game_settings";
+    private static final String SAVE_DIRECTORY_NAME = "saved_gameSettings";
 
     public SaveAction(String name, JFrame frame, Game game) {
         super(name);
@@ -27,26 +28,25 @@ public class SaveAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-//        File wk = new File(System.getProperty("user.dir"));
-//        this.fc.setCurrentDirectory(wk);
-//        int returnVal = this.fc.showOpenDialog(this.frame);
-        String filename = (String)JOptionPane.showInputDialog(
-                frame,
-                "Please insert name of the file: ",
-                "Save Game Settings",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                null,
-                "savedGame");
-        System.out.println(filename);
-        if (filename != null) {
-            if (this.trySaveGameSettings(filename)) {
-                System.out.println("Export successful");
+        boolean error = true;
+        while (error) {
+            String filename = (String) JOptionPane.showInputDialog(
+                    frame,
+                    "Please insert name of the file: ",
+                    "Save Game Settings",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    "savedGame");
+            if (filename != null) {
+                if (this.trySaveGameSettings(filename)) {
+                    Popups.showSuccessfulSaving();
+                    error = false;
+                }
             } else {
-                System.out.println("Export not successful");
+                Popups.showCancelledSaving();
+                error = false;
             }
-        } else {
-            System.out.println("cancelled");
         }
     }
 
@@ -56,24 +56,25 @@ public class SaveAction extends AbstractAction {
             saveGameSettings(filename);
             return true;
         } catch (NameTooLongException e) {
-            System.out.println("Filename is too long. Game did not save.");
+            Popups.showErrorSaving("Filename is too long.\nGame did not save.");
         } catch (NameTooShortException e) {
-            System.out.println("Filename is too short. Game did not save.");
+            Popups.showErrorSaving("Filename is too short.\nGame did not save.");
         } catch (ForbiddenCharacterException e) {
-            System.out.println("There is a forbidden character in this filename.\nGame did not save.");
+            Popups.showErrorSaving("There is a forbidden character in the filename you entered.\nGame did not save.");
         } catch (FileAlreadyExistsException e) {
-            System.out.println("This filename already exists.");
+            if (Popups.showFileNameAlreadyExistsError("The filename you entered already exists.\nDo you want to overwrite the existing file?")) {
+                saveGameSettings(filename);
+                return true;
+            }
         } catch (Exception e) {
-            System.out.println("Something went wrong with saving the game!");
+            Popups.showGeneralException();
         }
         return false;
     }
 
     private void saveGameSettings(String fileName) throws SecurityException {
         File saveDirectory = new File(SAVE_DIRECTORY_NAME);
-        if (!saveDirectory.mkdir()) {
-            System.out.println("Directory was not correctly made.");
-        }
+        saveDirectory.mkdir();
 
         try (
                 FileOutputStream fileOutputStream = new FileOutputStream(
@@ -82,9 +83,8 @@ public class SaveAction extends AbstractAction {
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
         ) {
             objectOutputStream.writeObject(game.getGameSetting());
-            System.out.println("Save successful");
         } catch (IOException e) {
-            System.out.println("Failed or interrupted I/O operations");
+            Popups.showErrorSaving("Saving was unsuccessful. Did not succeed in writing the object to the file.");
         }
     }
 
