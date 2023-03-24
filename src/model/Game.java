@@ -33,6 +33,8 @@ public class Game {
      */
     private final int[] chipSets = new int[2];
 
+    private final int[] initialChipSets = new int[2];
+
     /**
      * A 2-dimensional array which contains two goal positions for the initiator and the responder
      */
@@ -136,7 +138,6 @@ public class Game {
      * Initializes a new round of play, where agents keep learnt behaviour across games.
      */
     public void newRound() {
-        System.out.println("\n--- NEW ROUND ---");
         this.board.resetBoard();
         generateNewNegotiationSetting();
 
@@ -152,6 +153,7 @@ public class Game {
      * Generates a new negotiation setting.
      */
     private void generateNewNegotiationSetting() {
+        System.out.println("\n--- NEW ROUND ---");
         setBooleanGameFinished(false);
         this.newOffer = -1;
         this.nrOffers = 0;
@@ -181,7 +183,9 @@ public class Game {
             numIndexCodes *= (this.binMaxChips[i] + 1); // +1 to account for 0 chips in that bin
         }
         chipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
+        initialChipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
         chipSets[1] = Chips.getIndex(chipsResp, this.binMaxChips);
+        initialChipSets[1] = Chips.getIndex(chipsResp, this.binMaxChips);
 
         int pos;
         Point goalPosition;
@@ -268,13 +272,11 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             if (isMessageSend) {
-                System.out.println("initiator receives message.");
                 this.initiator.receiveMessage(messageSend);
                 isMessageSend = false;
             }
             tmpNewOffer = this.initiator.makeOffer(newOffer);
             if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
-                // negotiation ends when agent offers original distribution
         } else {
             if (isMessageSend) {
                 this.responder.receiveMessage(messageSend);
@@ -283,7 +285,6 @@ public class Game {
             tmpNewOffer = this.responder.makeOffer(newOffer);
             if (tmpNewOffer == this.responder.getChips()) negotiationEnds = true;
         }
-
 
         flippedOffer = flipOffer(tmpNewOffer);
         if (negotiationEnds) { // Negotiation terminated
@@ -297,21 +298,20 @@ public class Game {
             switchTurn();
         }
 
-        if (simulationOn)
-            notifyListeners();
+        if (simulationOn) notifyListeners();
     }
 
     /**
-     * Plays the negotiation until 100 steps have been performed or the game ended
+     * Plays the negotiation until 10 steps have been performed or the game ended
      */
     public void playTillEnd() {
         int i = 0;
-        while (i < 100 && !isGameFinished) {
+        while (i < 10 && !isGameFinished) {
             step();
             i++;
         }
-        if (i >= 100) {
-            System.out.println("one hundred steps performed.");
+        if (i >= 10) {
+            System.out.println("--- Ten steps performed. ---");
         }
     }
 
@@ -485,10 +485,10 @@ public class Game {
         return this.board;
     }
 
-    public int[][] getChipSets() {
+    public int[][] getInitialChipSets() {
         int[][] binChipSets = new int[2][Settings.CHIP_DIVERSITY];
-        for (int i = 0; i < chipSets.length; i++) {
-            binChipSets[i] = Chips.getBins(chipSets[i], binMaxChips);
+        for (int i = 0; i < initialChipSets.length; i++) {
+            binChipSets[i] = Chips.getBins(initialChipSets[i], binMaxChips);
         }
         return binChipSets;
     }

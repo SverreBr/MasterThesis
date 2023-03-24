@@ -1,6 +1,7 @@
 package model.player;
 
 import model.Game;
+import utilities.Chips;
 import utilities.Messages;
 import utilities.Settings;
 
@@ -75,8 +76,8 @@ public class PlayerToM extends Player {
         if (this.orderToM > 0) {
             Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
             confidence = 1.0;  // starting confidence
-            selfModel = new PlayerToM("", game, orderToM - 1, learningSpeed, chipsSelf, chipsOther, utilityFunction);
-            partnerModel = new PlayerToM("", game, orderToM - 1, learningSpeed, chipsOther, chipsSelf, utilityFunction);
+            selfModel = new PlayerToM("selfModel_" + playerName, game, orderToM - 1, learningSpeed, chipsSelf, chipsOther, utilityFunction);
+            partnerModel = new PlayerToM("partnerModel_" + playerName, game, orderToM - 1, learningSpeed, chipsOther, chipsSelf, utilityFunction);
             partnerModel.setConfidenceLockedTo(true);
         } else {
             selfModel = null;
@@ -94,6 +95,7 @@ public class PlayerToM extends Player {
     public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
         super.initNewRound(chipsSelf, chipsOther, utilityFunction);
         this.initialPoints = getUtilityValue();
+        this.receivedMessage = false;
         if (orderToM > 0) {
             Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
             selfModel.initNewRound(chipsSelf, chipsOther, utilityFunction);
@@ -120,7 +122,6 @@ public class PlayerToM extends Player {
             curOffer = selectOffer(offerReceived);
         }
         sendOffer(curOffer);
-        receivedMessage = false;
         return curOffer;
     }
 
@@ -179,6 +180,7 @@ public class PlayerToM extends Player {
     protected double getValue(int offerToSelf) {
         int loc, offerToOther;
         double curValue = 0.0;
+        double someValue = 0.0;
         if (orderToM == 0) {
             // ToM0 uses only expected value
             return getExpectedValue(offerToSelf);
@@ -190,7 +192,8 @@ public class PlayerToM extends Player {
             for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
                 if (locationBeliefs[loc] > 0.0) {
                     partnerModel.utilityFunction = game.getUtilityFunction(loc);
-                    curValue += locationBeliefs[loc] * getLocationValue(offerToSelf, offerToOther);
+                    someValue = getLocationValue(offerToSelf, offerToOther);
+                    curValue += locationBeliefs[loc] * someValue;
                 }
             }
             partnerModel.restoreBeliefs();
@@ -199,6 +202,7 @@ public class PlayerToM extends Player {
             // fully confident in own theory of mind capabilities
             return curValue;
         }
+
         // recursion of theory of mind
         return curValue * confidence + (1 - confidence) * selfModel.getValue(offerToSelf);
 
@@ -224,7 +228,7 @@ public class PlayerToM extends Player {
             // Offer is not equal to partner its offer, so new offer has been made
             response = game.flipOffer(response);
             curValue = Math.max(utilityFunction[response], utilityFunction[this.chips]) - 2;
-            // one for current offer and one for offer from partner
+            // minus one for current offer and one for offer from partner
         }
         return curValue;
     }
@@ -322,13 +326,13 @@ public class PlayerToM extends Player {
             }
         }
 
-        if (!confidenceLocked) {
-            double learningSpeed = getLearningSpeed();
-            confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));
-//            if (orderToM > 1) {  // self model must have theory of mind order higher than 0
-//                selfModel.updateLocationBeliefs(offerReceived);
-//            } // TODO: (ASK) this is double right?
-        }
+//        if (!confidenceLocked) {
+//            double learningSpeed = getLearningSpeed();
+//            confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));
+////            if (orderToM > 1) {  // self model must have theory of mind order higher than 0
+////                selfModel.updateLocationBeliefs(offerReceived);
+////            } // TODO: (ASK) this is double right?
+//        }
     }
 
     /**
@@ -401,12 +405,31 @@ public class PlayerToM extends Player {
         return initialPoints;
     }
 
-    public double[] getLocationBeliefs() {
-        return locationBeliefs;
+    public double[] getLocationBeliefs(int orderToM) {
+        if (this.orderToM == 0) {
+            return null;
+        }
+        if (this.orderToM == orderToM) {
+            return locationBeliefs;
+        }
+        return selfModel.getLocationBeliefs(orderToM);
     }
 
-    public PlayerToM getPartnerModel() {
-        return partnerModel;
+    public double[] getLocationBeliefs() {
+        if (this.orderToM > 0) {
+            return this.locationBeliefs;
+        }
+        return null;
+    }
+
+    public double[] getPartnerModelLocationBeliefs(int orderToMSelf) {
+        if (orderToMSelf < 2) { // Partner model only has location beliefs when it is ToM > 1
+            return null;
+        }
+        if (orderToMSelf == orderToM) {
+            return partnerModel.getLocationBeliefs(orderToMSelf-1);
+        }
+        return selfModel.getPartnerModelLocationBeliefs(orderToMSelf);
     }
 
     /////////////////
@@ -417,7 +440,7 @@ public class PlayerToM extends Player {
         int loc;
         if (this.orderToM > 0) { // Models goal location of trading partner
             if (locationBeliefs[location] > 0.0) {
-                saveLocationBeliefsDueToMessage();
+                saveLocationBeliefsDueToMessage();  // Believe agent, but keep alternative if fallen in disbelief
                 for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
                     locationBeliefs[loc] = 0;
                 }
@@ -431,33 +454,32 @@ public class PlayerToM extends Player {
     }
 
     public void receiveMessage(String message) {
-//        System.out.println("\tMessage received!");
         int loc;
         String messageType = Messages.getMessageType(message);
         if (messageType.equals(Messages.LOCATION_MESSAGE)) {
             loc = Messages.getLocationFromMessage(message);
             receiveLocationMessage(loc);
         }
-        if (orderToM > 0) {
+        if (orderToM > 0) { // Agent has selfModel and partnerModel
             selfModel.receiveMessage(message);
+            partnerModel.sendMessage(message);
         }
     }
 
     public void sendMessage(String message) {
-        partnerModel.receiveMessage(message);
-        if (selfModel.getOrderToM() > 1) { // TODO: check this (selfModel is playerTom, not lying)
+        if (orderToM > 0) {
+            partnerModel.receiveMessage(message);
             selfModel.sendMessage(message);
         }
     }
 
     private void restoreLocationBeliefsDueToMessage() {
-//        System.out.println("\tRestore location beliefs.");
         this.receivedMessage = false;
         locationBeliefs = savedLocationBeliefsWithoutMessage.clone();
     }
 
     private void saveLocationBeliefsDueToMessage() {
-//        System.out.println("\tSave location beliefs.");
+        // TODO: what if other agent models that it can send another message (location beliefs are overwritten?).
         this.receivedMessage = true;
         savedLocationBeliefsWithoutMessage = locationBeliefs.clone();
     }

@@ -32,7 +32,7 @@ public class GameSetting implements Serializable {
 
     public void getSettingsFromGame(Game game) {
         board = game.getBoard().getBoard();
-        chipSets = game.getChipSets();
+        chipSets = game.getInitialChipSets();
         goalPositions = game.getGoalPositions().clone();
     }
 

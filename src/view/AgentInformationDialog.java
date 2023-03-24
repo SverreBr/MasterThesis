@@ -13,6 +13,8 @@ public class AgentInformationDialog extends JDialog {
     private final JPanel mainPanel;
     private final PlayerLying agent;
 
+    private final DecimalFormat df = new DecimalFormat("####0.00");
+
     public AgentInformationDialog(Frame owner, String title, PlayerLying agent) {
         super(owner, title, true);
         this.agent = agent;
@@ -35,40 +37,47 @@ public class AgentInformationDialog extends JDialog {
     }
 
     private void addLocationBeliefs() {
-        DecimalFormat df = new DecimalFormat("####0.00");
+        JTextPane locationBeliefsPane, locationBeliefsPaneValues;
+        int orderToM = agent.getOrderToM();
 
-        JTextPane locationBeliefsPane1 = new JTextPane();
-        addStylesToDoc(locationBeliefsPane1, "Location beliefs agent (order=" + agent.getOrderToM() + "): ");
-        mainPanel.add(locationBeliefsPane1);
+        while (orderToM > 0) {
+            locationBeliefsPane = new JTextPane();
+            addStylesToDoc(locationBeliefsPane, "Location beliefs agent (order=" + orderToM + "): ");
+            mainPanel.add(locationBeliefsPane);
 
-        JTextPane locationBeliefsPane2 = new JTextPane();
-        double[] locationBeliefs = agent.getLocationBeliefs();
-        StringBuilder text = new StringBuilder("[" + df.format(locationBeliefs[0]));
-        for (int i = 1; i < locationBeliefs.length; i++) {
-            text.append(", ").append(df.format(locationBeliefs[i]));
+            locationBeliefsPaneValues = new JTextPane();
+            double[] locationBeliefs = agent.getLocationBeliefs(orderToM);
+            StringBuilder text = new StringBuilder("[" + df.format(locationBeliefs[0]));
+            for (int i = 1; i < locationBeliefs.length; i++) {
+                text.append("; ").append(df.format(locationBeliefs[i]));
+            }
+            text.append("]");
+            addStylesToDoc(locationBeliefsPaneValues, String.valueOf(text));
+            mainPanel.add(locationBeliefsPaneValues);
+            orderToM--;
         }
-        text.append("]");
-        addStylesToDoc(locationBeliefsPane2, String.valueOf(text));
-        mainPanel.add(locationBeliefsPane2);
     }
 
     private void addLocationBeliefsPartner() {
-        DecimalFormat df = new DecimalFormat("####0.00");
+        JTextPane locationBeliefsPane, locationBeliefsPaneValues;
+        int orderToM = agent.getOrderToM();
 
-        JTextPane locationBeliefsPane1 = new JTextPane();
-        addStylesToDoc(locationBeliefsPane1, "Modelled location beliefs trading partner (order=" + agent.getPartnerModel().getOrderToM() + "): ");
-        mainPanel.add(locationBeliefsPane1);
+        while (orderToM > 1) {
+            locationBeliefsPane = new JTextPane();
+            addStylesToDoc(locationBeliefsPane, "Modelled location beliefs trading partner (order=" + (orderToM-1) + "): ");
+            mainPanel.add(locationBeliefsPane);
 
-
-        JTextPane locationBeliefsPane2 = new JTextPane();
-        double[] locationBeliefs = agent.getPartnerModel().getLocationBeliefs();
-        StringBuilder text = new StringBuilder("[" + df.format(locationBeliefs[0]));
-        for (int i = 1; i < locationBeliefs.length; i++) {
-            text.append(", ").append(df.format(locationBeliefs[i]));
+            locationBeliefsPaneValues = new JTextPane();
+            double[] locationBeliefs = agent.getPartnerModelLocationBeliefs(orderToM);
+            StringBuilder text = new StringBuilder("[" + df.format(locationBeliefs[0]));
+            for (int i = 1; i < locationBeliefs.length; i++) {
+                text.append("; ").append(df.format(locationBeliefs[i]));
+            }
+            text.append("]");
+            addStylesToDoc(locationBeliefsPaneValues, String.valueOf(text));
+            mainPanel.add(locationBeliefsPaneValues);
+            orderToM--;
         }
-        text.append("]");
-        addStylesToDoc(locationBeliefsPane2, String.valueOf(text));
-        mainPanel.add(locationBeliefsPane2);
     }
 
     private void addStylesToDoc(JTextPane pane, String text) {

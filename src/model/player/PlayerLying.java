@@ -72,42 +72,38 @@ public class PlayerLying extends PlayerToM {
         if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
             if (canLie) {
                 for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
-                    partnerModel.saveBeliefs();
-                    partnerModel.receiveMessage(Messages.createLocationMessage(loc));
                     addOffers(loc);
-                    partnerModel.restoreBeliefs();
                 }
-            } else {
+            }
+            else {
                 goalPosition = game.getGoalPositionPlayer(this.getName());
-                partnerModel.saveBeliefs();
-                partnerModel.receiveMessage(Messages.createLocationMessage(goalPosition));
                 addOffers(goalPosition);
                 partnerModel.restoreBeliefs();
             }
         }
         if (!thereIsBestOfferWithoutMessage) {
             boolean lyingIsBetter = true;
-            System.out.println("There are offers that give " + this.getName() + " a better value than using no message.");
+            System.out.println("\nThere are offers that give " + this.getName() + " a better value than using no message.");
             System.out.println("-> Offers that are optimal without message:");
             for (LyingOfferType smt : bestOffersWithoutMessage) {
-                System.out.println("\t- value=" + noMessageOfferValue + ", offer to self=" +
+                System.out.println("\t- value=" + noMessageOfferValue + "; offer to self=" + smt.offer() + "; " +
                         Arrays.toString(Chips.getBins(smt.offer(), game.getBinMaxChips())));
             }
-            System.out.println("\t- Chosen is offer to self: " +
+            System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.offer() + "; " +
                     Arrays.toString(Chips.getBins(bestLyingOfferType.offer(), game.getBinMaxChips())));
 
             // choose offer with message
             bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
             System.out.println("-> Offers that are optimal with message are:");
             for (LyingOfferType something : bestOffers) {
-                System.out.println("\t- value=" + tmpSelectOfferValue + ", offer to self=" +
+                System.out.println("\t- value=" + tmpSelectOfferValue + ", offer to self=" + something.offer() + "; " +
                         Arrays.toString(Chips.getBins(something.offer(), game.getBinMaxChips())) +
                         ", loc=" + something.loc());
                 if (something.loc() == game.getGoalPositionPlayer(this.getName())) {
                     lyingIsBetter = false;
                 }
             }
-            System.out.println("\t- Chosen is offer to self: " +
+            System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.offer() + "; " +
                     Arrays.toString(Chips.getBins(bestLyingOfferType.offer(), game.getBinMaxChips())) +
                     ", loc=" + bestLyingOfferType.loc());
             if (lyingIsBetter) {
@@ -129,13 +125,22 @@ public class PlayerLying extends PlayerToM {
         } else if (bestLoc != -1) { // else, make the best offer with possibly a message
             sendMessage(Messages.createLocationMessage(bestLoc));
         }
+        System.out.println("Value of offer = " + getValue(bestOffer));
         return bestOffer;
     }
 
     private void addOffers(int loc) {
         double curValue;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-            curValue = getValue(i);
+            if (loc != -1) { // TODO: make this more efficient?
+                partnerModel.saveBeliefs();
+                partnerModel.receiveMessage(Messages.createLocationMessage(loc));
+                curValue = getValue(i);
+                partnerModel.restoreBeliefs();
+            } else {
+                curValue = getValue(i);
+            }
+
             if (curValue > tmpSelectOfferValue) {
                 tmpSelectOfferValue = curValue;
                 bestOffers = new ArrayList<>();

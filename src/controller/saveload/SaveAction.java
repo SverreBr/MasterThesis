@@ -56,11 +56,11 @@ public class SaveAction extends AbstractAction {
             saveGameSettings(filename);
             return true;
         } catch (NameTooLongException e) {
-            Popups.showErrorSaving("Filename is too long.\nGame did not save.");
+            Popups.showErrorSaving("Filename is too long.\nPlease enter a shorter description.");
         } catch (NameTooShortException e) {
-            Popups.showErrorSaving("Filename is too short.\nGame did not save.");
+            Popups.showErrorSaving("Filename is too short.\nPlease use at least one character.");
         } catch (ForbiddenCharacterException e) {
-            Popups.showErrorSaving("There is a forbidden character in the filename you entered.\nGame did not save.");
+            Popups.showErrorSaving("There is a forbidden character in the filename you entered.\nPlease use only letters and numbers for the filename.");
         } catch (FileAlreadyExistsException e) {
             if (Popups.showFileNameAlreadyExistsError("The filename you entered already exists.\nDo you want to overwrite the existing file?")) {
                 saveGameSettings(filename);

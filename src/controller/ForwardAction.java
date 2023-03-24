@@ -56,7 +56,7 @@ public class ForwardAction implements ForwardListener {
         pane = new JPanel();
 
         frame = new JFrame("Forwarding rounds");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
         makePane();
