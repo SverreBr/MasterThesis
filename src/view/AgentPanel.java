@@ -12,6 +12,7 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -238,7 +239,7 @@ public class AgentPanel extends JComponent implements GameListener {
         int idx = 0;
         style[idx] = "bold";
         content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanLie() + ")";
-        content[idx++] = "initial chips:";
+        content[idx++] = "initial chips: " + Arrays.toString(this.initialChips);
         content[idx++] = "";
         content[idx++] = "";
         content[idx++] = "initial points: " + this.initialPoints;

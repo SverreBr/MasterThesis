@@ -24,14 +24,35 @@ public class SettingsAction extends AbstractAction {
 
     /**
      * Constructor
+     *
      * @param description Name of the action
-     * @param game Game model
-     * @param mainFrame Main frame of the visuals
+     * @param game        Game model
+     * @param mainFrame   Main frame of the visuals
      */
     public SettingsAction(String description, Game game, JFrame mainFrame) {
         super(description);
         this.game = game;
         this.mainFrame = mainFrame;
+    }
+
+    /**
+     * Method called when the settings of the agents are changed based on the settingsDialog.
+     *
+     * @param sd SettingsDialog
+     */
+    private void changeGame(SettingsDialog sd) {
+        int initToM, respToM;
+        double initLR, respLR;
+        boolean initCanLie, respCanLie;
+
+        initToM = sd.getInitiatorToMFieldValue();
+        initLR = sd.getInitiatorLRFieldValue();
+        initCanLie = sd.isInitiatorLieFieldValue();
+        respToM = sd.getResponderToMFieldValue();
+        respLR = sd.getResponderLRFieldValue();
+        respCanLie = sd.isResponderLieFieldValue();
+
+        game.reset(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
     }
 
     @Override
@@ -40,22 +61,11 @@ public class SettingsAction extends AbstractAction {
             Popups.showSettingsButtonNotAccessible();
             return;
         }
-        int initToM, respToM;
-        double initLR, respLR;
-        boolean initCanLie, respCanLie;
 
-        SettingsDialog sd = new SettingsDialog(mainFrame,"Game player settings");
+        SettingsDialog sd = new SettingsDialog(mainFrame, "Game player settings");
         sd.setVisible(true);
 
-        if (sd.gameHasChanged) {
-            initToM = sd.getInitiatorToMFieldValue();
-            initLR = sd.getInitiatorLRFieldValue();
-            initCanLie = sd.isInitiatorLieFieldValue();
-            respToM = sd.getResponderToMFieldValue();
-            respLR = sd.getResponderLRFieldValue();
-            respCanLie = sd.isResponderLieFieldValue();
-
-            game.reset(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
-        }
+        if (sd.gameHasChanged) changeGame(sd);
+        sd.dispose();
     }
 }

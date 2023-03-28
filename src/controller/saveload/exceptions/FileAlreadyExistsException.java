@@ -5,7 +5,7 @@ package controller.saveload.exceptions;
  */
 public class FileAlreadyExistsException extends Exception {
     /**
-     * Method for the exception for if a filename already exists
+     * Method for the exception when a filename already exists
      *
      * @param filename filename that will be checked
      */

@@ -1,11 +1,12 @@
 package controller.saveload.exceptions;
 
 /**
- * NameTooShortException class: Exception for if a filename is too short
+ * NameTooShortException class: Exception for when a filename is too short
  */
 public class NameTooShortException extends Exception {
     /**
-     * Method for the exception for if a filename is too short
+     * Method for the exception when a filename is too short.
+     * (Settings given in SaveLoadSettings.)
      *
      * @param filename filename that will be checked
      */

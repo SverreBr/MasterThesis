@@ -1,11 +1,12 @@
 package controller.saveload.exceptions;
 
 /**
- * NameTooLongException class: Exception for if a filename is too long
+ * NameTooLongException class: Exception for when a filename is too long
  */
 public class NameTooLongException extends Exception {
     /**
-     * Method for the exception for if a filename is too long
+     * Method for the exception when a filename is too long.
+     * (Setting given in SaveLoadSettings.)
      *
      * @param filename filename that will be checked
      */

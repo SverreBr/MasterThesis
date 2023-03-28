@@ -5,6 +5,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
@@ -126,6 +127,10 @@ public class Settings {
     public static final String ACCEPT_OFFER_MESSAGE = "I accept your offer.";
 
     public static final int SAVE_NUMBER = 3;
+
+    public static final double EPSILON = 1e-9;
+
+    public static final DecimalFormat PRINT_DF = new DecimalFormat("####0.0000");
 
     /**
      * Returns a color given a certain integer

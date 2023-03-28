@@ -54,6 +54,22 @@ public class AgentInformationDialog extends JDialog {
             text.append("]");
             addStylesToDoc(locationBeliefsPaneValues, String.valueOf(text));
             mainPanel.add(locationBeliefsPaneValues);
+
+            /////////////////////////////
+            locationBeliefsPane = new JTextPane();
+            addStylesToDoc(locationBeliefsPane, "Saved location beliefs agent (order=" + orderToM + "): ");
+            mainPanel.add(locationBeliefsPane);
+
+            locationBeliefsPaneValues = new JTextPane();
+            locationBeliefs = agent.getLocationBeliefsWithoutMessage(orderToM);
+            text = new StringBuilder("[" + df.format(locationBeliefs[0]));
+            for (int i = 1; i < locationBeliefs.length; i++) {
+                text.append("; ").append(df.format(locationBeliefs[i]));
+            }
+            text.append("]");
+            addStylesToDoc(locationBeliefsPaneValues, String.valueOf(text));
+            mainPanel.add(locationBeliefsPaneValues);
+
             orderToM--;
         }
     }
@@ -70,6 +86,21 @@ public class AgentInformationDialog extends JDialog {
             locationBeliefsPaneValues = new JTextPane();
             double[] locationBeliefs = agent.getPartnerModelLocationBeliefs(orderToM);
             StringBuilder text = new StringBuilder("[" + df.format(locationBeliefs[0]));
+            for (int i = 1; i < locationBeliefs.length; i++) {
+                text.append("; ").append(df.format(locationBeliefs[i]));
+            }
+            text.append("]");
+            addStylesToDoc(locationBeliefsPaneValues, String.valueOf(text));
+            mainPanel.add(locationBeliefsPaneValues);
+
+            //////////////////////////////////////
+            locationBeliefsPane = new JTextPane();
+            addStylesToDoc(locationBeliefsPane, "Modelled saved location beliefs trading partner (order=" + (orderToM-1) + "): ");
+            mainPanel.add(locationBeliefsPane);
+
+            locationBeliefsPaneValues = new JTextPane();
+            locationBeliefs = agent.getPartnerModelLocationBeliefsWithoutMessage(orderToM);
+            text = new StringBuilder("[" + df.format(locationBeliefs[0]));
             for (int i = 1; i < locationBeliefs.length; i++) {
                 text.append("; ").append(df.format(locationBeliefs[i]));
             }

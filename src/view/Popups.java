@@ -126,9 +126,11 @@ public class Popups extends JOptionPane {
                 JOptionPane.ERROR_MESSAGE);
     }
 
-    public static boolean showFileNameAlreadyExistsError(String description) {
-        int returnVal = showOptionDialog(null, description, "Filename Already Exists Error",
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,null, null);
+    public static boolean showFileNameAlreadyExistsError() {
+        int returnVal = showOptionDialog(null,
+                "The filename you entered already exists.\nDo you want to overwrite the existing file?",
+                "Filename Already Exists Error", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
+                null,null, null);
         return returnVal == JOptionPane.YES_OPTION;
     }
 }
