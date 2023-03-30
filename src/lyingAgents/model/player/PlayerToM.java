@@ -171,7 +171,7 @@ public class PlayerToM extends Player {
         bestOffers.add(this.chips);
         tmpSelectOfferValue = utilityFunction[this.chips];
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-            curValue = getValue(i);
+            curValue = getValue(i, offerReceived);
             if (curValue - Settings.EPSILON > tmpSelectOfferValue) {
                 tmpSelectOfferValue = curValue;
                 bestOffers = new ArrayList<>();
@@ -198,24 +198,31 @@ public class PlayerToM extends Player {
     /**
      * Calculates the expected value of an offer
      *
-     * @param offerToSelf offer from the perspective of this agent. That is, if accepted, this agent gets offerToSelf
+     * @param makeOfferToSelf offer from the perspective of this agent. That is, if accepted, this agent gets makeOfferToSelf
      * @return the expected value of making this offer.
      */
-    protected double getValue(int offerToSelf) {
+    protected double getValue(int makeOfferToSelf, int offerReceived) {
         int loc, offerToOther;
         double curValue = 0.0;
+
+        if (makeOfferToSelf == this.chips) {  // agent offers own chips (withdraw)
+            return utilityFunction[this.chips];
+        } else if (makeOfferToSelf == offerReceived) {  // agent offers same offer as it receives (seen as accept)
+            return utilityFunction[offerReceived];
+        }
+
         if (orderToM == 0) {
             // ToM0 uses only expected value
-            return getExpectedValue(offerToSelf);
+            return getExpectedValue(makeOfferToSelf);
         }
         if ((confidence - Settings.EPSILON > 0) || confidenceLocked) {
-            offerToOther = game.flipOffer(offerToSelf);
+            offerToOther = game.flipOffer(makeOfferToSelf);
             partnerModel.saveBeliefs();
             partnerModel.receiveOffer(offerToOther);
             for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
                 if (locationBeliefs[loc] - Settings.EPSILON > 0.0) {
                     partnerModel.utilityFunction = game.getUtilityFunction(loc);
-                    curValue += locationBeliefs[loc] * getLocationValue(offerToSelf, offerToOther);
+                    curValue += locationBeliefs[loc] * getLocationValue(makeOfferToSelf, offerToOther);
                 }
             }
             partnerModel.restoreBeliefs();
@@ -226,7 +233,7 @@ public class PlayerToM extends Player {
         }
 
         // recursion of theory of mind
-        return curValue * confidence + (1 - confidence) * selfModel.getValue(offerToSelf);
+        return curValue * confidence + (1 - confidence) * selfModel.getValue(makeOfferToSelf, offerReceived);
 
     }
 
@@ -235,9 +242,9 @@ public class PlayerToM extends Player {
      *
      * @param offerToSelf  offer to agent self
      * @param offerToOther offer to the other agent
-     * @return the value associated to
+     * @return the value associated to making the offer
      */
-    protected double getLocationValue(int offerToSelf, int offerToOther) {
+    private double getLocationValue(int offerToSelf, int offerToOther) {
         int response = partnerModel.selectOffer(offerToOther);
         double curValue;
         if (response == offerToOther) {
@@ -325,8 +332,8 @@ public class PlayerToM extends Player {
                 // Given loc, offerReceived gives the partner a higher score than the initial situation
                 partnerAlternative = partnerModel.selectOffer(0); // 0 since worst possible offer
                 // Agent's guess for partner's best option given location l
-                maxExpVal = partnerModel.getValue(partnerAlternative);
-                curExpVal = partnerModel.getValue(offerPartnerChips);
+                maxExpVal = partnerModel.getValue(partnerAlternative, -1);
+                curExpVal = partnerModel.getValue(offerPartnerChips, -1);
                 // Agent's guess for partner's value of offerReceived
                 if (maxExpVal - Settings.EPSILON > -1) {
                     newBelief = (1 + curExpVal) / (1 + maxExpVal);
@@ -364,7 +371,6 @@ public class PlayerToM extends Player {
             confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));
         }
     }
-
 
     /**
      * Saves beliefs for (nested) hypothetical beliefs
@@ -522,18 +528,25 @@ public class PlayerToM extends Player {
         boolean believeLoc = false;
 
         if (this.orderToM > 0) { // Models goal location of trading partner
-            // Believe agent, but keep alternative (without message influence) if agent falls in disbelief later on
-            if (!this.receivedMessage) storeLocationBeliefsDueToBelievedMessage();
-
-            if (locationBeliefs[location] - Settings.EPSILON > 0.0) believeLoc = true;
-            for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
-                locationBeliefs[loc] = 0.0;
+            if (!this.receivedMessage) { // First message received
+                storeLocationBeliefsDueToBelievedMessage();
+                if (locationBeliefs[location] - Settings.EPSILON > 0.0) believeLoc = true;
+                for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
+                    locationBeliefs[loc] = 0.0;
+                }
+                if (believeLoc) locationBeliefs[location] = 1.0;
+            } else {  // already received a message
+                if (locationBeliefs[location] - Settings.EPSILON <= 0.0) {
+                    for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
+                        locationBeliefs[loc] = 0.0;
+                    }
+                } // else, still believe trading partner.
             }
-            if (believeLoc) locationBeliefs[location] = 1.0;  // All probability mass to one location.
-            // TODO: else is now all location beliefs equal to zero.
         }
         this.receivedMessage = true;
     }
+
+
 
     /**
      * Method that is called when the agent receives a message.
@@ -604,5 +617,13 @@ public class PlayerToM extends Player {
      */
     private void storeLocationBeliefsDueToBelievedMessage() {
         locationBeliefsWithoutMessage = locationBeliefs.clone();
+    }
+
+    public boolean getHasReceivedMessage() {
+        return receivedMessage;
+    }
+
+    public boolean getHasSentMessage() {
+        return hasSentMessage;
     }
 }

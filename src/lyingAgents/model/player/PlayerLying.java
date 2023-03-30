@@ -99,7 +99,7 @@ public class PlayerLying extends PlayerToM {
 
         bestOffers.add(new LyingOfferType(this.chips, -1));  // withdraw from negotiation as basis
         tmpSelectOfferValue = utilityFunction[this.chips];
-        addOffersWithoutMessage();  // send no message
+        addOffersWithoutMessage(offerReceived);  // send no message
 
         // Choose offer without message if at least as good as with a message.
         List<LyingOfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
@@ -110,11 +110,11 @@ public class PlayerLying extends PlayerToM {
         if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
             if (canLie) {
                 for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
-                    addOffers(loc);
+                    addOffers(loc, offerReceived);
                 }
             } else {
                 goalPosition = game.getGoalPositionPlayer(this.getName());
-                addOffers(goalPosition);
+                addOffers(goalPosition, offerReceived);
             }
         }
 
@@ -151,8 +151,9 @@ public class PlayerLying extends PlayerToM {
         bestLoc = bestLyingOfferType.loc();
 
         System.out.println(getName() + ": Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
-                "; Value of offer = " + Settings.PRINT_DF.format(getValue(bestOffer)) +
-                "; tmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
+                "; location=" + bestLoc +
+                ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer, offerReceived)) +
+                ";\n\ttmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
@@ -163,9 +164,17 @@ public class PlayerLying extends PlayerToM {
             // withdraw from negotiation
             System.out.println("WITHDRAW");
             bestOffer = this.chips;
-        } else if (bestLoc != -1) { // else, make the best offer with possibly a message
-            sendMessage(Messages.createLocationMessage(bestLoc));
-            System.out.println("Offer value after sending message: " + Settings.PRINT_DF.format(getValue(bestOffer)));
+        } else {  // else, make the best offer with possibly a message
+            if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
+
+            double offerValue = getValue(bestOffer, offerReceived);
+            if (bestLoc != -1) System.out.println("Offer value (after sending message (" + bestLoc +")): " + Settings.PRINT_DF.format(offerValue));
+            if ((offerValue + Settings.EPSILON < tmpSelectOfferValue) || (offerValue - Settings.EPSILON > tmpSelectOfferValue)) {
+                System.out.println("!!! WRONG NUMBERS !!! -> " + Settings.PRINT_DF.format(offerValue) + " != " + Settings.PRINT_DF.format(tmpSelectOfferValue));
+                for (int i = 0; i < 5; i++) {
+                    System.out.println("\tvalue = " + Settings.PRINT_DF.format(getValue(bestOffer, offerReceived)));
+                }
+            }
         }
 
         return bestOffer;
@@ -176,14 +185,14 @@ public class PlayerLying extends PlayerToM {
      *
      * @param loc The location to message to the other agent
      */
-    private void addOffers(int loc) {
+    private void addOffers(int loc, int offerReceived) {
         double curValue;
         boolean saveHasSentMessage = this.hasSentMessage;
 
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             partnerModel.saveBeliefs();
             partnerModel.receiveMessage(Messages.createLocationMessage(loc));
-            curValue = getValue(i);  // TODO: what to do when value is higher when sending offer that accepts the offer.
+            curValue = getValue(i, offerReceived);  // TODO: what to do when value is higher when sending offer that accepts the offer.
             partnerModel.restoreBeliefs();
             this.setHasSentMessage(saveHasSentMessage);
 
@@ -194,10 +203,10 @@ public class PlayerLying extends PlayerToM {
     /**
      * Adds offers without a message.
      */
-    private void addOffersWithoutMessage() {
+    private void addOffersWithoutMessage(int offerReceived) {
         double curValue;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-            curValue = getValue(i);
+            curValue = getValue(i, offerReceived);
             processOffer(i, -1, curValue);
         }
     }

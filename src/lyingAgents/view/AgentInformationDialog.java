@@ -51,9 +51,33 @@ public class AgentInformationDialog extends JDialog {
      */
     private void createMainPanel() {
         mainPanel.setLayout(new GridLayout(0, 2));
+        addInformation();
 
         if (agent.getOrderToM() > 0) addLocationBeliefs();
         if (agent.getOrderToM() > 1) addLocationBeliefsPartner();
+    }
+
+    /**
+     * Method to add some basic information about the agent to the dialog
+     */
+    private void addInformation() {
+        JTextPane textPane;
+
+        textPane = new JTextPane();
+        MiscFunc.addStylesToDoc(textPane, "Agent has sent a message: ", "regular");
+        mainPanel.add(textPane);
+
+        textPane = new JTextPane();
+        MiscFunc.addStylesToDoc(textPane, Boolean.toString(agent.getHasSentMessage()), "regular");
+        mainPanel.add(textPane);
+
+        textPane = new JTextPane();
+        MiscFunc.addStylesToDoc(textPane, "Agent has received a message: ", "regular");
+        mainPanel.add(textPane);
+
+        textPane = new JTextPane();
+        MiscFunc.addStylesToDoc(textPane, Boolean.toString(agent.getHasReceivedMessage()), "regular");
+        mainPanel.add(textPane);
     }
 
     /**

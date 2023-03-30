@@ -13,7 +13,7 @@ public class SaveLoadSettings {
     /**
      * maximum number of characters a file name may have
      */
-    public static final int MAX_FILE_NAME = 15;
+    public static final int MAX_FILE_NAME = 20;
 
     /**
      * minimum number of characters a file name may have
