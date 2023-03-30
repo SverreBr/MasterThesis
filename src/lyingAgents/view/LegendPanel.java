@@ -1,7 +1,7 @@
 package lyingAgents.view;
 
-import lyingAgents.controller.BoardSettingsAction;
-import lyingAgents.controller.SettingsAction;
+import lyingAgents.controller.GameSettingsAction;
+import lyingAgents.controller.AgentSettingsAction;
 import lyingAgents.model.GameListener;
 import lyingAgents.model.Game;
 import lyingAgents.utilities.MiscFunc;
@@ -35,9 +35,12 @@ public class LegendPanel extends JPanel implements GameListener {
     /**
      * Settings button
      */
-    private final JButton settingsButton;
+    private final JButton agentSettingsButton;
 
-    private final JButton boardSettingsButton;
+    /**
+     * Button to change game settings
+     */
+    private final JButton gameSettingsButton;
 
     /**
      * Panel for the settings button
@@ -56,6 +59,7 @@ public class LegendPanel extends JPanel implements GameListener {
 
     /**
      * Constructor for the legend panel
+     *
      * @param game The game model
      */
     public LegendPanel(Game game, JFrame mainFrame) {
@@ -66,11 +70,10 @@ public class LegendPanel extends JPanel implements GameListener {
         createTextPane();
         updateLegendText();
 
-        this.settingsButton = new JButton();
-        this.boardSettingsButton = new JButton();
+        this.agentSettingsButton = new JButton();
+        this.gameSettingsButton = new JButton();
         buttonPanel = new JPanel();
         createButtonPanel();
-
 
         this.setLayout(new BorderLayout());
         this.add(info, BorderLayout.CENTER);
@@ -92,8 +95,8 @@ public class LegendPanel extends JPanel implements GameListener {
     private void changeBackgrounds() {
         setBackground(Settings.getBackGroundColor());
         info.setBackground(Settings.getBackGroundColor());
-        settingsButton.setBackground(Settings.getBackGroundColor());
-        boardSettingsButton.setBackground(Settings.getBackGroundColor());
+        agentSettingsButton.setBackground(Settings.getBackGroundColor());
+        gameSettingsButton.setBackground(Settings.getBackGroundColor());
         buttonPanel.setBackground(Settings.getBackGroundColor());
     }
 
@@ -109,59 +112,65 @@ public class LegendPanel extends JPanel implements GameListener {
         MiscFunc.createsStyledDocument(doc);
     }
 
+    /**
+     * Creates buttons and adds them to the panel
+     */
     private void createButtonPanel() {
-        createSettingsButton();
-        createBoardSettingsButton();
+        createAgentSettingsButton();
+        createGameSettingsButton();
 
         buttonPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTH;
-        buttonPanel.add(settingsButton, gbc);
+        buttonPanel.add(agentSettingsButton, gbc);
         gbc.gridy++;
-        buttonPanel.add(boardSettingsButton, gbc);
+        buttonPanel.add(gameSettingsButton, gbc);
         gbc.gridy++;
         gbc.weighty = 1.0;
-//        gbc.ipady = 40;
         buttonPanel.add(Box.createRigidArea(new Dimension(SETTINGS_BUTTON_SIZE, 0)), gbc);
     }
 
     /**
-     * Creates settings button
+     * Creates agent settings button
      */
-    private void createSettingsButton() {
-        settingsButton.setAction(new SettingsAction("", game, mainFrame));
+    private void createAgentSettingsButton() {
+        agentSettingsButton.setAction(new AgentSettingsAction("", game, mainFrame));
         try {
             Image img = ImageIO.read(new File("fig/settingsIcon.png"));
             img = img.getScaledInstance(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE, Image.SCALE_DEFAULT);
-            settingsButton.setIcon(new ImageIcon(img));
+            agentSettingsButton.setIcon(new ImageIcon(img));
         } catch (Exception ex) {
-            System.err.println("Image file not found!");
+            Popups.showGeneralException("Couldn't find the image for the agent settings button.");
         }
 
-        settingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE + 5));
-        settingsButton.setBorder(BorderFactory.createEmptyBorder(0,0,5,0));
-        settingsButton.setToolTipText("Click here to change the settings of the agents.");
+        agentSettingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE + 5));
+        agentSettingsButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        agentSettingsButton.setToolTipText("Click here to change the settings of the agents.");
     }
 
-    private void createBoardSettingsButton() {
-        boardSettingsButton.setAction(new BoardSettingsAction("", game, mainFrame));
+    /**
+     * Creates game settings button
+     */
+    private void createGameSettingsButton() {
+        gameSettingsButton.setAction(new GameSettingsAction("", game, mainFrame));
         try {
             Image img = ImageIO.read(new File("fig/boardSettingsIcon.png"));
             img = img.getScaledInstance(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE, Image.SCALE_DEFAULT);
-            boardSettingsButton.setIcon(new ImageIcon(img));
+            gameSettingsButton.setIcon(new ImageIcon(img));
         } catch (Exception ex) {
-            System.err.println("Image file not found!");
+            Popups.showGeneralException("Couldn't find the image for game settings button");
         }
 
-        boardSettingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE + 10));
-        boardSettingsButton.setBorder(BorderFactory.createEmptyBorder(5,0,5,0));
-        boardSettingsButton.setToolTipText("Click here to change the settings of the board.");
+        gameSettingsButton.setPreferredSize(new Dimension(SETTINGS_BUTTON_SIZE, SETTINGS_BUTTON_SIZE + 10));
+        gameSettingsButton.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        gameSettingsButton.setToolTipText("Click here to change the game settings.");
     }
 
     /**
      * Paint the panel
+     *
      * @param g the <code>Graphics</code> object to protect
      */
     @Override
@@ -243,7 +252,7 @@ public class LegendPanel extends JPanel implements GameListener {
                 doc.insertString(doc.getLength(), content.get(i) + "\n", doc.getStyle(style.get(i)));
             }
         } catch (BadLocationException ble) {
-            System.err.println("Couldn't insert text into text pane.");
+            Popups.showGeneralException(Settings.GENERAL_EXCEPTION);
         }
     }
 
@@ -257,5 +266,6 @@ public class LegendPanel extends JPanel implements GameListener {
     }
 
     @Override
-    public void gameChanged() {}
+    public void gameChanged() {
+    }
 }

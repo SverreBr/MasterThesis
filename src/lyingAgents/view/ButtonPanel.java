@@ -132,7 +132,6 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         body.add(step);
         body.add(play);
         body.add(newNeg);
-//        body.add(Box.createRigidArea(new Dimension(1, 1)));
         body.add(forwardPanel);
 
         changeBackgrounds();
@@ -216,9 +215,6 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         step.setEnabled(setEnabled);
     }
 
-    /**
-     * Method called when field inGame is changed. Two buttons are disabled.
-     */
     @Override
     public void inGameChanged() {
         boolean setEnabled = !(this.game.isGameFinished());

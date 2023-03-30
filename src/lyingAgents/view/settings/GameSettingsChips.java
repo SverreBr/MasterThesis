@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * BoardSettingsChips class: deals with determining the colors of the chips of the players in game settings
  */
-public class BoardSettingsChips extends JComponent {
+public class GameSettingsChips extends JComponent {
 
     /**
      * Component width of the chips with text fields
@@ -33,7 +33,7 @@ public class BoardSettingsChips extends JComponent {
     /**
      * Constructor
      */
-    public BoardSettingsChips() {
+    public GameSettingsChips() {
         this.setBackground(Settings.getBackGroundColor());
         setPreferredSize(new Dimension(COMPONENT_WIDTH, COMPONENT_HEIGHT));
 

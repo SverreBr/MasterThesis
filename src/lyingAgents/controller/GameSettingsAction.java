@@ -1,6 +1,6 @@
 package lyingAgents.controller;
 
-import lyingAgents.view.settings.BoardSettingsDialog;
+import lyingAgents.view.settings.GameSettingsDialog;
 import lyingAgents.utilities.GameSetting;
 import lyingAgents.model.Game;
 import lyingAgents.view.Popups;
@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 /**
  * BoardSettingsAction class: Action when button is clicked to change the board of the game.
  */
-public class BoardSettingsAction extends AbstractAction {
+public class GameSettingsAction extends AbstractAction {
 
     /**
      * Game model of the simulation
@@ -30,7 +30,7 @@ public class BoardSettingsAction extends AbstractAction {
      * @param game        Game model of the simulation
      * @param mainFrame   Mainframe of the simulation
      */
-    public BoardSettingsAction(String description, Game game, JFrame mainFrame) {
+    public GameSettingsAction(String description, Game game, JFrame mainFrame) {
         super(description);
         this.game = game;
         this.mainFrame = mainFrame;
@@ -43,7 +43,7 @@ public class BoardSettingsAction extends AbstractAction {
             return;
         }
 
-        BoardSettingsDialog bsd = new BoardSettingsDialog(mainFrame, "Game settings");
+        GameSettingsDialog bsd = new GameSettingsDialog(mainFrame, "Game settings");
         bsd.setVisible(true);
 
         if (bsd.isGameHasChanged()) {

@@ -1,7 +1,7 @@
 package lyingAgents.utilities;
 
 import lyingAgents.model.Game;
-import lyingAgents.view.settings.BoardSettingsDialog;
+import lyingAgents.view.settings.GameSettingsDialog;
 
 import java.io.Serializable;
 
@@ -31,7 +31,7 @@ public class GameSetting implements Serializable {
      *
      * @param bsd The dialog where the user provided information
      */
-    public void getSettingsFromDialog(BoardSettingsDialog bsd) {
+    public void getSettingsFromDialog(GameSettingsDialog bsd) {
         board = new int[Settings.BOARD_HEIGHT][Settings.BOARD_WIDTH];
         for (int row = 0; row < Settings.BOARD_WIDTH; row++) {
             for (int col = 0; col < Settings.BOARD_HEIGHT; col++) {

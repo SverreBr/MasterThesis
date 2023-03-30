@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * BoardSettingsBoard class: Class for changing the board settings
  */
-public class BoardSettingsBoard extends JComponent {
+public class GameSettingsBoard extends JComponent {
 
     /**
      * determines the offset between drawing the rectangles of the board
@@ -34,7 +34,7 @@ public class BoardSettingsBoard extends JComponent {
     /**
      * Constructor of the board panel
      */
-    public BoardSettingsBoard() {
+    public GameSettingsBoard() {
         this.setBackground(Settings.getBackGroundColor());
         setPreferredSize(new Dimension(300, 300));
         addTextFields();

@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 /**
  * SettingsAction class: deals with changing settings via the settings button
  */
-public class SettingsAction extends AbstractAction {
+public class AgentSettingsAction extends AbstractAction {
 
     /**
      * The game model
@@ -29,7 +29,7 @@ public class SettingsAction extends AbstractAction {
      * @param game        Game model
      * @param mainFrame   lyingAgents.Main frame of the visuals
      */
-    public SettingsAction(String description, Game game, JFrame mainFrame) {
+    public AgentSettingsAction(String description, Game game, JFrame mainFrame) {
         super(description);
         this.game = game;
         this.mainFrame = mainFrame;

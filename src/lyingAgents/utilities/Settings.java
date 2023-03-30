@@ -141,6 +141,11 @@ public class Settings {
     public static final int MAX_NUMBER_OFFERS = 10;
 
     /**
+     * Shown when a general exception occurs
+     */
+    public static final String GENERAL_EXCEPTION = "Hmm... I don't know what went wrong, but don't do that again please.";
+
+    /**
      * A formatter for printing doubles
      */
     public static final DecimalFormat PRINT_DF = new DecimalFormat("####0.0000");

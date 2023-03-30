@@ -10,22 +10,22 @@ import java.awt.*;
 /**
  * BoardSettingsDialog class: The class that deals with creating a dialog where the user can enter a new board setting
  */
-public class BoardSettingsDialog extends JDialog {
+public class GameSettingsDialog extends JDialog {
 
     /**
      * The board where the user can enter values that correspond to the colors of the board
      */
-    private final BoardSettingsBoard boardSettingsBoard;
+    private final GameSettingsBoard gameSettingsBoard;
 
     /**
      * The chips of the initiator where the user can enter values that correspond to the colors of the chips
      */
-    private final BoardSettingsChips boardSettingsChipsInitiator;
+    private final GameSettingsChips gameSettingsChipsInitiator;
 
     /**
      * The chips of the responder where the user can enter values that correspond to the colors of the chips
      */
-    private final BoardSettingsChips boardSettingsChipsResponder;
+    private final GameSettingsChips gameSettingsChipsResponder;
 
     /**
      * Panel with settings of the agent that the user can change
@@ -68,19 +68,19 @@ public class BoardSettingsDialog extends JDialog {
      * @param owner Frame that this dialog is put on top
      * @param title Title of this dialog
      */
-    public BoardSettingsDialog(JFrame owner, String title) {
+    public GameSettingsDialog(JFrame owner, String title) {
         super(owner, title, true);
 
-        boardSettingsBoard = new BoardSettingsBoard();
-        boardSettingsChipsInitiator = new BoardSettingsChips();
-        boardSettingsChipsResponder = new BoardSettingsChips();
+        gameSettingsBoard = new GameSettingsBoard();
+        gameSettingsChipsInitiator = new GameSettingsChips();
+        gameSettingsChipsResponder = new GameSettingsChips();
         agentSettingsPanel = new JPanel();
         createAgentSettingsPanel();
 
         btnPanel = new JPanel();
         createButtonPanel();
 
-        getContentPane().add(boardSettingsBoard, BorderLayout.WEST);
+        getContentPane().add(gameSettingsBoard, BorderLayout.WEST);
         getContentPane().add(agentSettingsPanel, BorderLayout.EAST);
         getContentPane().add(btnPanel, BorderLayout.SOUTH);
         setResizable(false);
@@ -130,7 +130,7 @@ public class BoardSettingsDialog extends JDialog {
         MiscFunc.addStylesToDoc(someText, "- Initiator chips: ", "regular");
         agentSettingsPanel.add(someText, gbc);
         gbc.gridx++;
-        agentSettingsPanel.add(boardSettingsChipsInitiator, gbc);
+        agentSettingsPanel.add(gameSettingsChipsInitiator, gbc);
         gbc.gridy++;
         gbc.gridx = 0;
 
@@ -138,7 +138,7 @@ public class BoardSettingsDialog extends JDialog {
         MiscFunc.addStylesToDoc(someText, "- Responder chips: ", "regular");
         agentSettingsPanel.add(someText, gbc);
         gbc.gridx++;
-        agentSettingsPanel.add(boardSettingsChipsResponder, gbc);
+        agentSettingsPanel.add(gameSettingsChipsResponder, gbc);
     }
 
     /**
@@ -220,7 +220,7 @@ public class BoardSettingsDialog extends JDialog {
      * @return Integer corresponding to the color of the tile of the board with specified row and column
      */
     public int getIntColorTile(int row, int col) {
-        return boardSettingsBoard.getIntColorTile(row, col);
+        return gameSettingsBoard.getIntColorTile(row, col);
     }
 
     /**
@@ -242,7 +242,7 @@ public class BoardSettingsDialog extends JDialog {
      * @return Integer corresponding to the color of the chips asked for
      */
     public int getChipInitiator(int idx) {
-        return boardSettingsChipsInitiator.getChip(idx);
+        return gameSettingsChipsInitiator.getChip(idx);
     }
 
     /**
@@ -252,6 +252,6 @@ public class BoardSettingsDialog extends JDialog {
      * @return Integer corresponding to the color of the chips asked for
      */
     public int getChipResponder(int idx) {
-        return boardSettingsChipsResponder.getChip(idx);
+        return gameSettingsChipsResponder.getChip(idx);
     }
 }

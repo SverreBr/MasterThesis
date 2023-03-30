@@ -6,7 +6,6 @@ import lyingAgents.utilities.Settings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,6 +18,9 @@ public class BoardPanel extends JComponent implements GameListener {
      */
     private final Game game;
 
+    /**
+     * Offset o
+     */
     private static final int OFFSET = 1;
 
     /**
@@ -37,12 +39,6 @@ public class BoardPanel extends JComponent implements GameListener {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g.create();
-        // TODO: remove renderingHints?
-        Map<RenderingHints.Key, Object> rh = new HashMap<>();
-        rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        rh.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHints(rh);
-
         paintGrid(g2);
 
         g2.setFont(new Font("SansSerif", Font.PLAIN, 36));
@@ -138,7 +134,7 @@ public class BoardPanel extends JComponent implements GameListener {
         Dimension siteSize = getTileSize();
         FontMetrics metrics = g2.getFontMetrics(g2.getFont());
         int x = metrics.stringWidth("0");
-        int y = metrics.getAscent(); //metrics.getHeight() / 2 +
+        int y = metrics.getAscent();
 
         Map<Integer, Point> goalPositionsDict = game.getGoalPositionsDict();
         for (Map.Entry<Integer, Point> entry : goalPositionsDict.entrySet()) {

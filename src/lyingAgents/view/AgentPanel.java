@@ -22,6 +22,9 @@ import java.util.List;
  */
 public class AgentPanel extends JComponent implements GameListener {
 
+    /**
+     * Formatter for double values
+     */
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     /**
@@ -39,10 +42,19 @@ public class AgentPanel extends JComponent implements GameListener {
      */
     private final JScrollPane messageScroll;
 
+    /**
+     * Contains the buttons on this agent panel
+     */
     private final JPanel buttonPanel;
 
+    /**
+     * The main frame where this panel is built upon
+     */
     private final JFrame mainFrame;
 
+    /**
+     * Size of the button to get information on the agent
+     */
     private static final int INFORMATION_BUTTON_SIZE = 40;
 
     /**
@@ -129,7 +141,6 @@ public class AgentPanel extends JComponent implements GameListener {
         informationButton.setAction(new AgentInformationAction(agentName, game, mainFrame));
 
         informationButton.setPreferredSize(new Dimension(INFORMATION_BUTTON_SIZE, 0));
-//        informationButton.setBorder(BorderFactory.createEmptyBorder());
         informationButton.setToolTipText("Click here to see information about the " + this.agentName + ".");
 
         buttonPanel.setLayout(new BorderLayout());
@@ -141,11 +152,7 @@ public class AgentPanel extends JComponent implements GameListener {
      * Sets the agent with the corresponding name to this panel
      */
     private void setAgent() {
-        if (agentName.equals(Settings.INITIATOR_NAME)) {
-            this.agent = game.getInitiator();
-        } else {
-            this.agent = game.getResponder();
-        }
+        this.agent = agentName.equals(Settings.INITIATOR_NAME) ? game.getInitiator() : game.getResponder();
     }
 
     /**
@@ -180,7 +187,6 @@ public class AgentPanel extends JComponent implements GameListener {
     private void createScrollMessagePane() {
         messageScroll.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH,
                 Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT - INFORMATION_BUTTON_SIZE - 20));
-//        messageScroll.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT));
         messageScroll.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 0, 0, 0),
                 BorderFactory.createCompoundBorder(
@@ -258,7 +264,6 @@ public class AgentPanel extends JComponent implements GameListener {
             content[idx++] = "";
             style[idx] = "regular";
             content[idx++] = "";
-//            style[idx] = "regular"; content[idx++] = "final points: " + agent.getUtilityValue();
             style[idx] = "regular";
             content[idx++] = "total nr. offers: " + game.getNrOffers();
             style[idx] = "italic";
@@ -317,7 +322,6 @@ public class AgentPanel extends JComponent implements GameListener {
                 g2.fillOval(offset + trackNumChips * tokenSize, height, tokenSize, tokenSize);
                 trackNumChips += 1;
             }
-
         }
 
         if (agent.getGame().isGameFinished()) {

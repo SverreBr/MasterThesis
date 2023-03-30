@@ -64,6 +64,11 @@ public class MainFrame extends JFrame {
         pack();
     }
 
+    /**
+     * Adds a menubar to the frame
+     *
+     * @param game The game model
+     */
     private void addMenuBar(Game game) {
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");

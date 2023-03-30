@@ -5,6 +5,7 @@ import lyingAgents.controller.saveload.exceptions.ForbiddenCharacterException;
 import lyingAgents.controller.saveload.exceptions.NameTooLongException;
 import lyingAgents.controller.saveload.exceptions.NameTooShortException;
 import lyingAgents.model.Game;
+import lyingAgents.utilities.Settings;
 import lyingAgents.view.Popups;
 
 import javax.swing.*;
@@ -83,7 +84,7 @@ public class SaveAction extends AbstractAction {
                 return true;
             }
         } catch (Exception e) {
-            Popups.showGeneralException();
+            Popups.showGeneralException(Settings.GENERAL_EXCEPTION);
         }
         return false;
     }
@@ -97,7 +98,7 @@ public class SaveAction extends AbstractAction {
         File saveDirectory = new File(SaveLoadSettings.SAVE_DIRECTORY_NAME);
         if (!saveDirectory.exists()) {
             boolean wasSuccessful = saveDirectory.mkdir();
-            if (!wasSuccessful) Popups.showGeneralException();
+            if (!wasSuccessful) Popups.showGeneralException(Settings.GENERAL_EXCEPTION);
         }
 
         try (

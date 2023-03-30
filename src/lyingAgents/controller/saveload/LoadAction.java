@@ -1,6 +1,7 @@
 package lyingAgents.controller.saveload;
 
 import lyingAgents.model.Game;
+import lyingAgents.utilities.Settings;
 import lyingAgents.view.Popups;
 import lyingAgents.utilities.GameSetting;
 
@@ -51,7 +52,7 @@ public class LoadAction extends AbstractAction {
         File saveDirectory = new File(SaveLoadSettings.SAVE_DIRECTORY_NAME);
         if (!saveDirectory.exists()) {
             boolean wasSuccessful = saveDirectory.mkdir();
-            if (!wasSuccessful) Popups.showGeneralException();
+            if (!wasSuccessful) Popups.showGeneralException(Settings.GENERAL_EXCEPTION);
         }
 
         this.fc.setCurrentDirectory(saveDirectory);
@@ -91,7 +92,7 @@ public class LoadAction extends AbstractAction {
         } catch (IOException | ClassNotFoundException e) {
             Popups.showIOExceptionLoading();
         } catch (Exception e) {
-            Popups.showGeneralException();
+            Popups.showGeneralException(Settings.GENERAL_EXCEPTION);
         }
         return false;
     }
