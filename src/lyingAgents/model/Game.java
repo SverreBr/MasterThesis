@@ -180,14 +180,14 @@ public class Game {
      * @param chipsResp The chips for the responder
      */
     private void calculateSetting(int[] chipsInit, int[] chipsResp) {
-        System.out.println("\n--- NEW ROUND ---");
+        System.out.println("\n-------------------- NEW ROUND --------------------");
         int numIndexCodes, pos;
         this.binMaxChips = Chips.makeNewChipBin();
 
         numIndexCodes = 1;
         for (int i = 0; i < Settings.CHIP_DIVERSITY; i++) {
             this.binMaxChips[i] = chipsInit[i] + chipsResp[i];
-            numIndexCodes *= (this.binMaxChips[i] + 1); // +1 to account for 0 chips in that bin
+            numIndexCodes *= (this.binMaxChips[i] + 1);
         }
         chipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
         initialChipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);

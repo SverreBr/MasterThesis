@@ -3,6 +3,7 @@ package lyingAgents.utilities;
 import lyingAgents.model.Game;
 import lyingAgents.view.settings.GameSettingsDialog;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -10,6 +11,12 @@ import java.io.Serializable;
  * GameSetting class: Creates a game setting for a game model
  */
 public class GameSetting implements Serializable {
+
+    /**
+     * Serializable version
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * The board as a matrix of colored tiles
