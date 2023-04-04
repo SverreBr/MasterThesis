@@ -18,14 +18,6 @@ public class ResultSettings {
     public static final String respFinalPoints = "resp_finalPoints";
     public static final String respGain = "resp_gain";
     public static final String nrOffers = "nr_offers";
-
-    public static final List<String> CELL_HEADERS = Arrays.asList(
-            initTom, respTom,
-            initLR, respLR,
-            initCanLie, respCanLie,
-            initInitPoints, respInitPoints,
-            initFinalPoints, respFinalPoints,
-            initGain, respGain, nrOffers);
     public static final List<Integer> initTomList = Arrays.asList(0, 1);
     public static final List<Integer> respTomList = Arrays.asList(0, 1);
     public static final List<Double> initLRList = List.of(0.5);

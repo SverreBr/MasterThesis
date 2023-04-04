@@ -169,7 +169,7 @@ public class PlayerToM extends Player {
         double curValue, tmpSelectOfferValue;
 
         bestOffers.add(this.chips);
-        tmpSelectOfferValue = utilityFunction[this.chips];
+        tmpSelectOfferValue = utilityFunction[this.chips] - 1; // TODO: change this -1?
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             curValue = getValue(i, offerReceived);
             if (curValue - Settings.EPSILON > tmpSelectOfferValue) {
@@ -205,11 +205,12 @@ public class PlayerToM extends Player {
         int loc, offerToOther;
         double curValue = 0.0;
 
-        if (makeOfferToSelf == this.chips) {  // agent offers own chips (withdraw)
-            return utilityFunction[this.chips];
-        } else if (makeOfferToSelf == offerReceived) {  // agent offers same offer as it receives (seen as accept)
-            return utilityFunction[offerReceived];
-        }
+        // TODO: add this?
+//        if (makeOfferToSelf == this.chips) {  // agent offers own chips (withdraw)
+//            return utilityFunction[this.chips];
+//        } else if (makeOfferToSelf == offerReceived) {  // agent offers same offer as it receives (seen as accept)
+//            return utilityFunction[offerReceived];
+//        }
 
         if (orderToM == 0) {
             // ToM0 uses only expected value
@@ -272,8 +273,9 @@ public class PlayerToM extends Player {
         super.receiveOffer(offerReceived);
         if (this.orderToM > 0) {
             updateLocationBeliefs(offerReceived);
-            if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with what is offered...
-                restoreLocationBeliefsDueToUnbelievedMessage();
+            if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) // TODO: also not believed when multiple not consistent messages have been sent
+            { // offer is not consistent with what is offered...
+                restoreLocationBeliefsDueToUnbelievedMessage();  // TODO: restores every time when message is received?
                 if (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME)) {
                     System.out.println(getName() + " does not believe trading partner.");
                     this.addMessage("(I don't believe you.)", false);
@@ -545,7 +547,6 @@ public class PlayerToM extends Player {
         }
         this.receivedMessage = true;
     }
-
 
 
     /**

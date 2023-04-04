@@ -98,7 +98,7 @@ public class PlayerLying extends PlayerToM {
         double noMessageOfferValue;
 
         bestOffers.add(new LyingOfferType(this.chips, -1));  // withdraw from negotiation as basis
-        tmpSelectOfferValue = utilityFunction[this.chips];
+        tmpSelectOfferValue = utilityFunction[this.chips] - 1; // TODO: change this -1?
         addOffersWithoutMessage(offerReceived);  // send no message
 
         // Choose offer without message if at least as good as with a message.
@@ -158,11 +158,13 @@ public class PlayerLying extends PlayerToM {
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
             System.out.println("ACCEPT");
+            if (bestOffer == offerReceived) System.out.println("!!! BEST OFFER IS ALREADY OFFER RECEIVED !!!");
             bestOffer = offerReceived;
         } else if ((utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[bestOffer]) &&
                 (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
             // withdraw from negotiation
             System.out.println("WITHDRAW");
+            if (bestOffer == this.chips) System.out.println("BEST OFFER IS ALREADY CURRENT CHIPS");
             bestOffer = this.chips;
         } else {  // else, make the best offer with possibly a message
             if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
@@ -171,7 +173,7 @@ public class PlayerLying extends PlayerToM {
             if (bestLoc != -1) System.out.println("Offer value (after sending message (" + bestLoc +")): " + Settings.PRINT_DF.format(offerValue));
             if ((offerValue + Settings.EPSILON < tmpSelectOfferValue) || (offerValue - Settings.EPSILON > tmpSelectOfferValue)) {
                 System.out.println("!!! WRONG NUMBERS !!! -> " + Settings.PRINT_DF.format(offerValue) + " != " + Settings.PRINT_DF.format(tmpSelectOfferValue));
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 10; i++) {
                     System.out.println("\tvalue = " + Settings.PRINT_DF.format(getValue(bestOffer, offerReceived)));
                 }
             }
