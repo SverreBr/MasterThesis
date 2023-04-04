@@ -157,14 +157,27 @@ public class Settings {
      * @return the color corresponding to the integer
      */
     public static Color getColor(int x) {
-        return switch (x) {
-            case 0 -> Color.decode("#6248DA");
-            case 1 -> Color.decode("#DC267F");
-            case 2 -> Color.decode("#FE6100");
-            case 3 -> Color.decode("#96B1F7");
-            case 4 -> Color.decode("#fccc60");
-            default -> Color.BLACK;
-        };
+        Color color;
+        switch (x) {
+            case 0:
+                color = Color.decode("#6248DA");
+                break;
+            case 1:
+                color = Color.decode("#DC267F");
+                break;
+            case 2:
+                color = Color.decode("#FE6100");
+                break;
+            case 3:
+                color = Color.decode("#96B1F7");
+                break;
+            case 4:
+                color = Color.decode("#fccc60");
+                break;
+            default:
+                color = Color.BLACK;
+        }
+        return color;
     }
 
     /**
