@@ -120,11 +120,11 @@ public class PlayerLying extends PlayerToM {
 
         System.out.println("-> Offers that are optimal without message:");
         for (LyingOfferType smt : bestOffersWithoutMessage) {
-            System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.offer() + "; " +
-                    Arrays.toString(Chips.getBins(smt.offer(), game.getBinMaxChips())));
+            System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
+                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())));
         }
-        System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.offer() + "; " +
-                Arrays.toString(Chips.getBins(bestLyingOfferType.offer(), game.getBinMaxChips())));
+        System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
+                Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())));
         if (!thereIsBestOfferWithoutMessage) {
             boolean lyingIsBetter = true;
             System.out.println("But there are offers that give " + this.getName() + " a better value than using no message.");
@@ -133,22 +133,22 @@ public class PlayerLying extends PlayerToM {
             bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
             System.out.println("-> Offers that are optimal with message are:");
             for (LyingOfferType something : bestOffers) {
-                System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + ", offer to self=" + something.offer() + "; " +
-                        Arrays.toString(Chips.getBins(something.offer(), game.getBinMaxChips())) +
-                        ", loc=" + something.loc());
-                if (something.loc() == game.getGoalPositionPlayer(this.getName())) {
+                System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + ", offer to self=" + something.getOffer() + "; " +
+                        Arrays.toString(Chips.getBins(something.getOffer(), game.getBinMaxChips())) +
+                        ", loc=" + something.getLoc());
+                if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
                     lyingIsBetter = false;
                 }
             }
-            System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.offer() + "; " +
-                    Arrays.toString(Chips.getBins(bestLyingOfferType.offer(), game.getBinMaxChips())) +
-                    ", loc=" + bestLyingOfferType.loc());
+            System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
+                    Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())) +
+                    ", loc=" + bestLyingOfferType.getLoc());
             if (lyingIsBetter)
                 System.out.println("--- THERE IS A COMBINATION WHERE LYING IS BETTER THAN TELLING THE TRUTH. ---");
         }
 
-        bestOffer = bestLyingOfferType.offer();
-        bestLoc = bestLyingOfferType.loc();
+        bestOffer = bestLyingOfferType.getOffer();
+        bestLoc = bestLyingOfferType.getLoc();
 
         System.out.println(getName() + ": Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
                 "; location=" + bestLoc +

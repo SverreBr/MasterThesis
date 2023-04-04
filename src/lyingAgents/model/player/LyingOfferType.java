@@ -1,10 +1,18 @@
 package lyingAgents.model.player;
 
-/**
- * Record to store an offer and a location message
- *
- * @param offer The offer to make
- * @param loc   The location to announce to the trading partner
- */
-public record LyingOfferType(int offer, int loc) {
+public class LyingOfferType {
+    private final int offer;
+    private final int loc;
+    public LyingOfferType(int offer, int loc) {
+        this.offer = offer;
+        this.loc = loc;
+    }
+
+    public int getOffer() {
+        return offer;
+    }
+
+    public int getLoc() {
+        return loc;
+    }
 }
