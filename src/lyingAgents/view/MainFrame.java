@@ -8,7 +8,6 @@ import lyingAgents.utilities.Settings;
 import javax.swing.*;
 import java.awt.*;
 
-import static lyingAgents.utilities.Settings.*;
 
 /**
  * The application window with all the panels.
@@ -28,39 +27,38 @@ public class MainFrame extends JFrame {
 
         JPanel leftBody = new JPanel();
         leftBody.setLayout(new BorderLayout());
-        leftBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT + LEGEND_PANEL_HEIGHT));
+        leftBody.setPreferredSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH, ViewSettings.AGENT_PANEL_HEIGHT + ViewSettings.LEGEND_PANEL_HEIGHT));
 
-        AgentPanel agentPanelInit = new AgentPanel(game, INITIATOR_NAME, this);
-        agentPanelInit.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
+        AgentPanel agentPanelInit = new AgentPanel(game, Settings.INITIATOR_NAME, this);
+        agentPanelInit.setPreferredSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH, ViewSettings.AGENT_PANEL_HEIGHT));
 
         LegendPanel legendPanel = new LegendPanel(game, this);
 
         leftBody.add(agentPanelInit, BorderLayout.NORTH);
         leftBody.add(legendPanel, BorderLayout.SOUTH);
-        leftBody.setBackground(Settings.getBackGroundColor());
+        leftBody.setBackground(ViewSettings.getBackGroundColor());
 
-        BoardPanel boardPanel = new BoardPanel(game);
-        boardPanel.setPreferredSize(new Dimension(BOARD_PANEL_SIZE, BOARD_PANEL_SIZE));
+        CenterPanel centerPanel = new CenterPanel(game);
 
         JPanel rightBody = new JPanel();
         rightBody.setLayout(new BorderLayout());
-        rightBody.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT + LEGEND_PANEL_HEIGHT));
+        rightBody.setPreferredSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH, ViewSettings.AGENT_PANEL_HEIGHT + ViewSettings.LEGEND_PANEL_HEIGHT));
 
-        AgentPanel agentPanelResp = new AgentPanel(game, RESPONDER_NAME, this);
-        agentPanelResp.setPreferredSize(new Dimension(BUTTON_PANEL_WIDTH, AGENT_PANEL_HEIGHT));
+        AgentPanel agentPanelResp = new AgentPanel(game, Settings.RESPONDER_NAME, this);
+        agentPanelResp.setPreferredSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH, ViewSettings.AGENT_PANEL_HEIGHT));
         ButtonPanel buttonPanel = new ButtonPanel(game);
 
         rightBody.add(agentPanelResp, BorderLayout.NORTH);
         rightBody.add(buttonPanel, BorderLayout.SOUTH);
-        rightBody.setBackground(Settings.getBackGroundColor());
+        rightBody.setBackground(ViewSettings.getBackGroundColor());
 
         addMenuBar(game);
 
         getContentPane().setLayout(new FlowLayout());
         getContentPane().add(leftBody);
-        getContentPane().add(boardPanel);
+        getContentPane().add(centerPanel);
         getContentPane().add(rightBody);
-        getContentPane().setBackground(Settings.getBackGroundColor());
+        getContentPane().setBackground(ViewSettings.getBackGroundColor());
         pack();
     }
 

@@ -64,6 +64,14 @@ public class AgentInformationDialog extends JDialog {
         JTextPane textPane;
 
         textPane = new JTextPane();
+        MiscFunc.addStylesToDoc(textPane, "Confidence in " + agent.getOrderToM() + "-order theory of mind: ", "regular");
+        mainPanel.add(textPane);
+
+        textPane = new JTextPane();
+        MiscFunc.addStylesToDoc(textPane, Double.toString(agent.getConfidence()), "regular");
+        mainPanel.add(textPane);
+
+        textPane = new JTextPane();
         MiscFunc.addStylesToDoc(textPane, "Agent has sent a message: ", "regular");
         mainPanel.add(textPane);
 

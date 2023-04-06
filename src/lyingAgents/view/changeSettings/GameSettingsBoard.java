@@ -1,7 +1,8 @@
-package lyingAgents.view.settings;
+package lyingAgents.view.changeSettings;
 
 import lyingAgents.utilities.MiscFunc;
 import lyingAgents.utilities.Settings;
+import lyingAgents.view.ViewSettings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -35,7 +36,7 @@ public class GameSettingsBoard extends JComponent {
      * Constructor of the board panel
      */
     public GameSettingsBoard() {
-        this.setBackground(Settings.getBackGroundColor());
+        this.setBackground(ViewSettings.getBackGroundColor());
         setPreferredSize(new Dimension(300, 300));
         addTextFields();
     }

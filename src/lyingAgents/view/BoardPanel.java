@@ -19,19 +19,15 @@ public class BoardPanel extends JComponent implements GameListener {
     private final Game game;
 
     /**
-     * Offset o
-     */
-    private static final int OFFSET = 1;
-
-    /**
      * Constructor of the board panel
      *
      * @param game the game model
      */
     public BoardPanel(Game game) {
         this.game = game;
-        this.setBackground(Settings.getBackGroundColor());
+        this.setBackground(ViewSettings.getBackGroundColor());
         this.game.addListener(this);
+        this.setPreferredSize(new Dimension(ViewSettings.BOARD_PANEL_SIZE, ViewSettings.BOARD_PANEL_SIZE));
     }
 
     @Override
@@ -41,10 +37,10 @@ public class BoardPanel extends JComponent implements GameListener {
         Graphics2D g2 = (Graphics2D) g.create();
         paintGrid(g2);
 
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 36));
+        g2.setFont(new Font("SansSerif", Font.BOLD, 36));
         paintStartLocation(g2);
         paintGoalLocation(g2);
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        g2.setFont(new Font("SansSerif", Font.BOLD, 16));
         paintGoalNumbers(g2);
 
         g2.dispose();
@@ -60,6 +56,15 @@ public class BoardPanel extends JComponent implements GameListener {
         Dimension siteSize = getTileSize();
         Dimension simulationSize = game.getBoardSize();
 
+        for (int x = 0; x < simulationSize.width; x++) {
+            for (int y = 0; y < simulationSize.height; y++) {
+                g2.setColor(game.getBoard().getTileColor(new Point(x, y)));
+                g2.fillRect(
+                        x * siteSize.width, y * siteSize.height,
+                        siteSize.width, siteSize.height);
+            }
+        }
+
         g2.setColor(Color.BLACK);
         for (int x = 0; x <= simulationSize.width; x++) {
             g2.drawLine(
@@ -72,16 +77,6 @@ public class BoardPanel extends JComponent implements GameListener {
                     0, y * siteSize.height,
                     panelSize.width, y * siteSize.height);
         }
-
-        for (int x = 0; x < simulationSize.width; x++) {
-            for (int y = 0; y < simulationSize.height; y++) {
-                g2.setColor(game.getBoard().getTileColor(new Point(x, y)));
-                g2.fillRect(
-                        x * siteSize.width + OFFSET, y * siteSize.height + OFFSET,
-                        siteSize.width - OFFSET, siteSize.height - OFFSET);
-            }
-        }
-
     }
 
     /**
@@ -100,6 +95,7 @@ public class BoardPanel extends JComponent implements GameListener {
      * @param g2 graphics
      */
     private void paintStartLocation(Graphics2D g2) {
+        int OFFSET = 1;
         Dimension siteSize = getTileSize();
 
         Point start = Settings.STARTING_POSITION;
@@ -108,7 +104,7 @@ public class BoardPanel extends JComponent implements GameListener {
         g2.fillRect(
                 start.x * siteSize.width + OFFSET, start.y * siteSize.height + OFFSET,
                 siteSize.width - OFFSET, siteSize.height - OFFSET);
-        drawSymbol(Settings.START_LOCATION_SYMBOL, g2, start);
+        drawSymbol(ViewSettings.START_LOCATION_SYMBOL, g2, start);
     }
 
     /**
@@ -123,10 +119,10 @@ public class BoardPanel extends JComponent implements GameListener {
         goalResp = game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME);
 
         if (goalInit.equals(goalResp)) {
-            drawSymbol(Settings.GOAL_LOCATION_SYMBOL, g2, goalInit);
+            drawSymbol(ViewSettings.GOAL_LOCATION_SYMBOL, g2, goalInit);
         } else {
-            drawSymbol(Settings.GOAL_LOCATION_SYMBOL_INITIATOR, g2, goalInit);
-            drawSymbol(Settings.GOAL_LOCATION_SYMBOL_RESPONDER, g2, goalResp);
+            drawSymbol(ViewSettings.GOAL_LOCATION_SYMBOL_INITIATOR, g2, goalInit);
+            drawSymbol(ViewSettings.GOAL_LOCATION_SYMBOL_RESPONDER, g2, goalResp);
         }
     }
 

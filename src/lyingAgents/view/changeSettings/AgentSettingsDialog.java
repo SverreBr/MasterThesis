@@ -1,4 +1,4 @@
-package lyingAgents.view.settings;
+package lyingAgents.view.changeSettings;
 
 import lyingAgents.utilities.MiscFunc;
 import lyingAgents.view.Popups;

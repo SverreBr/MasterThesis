@@ -1,7 +1,8 @@
-package lyingAgents.view.settings;
+package lyingAgents.view.changeSettings;
 
 import lyingAgents.utilities.MiscFunc;
 import lyingAgents.utilities.Settings;
+import lyingAgents.view.ViewSettings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -34,7 +35,7 @@ public class GameSettingsChips extends JComponent {
      * Constructor
      */
     public GameSettingsChips() {
-        this.setBackground(Settings.getBackGroundColor());
+        this.setBackground(ViewSettings.getBackGroundColor());
         setPreferredSize(new Dimension(COMPONENT_WIDTH, COMPONENT_HEIGHT));
 
         addTextFields();

@@ -97,9 +97,9 @@ public class PlayerLying extends PlayerToM {
         int bestOffer, bestLoc, goalPosition;
         double noMessageOfferValue;
 
-        bestOffers.add(new LyingOfferType(this.chips, -1));  // withdraw from negotiation as basis
-        tmpSelectOfferValue = utilityFunction[this.chips] - 1; // TODO: change this -1?
-        addOffersWithoutMessage(offerReceived);  // send no message
+        bestOffers.add(new LyingOfferType(this.chips, -1));
+        tmpSelectOfferValue = -Double.MAX_VALUE;
+        addOffersWithoutMessage();  // send no message
 
         // Choose offer without message if at least as good as with a message.
         List<LyingOfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
@@ -110,11 +110,11 @@ public class PlayerLying extends PlayerToM {
         if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
             if (canLie) {
                 for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
-                    addOffers(loc, offerReceived);
+                    addOffers(loc);
                 }
             } else {
                 goalPosition = game.getGoalPositionPlayer(this.getName());
-                addOffers(goalPosition, offerReceived);
+                addOffers(goalPosition);
             }
         }
 
@@ -152,7 +152,7 @@ public class PlayerLying extends PlayerToM {
 
         System.out.println(getName() + ": Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
                 "; location=" + bestLoc +
-                ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer, offerReceived)) +
+                ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer)) +
                 ";\n\ttmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
@@ -169,12 +169,12 @@ public class PlayerLying extends PlayerToM {
         } else {  // else, make the best offer with possibly a message
             if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
 
-            double offerValue = getValue(bestOffer, offerReceived);
+            double offerValue = getValue(bestOffer);
             if (bestLoc != -1) System.out.println("Offer value (after sending message (" + bestLoc +")): " + Settings.PRINT_DF.format(offerValue));
             if ((offerValue + Settings.EPSILON < tmpSelectOfferValue) || (offerValue - Settings.EPSILON > tmpSelectOfferValue)) {
                 System.out.println("!!! WRONG NUMBERS !!! -> " + Settings.PRINT_DF.format(offerValue) + " != " + Settings.PRINT_DF.format(tmpSelectOfferValue));
                 for (int i = 0; i < 10; i++) {
-                    System.out.println("\tvalue = " + Settings.PRINT_DF.format(getValue(bestOffer, offerReceived)));
+                    System.out.println("\tvalue = " + Settings.PRINT_DF.format(getValue(bestOffer)));
                 }
             }
         }
@@ -187,14 +187,14 @@ public class PlayerLying extends PlayerToM {
      *
      * @param loc The location to message to the other agent
      */
-    private void addOffers(int loc, int offerReceived) {
+    private void addOffers(int loc) {
         double curValue;
         boolean saveHasSentMessage = this.hasSentMessage;
 
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             partnerModel.saveBeliefs();
             partnerModel.receiveMessage(Messages.createLocationMessage(loc));
-            curValue = getValue(i, offerReceived);  // TODO: what to do when value is higher when sending offer that accepts the offer.
+            curValue = getValue(i);
             partnerModel.restoreBeliefs();
             this.setHasSentMessage(saveHasSentMessage);
 
@@ -205,10 +205,10 @@ public class PlayerLying extends PlayerToM {
     /**
      * Adds offers without a message.
      */
-    private void addOffersWithoutMessage(int offerReceived) {
+    private void addOffersWithoutMessage() {
         double curValue;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-            curValue = getValue(i, offerReceived);
+            curValue = getValue(i);
             processOffer(i, -1, curValue);
         }
     }

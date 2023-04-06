@@ -1,13 +1,11 @@
 package lyingAgents.model;
 
-import lyingAgents.utilities.GameSetting;
+import lyingAgents.utilities.*;
 import lyingAgents.model.player.PlayerLying;
-import lyingAgents.utilities.Chips;
-import lyingAgents.utilities.MiscFunc;
-import lyingAgents.utilities.Settings;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * lyingAgents.model.Game class: the two players and the coloured trails board
@@ -450,6 +448,10 @@ public class Game {
     public void addListener(GameListener listener) {
         this.listeners.add(listener);
     }
+
+//    public List<OfferOutcome> getParetoOutcome() {
+//        List<OfferOutcome> = new ArrayList<>();
+//    }
 
     ///////////////////////////////
     //--- Setters and getters ---//

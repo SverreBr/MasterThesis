@@ -1,7 +1,7 @@
 package lyingAgents.utilities;
 
 import lyingAgents.model.Game;
-import lyingAgents.view.settings.GameSettingsDialog;
+import lyingAgents.view.changeSettings.GameSettingsDialog;
 
 //import java.io.Serial;
 import java.io.Serializable;

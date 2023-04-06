@@ -169,9 +169,9 @@ public class PlayerToM extends Player {
         double curValue, tmpSelectOfferValue;
 
         bestOffers.add(this.chips);
-        tmpSelectOfferValue = utilityFunction[this.chips] - 1; // TODO: change this -1?
+        tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-            curValue = getValue(i, offerReceived);
+            curValue = getValue(i);
             if (curValue - Settings.EPSILON > tmpSelectOfferValue) {
                 tmpSelectOfferValue = curValue;
                 bestOffers = new ArrayList<>();
@@ -201,16 +201,9 @@ public class PlayerToM extends Player {
      * @param makeOfferToSelf offer from the perspective of this agent. That is, if accepted, this agent gets makeOfferToSelf
      * @return the expected value of making this offer.
      */
-    protected double getValue(int makeOfferToSelf, int offerReceived) {
+    protected double getValue(int makeOfferToSelf) {
         int loc, offerToOther;
         double curValue = 0.0;
-
-        // TODO: add this?
-//        if (makeOfferToSelf == this.chips) {  // agent offers own chips (withdraw)
-//            return utilityFunction[this.chips];
-//        } else if (makeOfferToSelf == offerReceived) {  // agent offers same offer as it receives (seen as accept)
-//            return utilityFunction[offerReceived];
-//        }
 
         if (orderToM == 0) {
             // ToM0 uses only expected value
@@ -234,7 +227,7 @@ public class PlayerToM extends Player {
         }
 
         // recursion of theory of mind
-        return curValue * confidence + (1 - confidence) * selfModel.getValue(makeOfferToSelf, offerReceived);
+        return curValue * confidence + (1 - confidence) * selfModel.getValue(makeOfferToSelf);
 
     }
 
@@ -334,14 +327,13 @@ public class PlayerToM extends Player {
                 // Given loc, offerReceived gives the partner a higher score than the initial situation
                 partnerAlternative = partnerModel.selectOffer(0); // 0 since worst possible offer
                 // Agent's guess for partner's best option given location l
-                maxExpVal = partnerModel.getValue(partnerAlternative, -1);
-                curExpVal = partnerModel.getValue(offerPartnerChips, -1);
+                maxExpVal = partnerModel.getValue(partnerAlternative);
+                curExpVal = partnerModel.getValue(offerPartnerChips);
                 // Agent's guess for partner's value of offerReceived
                 if (maxExpVal - Settings.EPSILON > -1) {
-                    newBelief = (1 + curExpVal) / (1 + maxExpVal);
-                    locationBeliefs[loc] *= Math.max(0.0, Math.min(1.0, newBelief));
-                    if (this.receivedMessage)
-                        locationBeliefsWithoutMessage[loc] *= Math.max(0.0, Math.min(1.0, newBelief));
+                    newBelief = Math.max(0.0, Math.min(1.0, (1 + curExpVal) / (1 + maxExpVal)));
+                    locationBeliefs[loc] *= newBelief;
+                    if (this.receivedMessage) locationBeliefsWithoutMessage[loc] *= newBelief;
                     accuracyRating += locationBeliefs[loc];
                 } else { // else: No offer is expected as the minimal value is greater than -1.
                     System.out.println("///--- Hmm, I thought it was not possible to get here. ---///");

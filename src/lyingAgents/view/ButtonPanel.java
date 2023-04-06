@@ -5,7 +5,6 @@ import lyingAgents.controller.ForwardListener;
 import lyingAgents.model.Game;
 import lyingAgents.model.GameListener;
 import lyingAgents.model.player.PlayerLying;
-import lyingAgents.utilities.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -144,9 +143,10 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
      * Change backgrounds
      */
     private void changeBackgrounds() {
-        setBackground(Settings.getBackGroundColor());
-        southButtons.setBackground(Settings.getBackGroundColor());
-        body.setBackground(Settings.getBackGroundColor());
+        Color color = ViewSettings.getBackGroundColor();
+        setBackground(color);
+        southButtons.setBackground(color);
+        body.setBackground(color);
     }
 
     /**

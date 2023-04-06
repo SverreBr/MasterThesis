@@ -93,19 +93,19 @@ public class LegendPanel extends JPanel implements GameListener {
      * Change background of the legend panel
      */
     private void changeBackgrounds() {
-        setBackground(Settings.getBackGroundColor());
-        info.setBackground(Settings.getBackGroundColor());
-        agentSettingsButton.setBackground(Settings.getBackGroundColor());
-        gameSettingsButton.setBackground(Settings.getBackGroundColor());
-        buttonPanel.setBackground(Settings.getBackGroundColor());
+        setBackground(ViewSettings.getBackGroundColor());
+        info.setBackground(ViewSettings.getBackGroundColor());
+        agentSettingsButton.setBackground(ViewSettings.getBackGroundColor());
+        gameSettingsButton.setBackground(ViewSettings.getBackGroundColor());
+        buttonPanel.setBackground(ViewSettings.getBackGroundColor());
     }
 
     /**
      * Creates the text pane for the legend panel
      */
     private void createTextPane() {
-        info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - SETTINGS_BUTTON_SIZE,
-                Settings.LEGEND_PANEL_HEIGHT - 30));
+        info.setPreferredSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH - SETTINGS_BUTTON_SIZE,
+                ViewSettings.LEGEND_PANEL_HEIGHT - 30));
         info.setEditable(false);
         info.setOpaque(false);
         StyledDocument doc = info.getStyledDocument();
@@ -234,15 +234,15 @@ public class LegendPanel extends JPanel implements GameListener {
         init = game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME);
         resp = game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME);
         if (init.equals(resp)) {
-            content.add("* " + Settings.GOAL_LOCATION_SYMBOL + ": Goal location both agents.");
+            content.add("* " + ViewSettings.GOAL_LOCATION_SYMBOL + ": Goal location both agents.");
         } else {
-            content.add("* " + Settings.GOAL_LOCATION_SYMBOL_INITIATOR + ": Goal location initiator.");
-            content.add("* " + Settings.GOAL_LOCATION_SYMBOL_RESPONDER + ": Goal location responder.");
+            content.add("* " + ViewSettings.GOAL_LOCATION_SYMBOL_INITIATOR + ": Goal location initiator.");
+            content.add("* " + ViewSettings.GOAL_LOCATION_SYMBOL_RESPONDER + ": Goal location responder.");
             style.add("regular");
         }
         style.add("regular");
 
-        content.add("* " + Settings.START_LOCATION_SYMBOL + ": Start location both agents.");
+        content.add("* " + ViewSettings.START_LOCATION_SYMBOL + ": Start location both agents.");
         style.add("regular");
 
         StyledDocument doc = info.getStyledDocument();

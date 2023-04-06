@@ -56,31 +56,6 @@ public class Settings {
     public static final int MIN_GOAL_DISTANCE = 3;
 
     /**
-     * determines the width of the button panel
-     */
-    public static final int BUTTON_PANEL_WIDTH = 320;
-
-    /**
-     * determines the height of the agent panel
-     */
-    public static final int AGENT_PANEL_HEIGHT = 540;
-
-    /**
-     * determines the height of the text panel in the agent panel
-     */
-    public static final int AGENT_TEXT_HEIGHT = 290;
-
-    /**
-     * determines the height of the legend panel
-     */
-    public static final int LEGEND_PANEL_HEIGHT = 210;
-
-    /**
-     * Size of the board panel
-     */
-    public static final int BOARD_PANEL_SIZE = 701;
-
-    /**
      * The starting position of each agent
      */
     public static final Point STARTING_POSITION = new Point(2, 2);
@@ -94,26 +69,6 @@ public class Settings {
      * The name of the responder
      */
     public static final String RESPONDER_NAME = "Responder";
-
-    /**
-     * The symbol used to indicate the start
-     */
-    public static final String START_LOCATION_SYMBOL = "X";
-
-    /**
-     * The symbol used to indicate the goal position if for both agents equal
-     */
-    public static final String GOAL_LOCATION_SYMBOL = "G";
-
-    /**
-     * The symbol used to indicate the goal position of the initiator
-     */
-    public static final String GOAL_LOCATION_SYMBOL_INITIATOR = "Gi";
-
-    /**
-     * The symbol used to indicate the goal position of the responder
-     */
-    public static final String GOAL_LOCATION_SYMBOL_RESPONDER = "Gr";
 
     /**
      * Message an agent provides when it terminates negotiation
@@ -149,6 +104,7 @@ public class Settings {
      * A formatter for printing doubles
      */
     public static final DecimalFormat PRINT_DF = new DecimalFormat("####0.0000");
+
 
     /**
      * Returns a color given a certain integer
@@ -192,14 +148,5 @@ public class Settings {
                 new Point(0, -1),
                 new Point(0, 1)
         );
-    }
-
-    /**
-     * Gets the background color of the simulation
-     *
-     * @return the color of the background for the simulation
-     */
-    public static Color getBackGroundColor() {
-        return Color.decode("#DAEFF9");
     }
 }

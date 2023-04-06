@@ -159,19 +159,20 @@ public class AgentPanel extends JComponent implements GameListener {
      * Changes the backgrounds of this panel
      */
     private void changeBackgrounds() {
-        this.info.setBackground(Settings.getBackGroundColor());
-        this.buttonPanel.setBackground(Settings.getBackGroundColor());
-        this.messageScroll.setBackground(Settings.getBackGroundColor());
-        this.messagePane.setBackground(Settings.getBackGroundColor());
-        this.setBackground(Settings.getBackGroundColor());
+        Color color = ViewSettings.getBackGroundColor();
+        this.info.setBackground(color);
+        this.buttonPanel.setBackground(color);
+        this.messageScroll.setBackground(color);
+        this.messagePane.setBackground(color);
+        this.setBackground(color);
     }
 
     /**
      * Creates text panel for this agent panel
      */
     private void createTextPane() {
-        info.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH - 20, Settings.AGENT_TEXT_HEIGHT));
-        info.setMaximumSize(new Dimension(Settings.BUTTON_PANEL_WIDTH, Settings.AGENT_TEXT_HEIGHT));
+        info.setPreferredSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH - 20, ViewSettings.AGENT_TEXT_HEIGHT));
+        info.setMaximumSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH, ViewSettings.AGENT_TEXT_HEIGHT));
         info.setEditable(false);
         info.setOpaque(false);
         info.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0),
@@ -185,8 +186,8 @@ public class AgentPanel extends JComponent implements GameListener {
      * Creates a scroll pane for the messages of the agent
      */
     private void createScrollMessagePane() {
-        messageScroll.setPreferredSize(new Dimension(Settings.BUTTON_PANEL_WIDTH,
-                Settings.AGENT_PANEL_HEIGHT - Settings.AGENT_TEXT_HEIGHT - INFORMATION_BUTTON_SIZE - 20));
+        messageScroll.setPreferredSize(new Dimension(ViewSettings.BUTTON_PANEL_WIDTH,
+                ViewSettings.AGENT_PANEL_HEIGHT - ViewSettings.AGENT_TEXT_HEIGHT - INFORMATION_BUTTON_SIZE - 20));
         messageScroll.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 0, 0, 0),
                 BorderFactory.createCompoundBorder(
@@ -259,7 +260,7 @@ public class AgentPanel extends JComponent implements GameListener {
             style[idx] = "regular";
             content[idx++] = "---";
             style[idx] = "regular";
-            content[idx++] = "final distribution chips:";
+            content[idx++] = "final distribution chips: " + Arrays.toString(agent.getChipsBin());
             style[idx] = "regular";
             content[idx++] = "";
             style[idx] = "regular";
@@ -270,31 +271,11 @@ public class AgentPanel extends JComponent implements GameListener {
             content[idx++] = "final (total) points: " + agent.getUtilityValue() + " (" + agent.getFinalPoints() + ")";
         }
 
-        if (agent.getOrderToM() > 0) {
-            style[idx] = "regular";
-            content[idx++] = "confidence: " + agent.getConfidence();
-        }
-
         while (idx < content.length) {
             style[idx] = "regular";
             content[idx++] = "";
         }
-        generateAgentInfo();
-    }
-
-    /**
-     * Adds the information of the agent to the document
-     */
-    private void generateAgentInfo() {
-        StyledDocument doc = info.getStyledDocument();
-        try {
-            doc.remove(0, doc.getLength());
-            for (int i = 0; i < content.length; i++) {
-                doc.insertString(doc.getLength(), content[i] + "\n", doc.getStyle(style[i]));
-            }
-        } catch (BadLocationException ble) {
-            System.err.println("Couldn't insert text into text pane.");
-        }
+        MiscFunc.addStylesToDocMulti(info, content, style);
     }
 
     @Override

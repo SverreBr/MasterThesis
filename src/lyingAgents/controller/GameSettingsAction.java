@@ -1,6 +1,6 @@
 package lyingAgents.controller;
 
-import lyingAgents.view.settings.GameSettingsDialog;
+import lyingAgents.view.changeSettings.GameSettingsDialog;
 import lyingAgents.utilities.GameSetting;
 import lyingAgents.model.Game;
 import lyingAgents.view.Popups;

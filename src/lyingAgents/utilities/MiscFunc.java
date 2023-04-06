@@ -73,6 +73,18 @@ public class MiscFunc {
         pane.setOpaque(false);
     }
 
+    public static void addStylesToDocMulti(JTextPane textPane, String[] text, String[] style) {
+        StyledDocument doc = textPane.getStyledDocument();
+        try {
+            doc.remove(0, doc.getLength());
+            for (int i = 0; i < text.length; i++) {
+                doc.insertString(doc.getLength(), text[i] + "\n", doc.getStyle(style[i]));
+            }
+        } catch (BadLocationException ble) {
+            System.err.println("Couldn't insert text into text pane.");
+        }
+    }
+
     /**
      * Gets the number of goal positions
      *
