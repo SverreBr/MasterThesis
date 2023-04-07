@@ -67,7 +67,6 @@ public class PlayerLying extends PlayerToM {
         if (offerReceived < 0) {
             curOffer = selectInitialOffer();
         } else {
-            System.out.println("\n" + getName() + ": Value offer received= " + utilityFunction[offerReceived]);
             receiveOffer(offerReceived);
             curOffer = chooseOffer(offerReceived);
         }
@@ -118,73 +117,63 @@ public class PlayerLying extends PlayerToM {
             }
         }
 
-        System.out.println("-> Offers that are optimal without message:");
-        for (OfferType smt : bestOffersWithoutMessage) {
-            System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
-                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
-                    ", loc=" + smt.getLoc());
-        }
-        System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
-                Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())));
-        System.out.println("-> Offers that are optimal:");
-        for (OfferType smt : bestOffers) {
-            System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
-                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
-                    ", loc=" + smt.getLoc());
-        }
+//        System.out.println("-> Offers that are optimal without message:");
+//        for (OfferType smt : bestOffersWithoutMessage) {
+//            System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
+//                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
+//                    ", loc=" + smt.getLoc());
+//        }
+//        System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
+//                Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())));
+//        System.out.println("-> Offers that are optimal:");
+//        for (OfferType smt : bestOffers) {
+//            System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
+//                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
+//                    ", loc=" + smt.getLoc());
+//        }
         if (!thereIsBestOfferWithoutMessage) {
-            boolean lyingIsBetter = true;
-            System.out.println("But there are offers that give " + this.getName() + " a better value than using no message.");
-
-            // choose offer with message
+//            boolean lyingIsBetter = true;
+//            System.out.println("But there are offers that give " + this.getName() + " a better value than using no message.");
+//
+//            // choose offer with message
             bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
 //            System.out.println("-> Offers that are optimal with message are:");
-            for (OfferType something : bestOffers) {
+//            for (OfferType something : bestOffers) {
 //                System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + ", offer to self=" + something.getOffer() + "; " +
 //                        Arrays.toString(Chips.getBins(something.getOffer(), game.getBinMaxChips())) +
 //                        ", loc=" + something.getLoc());
-                if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
-                    lyingIsBetter = false;
-                }
-            }
-            System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
-                    Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())) +
-                    ", loc=" + bestLyingOfferType.getLoc());
-            if (lyingIsBetter)
-                System.out.println("--- THERE IS A COMBINATION WHERE LYING IS BETTER THAN TELLING THE TRUTH. ---");
+//                if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
+//                    lyingIsBetter = false;
+//                }
+//            }
+//            System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
+//                    Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())) +
+//                    ", loc=" + bestLyingOfferType.getLoc());
+//            if (lyingIsBetter)
+//                System.out.println("--- THERE IS A COMBINATION WHERE LYING IS BETTER THAN TELLING THE TRUTH. ---");
         }
 
         bestOffer = bestLyingOfferType.getOffer();
         bestLoc = bestLyingOfferType.getLoc();
 
-        System.out.println(getName() + ": Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
-                "; location=" + bestLoc +
-                ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer)) +
-                ";\n\ttmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
+//        System.out.println(getName() + ": Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
+//                "; location=" + bestLoc +
+//                ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer)) +
+//                ";\n\ttmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
-            System.out.println("ACCEPT");
-            if (bestOffer == offerReceived) System.out.println("!!! BEST OFFER IS ALREADY OFFER RECEIVED !!!");
+//            System.out.println("ACCEPT");
+//            if (bestOffer == offerReceived) System.out.println("!!! BEST OFFER IS ALREADY OFFER RECEIVED !!!");
             bestOffer = offerReceived;
         } else if ((utilityFunction[this.chips] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
             // withdraw from negotiation
-            System.out.println("WITHDRAW");
-            if (bestOffer == this.chips) System.out.println("BEST OFFER IS ALREADY CURRENT CHIPS");
+//            System.out.println("WITHDRAW");
+//            if (bestOffer == this.chips) System.out.println("BEST OFFER IS ALREADY CURRENT CHIPS");
             bestOffer = this.chips;
         } else {  // else, make the best offer with possibly a message
             if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
-
-            double offerValue = getValue(bestOffer);
-            if (bestLoc != -1)
-                System.out.println("Offer value (after sending message (" + bestLoc + ")): " + Settings.PRINT_DF.format(offerValue));
-            if ((offerValue + Settings.EPSILON < tmpSelectOfferValue) || (offerValue - Settings.EPSILON > tmpSelectOfferValue)) {
-                System.out.println("!!! WRONG NUMBERS !!! -> " + Settings.PRINT_DF.format(offerValue) + " != " + Settings.PRINT_DF.format(tmpSelectOfferValue));
-                for (int i = 0; i < 10; i++) {
-                    System.out.println("\tvalue = " + Settings.PRINT_DF.format(getValue(bestOffer)));
-                }
-            }
         }
 
         return bestOffer; // TODO: Check this...
@@ -199,14 +188,15 @@ public class PlayerLying extends PlayerToM {
         double curValue;
         boolean saveHasSentMessage = this.hasSentMessage;
 
-        for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-            partnerModel.saveBeliefs();
-            partnerModel.receiveMessage(Messages.createLocationMessage(loc));
-            curValue = getValue(i);
-            partnerModel.restoreBeliefs();
-            this.setHasSentMessage(saveHasSentMessage);
-
-            processOffer(i, curValue, loc);
+        if (getOrderToM() > 0) {
+            for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
+                partnerModel.saveBeliefs();
+                partnerModel.receiveMessage(Messages.createLocationMessage(loc));
+                curValue = getValue(i);
+                partnerModel.restoreBeliefs();
+                this.setHasSentMessage(saveHasSentMessage);
+                processOffer(i, curValue, loc);
+            }
         }
     }
 

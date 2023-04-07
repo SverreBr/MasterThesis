@@ -178,7 +178,7 @@ public class Game {
      * @param chipsResp The chips for the responder
      */
     private void calculateSetting(int[] chipsInit, int[] chipsResp) {
-        System.out.println("\n-------------------- NEW ROUND --------------------");
+//        System.out.println("\n-------------------- NEW ROUND --------------------");
         int numIndexCodes, pos;
         this.binMaxChips = Chips.makeNewChipBin();
 
