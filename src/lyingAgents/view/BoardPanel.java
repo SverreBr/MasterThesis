@@ -28,6 +28,8 @@ public class BoardPanel extends JComponent implements GameListener {
         this.setBackground(ViewSettings.getBackGroundColor());
         this.game.addListener(this);
         this.setPreferredSize(new Dimension(ViewSettings.BOARD_PANEL_SIZE, ViewSettings.BOARD_PANEL_SIZE));
+        this.setMaximumSize(new Dimension(ViewSettings.BOARD_PANEL_SIZE, ViewSettings.BOARD_PANEL_SIZE));
+        this.setMinimumSize(new Dimension(ViewSettings.BOARD_PANEL_SIZE, ViewSettings.BOARD_PANEL_SIZE));
     }
 
     @Override

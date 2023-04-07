@@ -206,7 +206,7 @@ public abstract class Player {
      * @return the counter-offer from the perspective of this player.
      * That is, if accepted, this player gets the returned value.
      */
-    abstract public int selectOffer(int offerReceived);
+    abstract public List<Integer> selectOffer(int offerReceived);
 
     /**
      * Method called to receive a message by another player.

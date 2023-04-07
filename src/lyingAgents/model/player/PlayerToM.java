@@ -142,7 +142,8 @@ public class PlayerToM extends Player {
             curOffer = selectInitialOffer();
         } else {
             receiveOffer(offerReceived);
-            curOffer = selectOffer(offerReceived);
+            curOffer = chooseOffer(offerReceived);
+//            curOffer = selectOffer(offerReceived);
         }
         sendOffer(curOffer);
         return curOffer;
@@ -154,7 +155,12 @@ public class PlayerToM extends Player {
      * @return the offer that this agent makes as an initial offer
      */
     public int selectInitialOffer() {
-        return selectOffer(chips);
+        return chooseOffer(chips);
+    }
+
+    public int chooseOffer(int offerReceived) {
+        List<Integer> offerList = selectOffer(offerReceived);
+        return offerList.get((int) (Math.random() * offerList.size()));
     }
 
     /**
@@ -164,7 +170,7 @@ public class PlayerToM extends Player {
      * @return The offer offered to the other player from the perspective of this agent.
      * That is, if accepted, this agent gets the offer.
      */
-    public int selectOffer(int offerReceived) {
+    public List<Integer> selectOffer(int offerReceived) {
         List<Integer> bestOffers = new ArrayList<>();
         double curValue, tmpSelectOfferValue;
 
@@ -181,18 +187,20 @@ public class PlayerToM extends Player {
                 bestOffers.add(i);
             }
         }
-        int bestOffer = bestOffers.get((int) (Math.random() * bestOffers.size()));
+//        int bestOffer = bestOffers.get((int) (Math.random() * bestOffers.size()));
 
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
-            bestOffer = offerReceived;
-        } else if ((utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[bestOffer]) &&
+            bestOffers = new ArrayList<>();
+            bestOffers.add(offerReceived);
+        } else if ((utilityFunction[this.chips] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
             // withdraw from negotiation
-            bestOffer = this.chips;
-        } // else, make the best offer
-        return bestOffer;
+            bestOffers = new ArrayList<>();
+            bestOffers.add(this.chips);
+        } // else, make (one of) the best offer(s)
+        return bestOffers;
     }
 
     /**
@@ -228,7 +236,6 @@ public class PlayerToM extends Player {
 
         // recursion of theory of mind
         return curValue * confidence + (1 - confidence) * selfModel.getValue(makeOfferToSelf);
-
     }
 
     /**
@@ -239,21 +246,27 @@ public class PlayerToM extends Player {
      * @return the value associated to making the offer
      */
     private double getLocationValue(int offerToSelf, int offerToOther) {
-        int response = partnerModel.selectOffer(offerToOther);
-        double curValue;
-        if (response == offerToOther) {
-            // Partner accepts.
-            curValue = utilityFunction[offerToSelf] - 1;
-        } else if (response == partnerModel.chips) {
-            // Offer equals partner its offer, so partner has withdrawn from negotiation
-            curValue = utilityFunction[this.chips] - 1;
-        } else {
-            // Offer is not equal to partner its offer, so new offer has been made
-            response = game.flipOffer(response);
-            curValue = Math.max(utilityFunction[response], utilityFunction[this.chips]) - 2;
-            // minus one for current offer and one for offer from partner
+        List<Integer> responses = partnerModel.selectOffer(offerToOther);
+        double chance = 1.0 / responses.size();
+        double curValue, totValue;
+        totValue = 0.0;
+        for (int response : responses) {
+            if (response == offerToOther) {
+                // Partner accepts.
+                curValue = utilityFunction[offerToSelf] - 1;
+            } else if (response == partnerModel.chips) {
+                // Offer equals partner its offer, so partner has withdrawn from negotiation
+                curValue = utilityFunction[this.chips] - 1;
+            } else {
+                // Offer is not equal to partner its offer, so new offer has been made
+                response = game.flipOffer(response);
+                curValue = Math.max(utilityFunction[response], utilityFunction[this.chips]) - 2;
+                // minus one for current offer and one for offer from partner
+            }
+            totValue += chance * curValue;
         }
-        return curValue;
+
+        return totValue;
     }
 
     /**
@@ -313,7 +326,7 @@ public class PlayerToM extends Player {
      * @param offerReceived The offer received by the partner
      */
     private void updateLocationBeliefs(int offerReceived) {
-        int loc, partnerAlternative, offerPartnerChips, utilityOffer;
+        int loc, offerPartnerChips, utilityOffer, partnerAlternative;
         double sumAll, maxExpVal, curExpVal, accuracyRating, newBelief, sumAllSavedBeliefs;
 
         offerPartnerChips = game.flipOffer(offerReceived);
@@ -325,7 +338,7 @@ public class PlayerToM extends Player {
             utilityOffer = partnerModel.utilityFunction[offerPartnerChips] - Settings.SCORE_NEGOTIATION_STEP;
             if (utilityOffer - Settings.EPSILON > partnerModel.utilityFunction[partnerModel.chips]) {
                 // Given loc, offerReceived gives the partner a higher score than the initial situation
-                partnerAlternative = partnerModel.selectOffer(0); // 0 since worst possible offer
+                partnerAlternative = partnerModel.chooseOffer(0); // 0 since worst possible offer
                 // Agent's guess for partner's best option given location l
                 maxExpVal = partnerModel.getValue(partnerAlternative);
                 curExpVal = partnerModel.getValue(offerPartnerChips);

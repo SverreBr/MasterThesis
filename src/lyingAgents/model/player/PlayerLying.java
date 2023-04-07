@@ -23,7 +23,7 @@ public class PlayerLying extends PlayerToM {
     /**
      * List of best offers
      */
-    private List<LyingOfferType> bestOffers;
+    private List<OfferType> bestOffers;
 
     /**
      * Value for calculating the best offer to make.
@@ -69,7 +69,7 @@ public class PlayerLying extends PlayerToM {
         } else {
             System.out.println("\n" + getName() + ": Value offer received= " + utilityFunction[offerReceived]);
             receiveOffer(offerReceived);
-            curOffer = selectOffer(offerReceived);
+            curOffer = chooseOffer(offerReceived);
         }
         sendOffer(curOffer);
         return curOffer;
@@ -81,7 +81,7 @@ public class PlayerLying extends PlayerToM {
      * @return The best offer to make, that is, when accepted, this player gets the offer.
      */
     public int selectInitialOffer() {
-        return selectOffer(chips);
+        return chooseOffer(chips);
     }
 
     /**
@@ -91,18 +91,18 @@ public class PlayerLying extends PlayerToM {
      * @param offerReceived the offer made by the other player from the perspective of this agent.
      * @return The best offer as a response to offerReceived.
      */
-    public int selectOffer(int offerReceived) {
+    public int chooseOffer(int offerReceived) {
         bestOffers = new ArrayList<>();
-        LyingOfferType bestLyingOfferType;
+        OfferType bestLyingOfferType;
         int bestOffer, bestLoc, goalPosition;
         double noMessageOfferValue;
 
-        bestOffers.add(new LyingOfferType(this.chips, -1));
-        tmpSelectOfferValue = -Double.MAX_VALUE;
+        tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
+        bestOffers.add(new OfferType(this.chips, tmpSelectOfferValue, -1));
         addOffersWithoutMessage();  // send no message
 
         // Choose offer without message if at least as good as with a message.
-        List<LyingOfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
+        List<OfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
         bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
         noMessageOfferValue = tmpSelectOfferValue;
         thereIsBestOfferWithoutMessage = true;
@@ -119,23 +119,30 @@ public class PlayerLying extends PlayerToM {
         }
 
         System.out.println("-> Offers that are optimal without message:");
-        for (LyingOfferType smt : bestOffersWithoutMessage) {
+        for (OfferType smt : bestOffersWithoutMessage) {
             System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
-                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())));
+                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
+                    ", loc=" + smt.getLoc());
         }
         System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
                 Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())));
+        System.out.println("-> Offers that are optimal:");
+        for (OfferType smt : bestOffers) {
+            System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
+                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
+                    ", loc=" + smt.getLoc());
+        }
         if (!thereIsBestOfferWithoutMessage) {
             boolean lyingIsBetter = true;
             System.out.println("But there are offers that give " + this.getName() + " a better value than using no message.");
 
             // choose offer with message
             bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
-            System.out.println("-> Offers that are optimal with message are:");
-            for (LyingOfferType something : bestOffers) {
-                System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + ", offer to self=" + something.getOffer() + "; " +
-                        Arrays.toString(Chips.getBins(something.getOffer(), game.getBinMaxChips())) +
-                        ", loc=" + something.getLoc());
+//            System.out.println("-> Offers that are optimal with message are:");
+            for (OfferType something : bestOffers) {
+//                System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + ", offer to self=" + something.getOffer() + "; " +
+//                        Arrays.toString(Chips.getBins(something.getOffer(), game.getBinMaxChips())) +
+//                        ", loc=" + something.getLoc());
                 if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
                     lyingIsBetter = false;
                 }
@@ -160,7 +167,7 @@ public class PlayerLying extends PlayerToM {
             System.out.println("ACCEPT");
             if (bestOffer == offerReceived) System.out.println("!!! BEST OFFER IS ALREADY OFFER RECEIVED !!!");
             bestOffer = offerReceived;
-        } else if ((utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[bestOffer]) &&
+        } else if ((utilityFunction[this.chips] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
             // withdraw from negotiation
             System.out.println("WITHDRAW");
@@ -170,7 +177,8 @@ public class PlayerLying extends PlayerToM {
             if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
 
             double offerValue = getValue(bestOffer);
-            if (bestLoc != -1) System.out.println("Offer value (after sending message (" + bestLoc +")): " + Settings.PRINT_DF.format(offerValue));
+            if (bestLoc != -1)
+                System.out.println("Offer value (after sending message (" + bestLoc + ")): " + Settings.PRINT_DF.format(offerValue));
             if ((offerValue + Settings.EPSILON < tmpSelectOfferValue) || (offerValue - Settings.EPSILON > tmpSelectOfferValue)) {
                 System.out.println("!!! WRONG NUMBERS !!! -> " + Settings.PRINT_DF.format(offerValue) + " != " + Settings.PRINT_DF.format(tmpSelectOfferValue));
                 for (int i = 0; i < 10; i++) {
@@ -179,7 +187,7 @@ public class PlayerLying extends PlayerToM {
             }
         }
 
-        return bestOffer;
+        return bestOffer; // TODO: Check this...
     }
 
     /**
@@ -198,7 +206,7 @@ public class PlayerLying extends PlayerToM {
             partnerModel.restoreBeliefs();
             this.setHasSentMessage(saveHasSentMessage);
 
-            processOffer(i, loc, curValue);
+            processOffer(i, curValue, loc);
         }
     }
 
@@ -209,7 +217,7 @@ public class PlayerLying extends PlayerToM {
         double curValue;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             curValue = getValue(i);
-            processOffer(i, -1, curValue);
+            processOffer(i, curValue, -1);
         }
     }
 
@@ -222,15 +230,15 @@ public class PlayerLying extends PlayerToM {
      * @param location The location message
      * @param curValue The value of the combination of offer and location
      */
-    private void processOffer(int offer, int location, double curValue) {
+    private void processOffer(int offer, double curValue, int location) {
         if (curValue - Settings.EPSILON > tmpSelectOfferValue) {
             tmpSelectOfferValue = curValue;
             bestOffers = new ArrayList<>();
-            bestOffers.add(new LyingOfferType(offer, location));
+            bestOffers.add(new OfferType(offer, curValue, location));
             thereIsBestOfferWithoutMessage = false;
         } else if ((curValue >= tmpSelectOfferValue - Settings.EPSILON) &&
                 (curValue <= tmpSelectOfferValue + Settings.EPSILON)) {
-            bestOffers.add(new LyingOfferType(offer, location));
+            bestOffers.add(new OfferType(offer, curValue, location));
         }
     }
 

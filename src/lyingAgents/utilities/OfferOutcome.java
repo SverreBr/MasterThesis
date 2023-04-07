@@ -1,18 +1,18 @@
 package lyingAgents.utilities;
 
-public class OfferOutcome {
-    private final int offer;
+public class OfferOutcome implements Comparable<OfferOutcome>{
+    private final int offerForInit;
     private final int valueInit;
     private final int valueResp;
 
-    public OfferOutcome(int offer, int valueInit, int valueResp) {
-        this.offer = offer;
+    public OfferOutcome(int offerForInit, int valueInit, int valueResp) {
+        this.offerForInit = offerForInit;
         this.valueInit = valueInit;
         this.valueResp = valueResp;
     }
 
-    public int getOffer() {
-        return offer;
+    public int getOfferForInit() {
+        return offerForInit;
     }
 
     public int getValueInit() {
@@ -21,5 +21,14 @@ public class OfferOutcome {
 
     public int getValueResp() {
         return valueResp;
+    }
+
+    public int getSocialWelfare() {
+        return valueInit + valueResp;
+    }
+
+    @Override
+    public int compareTo(OfferOutcome o) {
+        return getSocialWelfare() - o.getSocialWelfare();
     }
 }
