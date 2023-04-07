@@ -449,9 +449,23 @@ public class Game {
         this.listeners.add(listener);
     }
 
-//    public List<OfferOutcome> getParetoOutcome() {
-//        List<OfferOutcome> = new ArrayList<>();
-//    }
+    public List<OfferOutcome> getParetoOutcomes() {
+        OfferOutcome newOffer;
+
+        List<OfferOutcome> paretoOutcomes = new ArrayList<>();
+        int[] utilityFuncInit = getUtilityFunction(getGoalPositionPlayer(Settings.INITIATOR_NAME));
+        int[] utilityFuncResp = getUtilityFunction(getGoalPositionPlayer(Settings.RESPONDER_NAME));
+        OfferOutcome initOutcome = new OfferOutcome(initialChipSets[0],
+                utilityFuncInit[initialChipSets[0]],
+                utilityFuncResp[initialChipSets[1]]);
+        for (int offer = 0; offer < utilityFuncInit.length; offer++) {
+            newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
+            if (((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp()))) {
+                paretoOutcomes.add(newOffer);
+            }
+        }
+        return paretoOutcomes;
+    }
 
     ///////////////////////////////
     //--- Setters and getters ---//

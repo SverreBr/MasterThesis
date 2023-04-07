@@ -193,12 +193,12 @@ public class AgentPanel extends JComponent implements GameListener {
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                         BorderFactory.createEmptyBorder(5, 5, 5, 5))));
+        messageScroll.setOpaque(false);
 
         messagePane.setEditable(false);
         messagePane.setOpaque(false);
 
-        StyledDocument doc = messagePane.getStyledDocument();
-        MiscFunc.createsStyledDocument(doc);
+        MiscFunc.createsStyledDocument(messagePane.getStyledDocument());
     }
 
     /**
