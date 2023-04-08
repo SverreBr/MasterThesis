@@ -86,14 +86,18 @@ public class GetResults {
             game.newRound();
         }
 
-        for (int i = 0; i < ResultSettings.KEEP_RESULTS_NR_ROUNDS; i++) {
-            game.newRound();
-            game.playTillEnd();
-        }
-
+        game.newRound();
+        game.playTillEnd();
         long endTime = System.currentTimeMillis();
         ResultElement resultElement = new ResultElement(game, (endTime - startTime) / 1000.0);
         data.add(resultElement);
+
+        for (int i = 1; i < ResultSettings.KEEP_RESULTS_NR_ROUNDS; i++) {
+            game.newRound();
+            game.playTillEnd();
+            resultElement = new ResultElement(game, -1);
+            data.add(resultElement);
+        }
     }
 
     public void writeExcel() throws IOException {
