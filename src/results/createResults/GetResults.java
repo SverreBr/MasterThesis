@@ -45,6 +45,11 @@ public class GetResults {
                                         System.out.println("\t  Skipping [" + initTom + ", " + respTom + ", " + initLR + ", " + respLR + ", " + initCanLie + ", " + respCanLie + "] Done;");
                                     } else {
                                         generateNewGame(initTom, respTom, initLR, respLR, initCanLie, respCanLie);
+                                        try {
+                                            writeExcel();
+                                        } catch (IOException exception) {
+                                            System.out.println("writing to excel did not succeed.");
+                                        }
                                         System.out.println("\t[" + initTom + ", " + respTom + ", " + initLR + ", " + respLR + ", " + initCanLie + ", " + respCanLie + "] Done;");
                                     }
                                 }
@@ -54,11 +59,6 @@ public class GetResults {
                 }
             }
             System.out.println("Finished iteration " + cnt + ".\n");
-            try {
-                writeExcel();
-            } catch (IOException exception) {
-                System.out.println("writing to excel did not succeed.");
-            }
         }
     }
 
