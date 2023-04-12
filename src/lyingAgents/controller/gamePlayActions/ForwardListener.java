@@ -1,4 +1,4 @@
-package lyingAgents.controller;
+package lyingAgents.controller.gamePlayActions;
 
 /**
  * ForwardListener class: listens to the ForwardAction when rounds are forwarded
@@ -8,7 +8,7 @@ public interface ForwardListener {
     /**
      * Notified that execution of forwarding rounds has begun
      */
-    void executionStarted();
+    void forwardExecutionStarted();
 
     /**
      * Notified that forward action is done
@@ -20,5 +20,5 @@ public interface ForwardListener {
     /**
      * Notified that execution for forwarding rounds is aborted
      */
-    void executionAborted();
+    void forwardExecutionAborted();
 }

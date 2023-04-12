@@ -1,12 +1,9 @@
-package lyingAgents.controller;
+package lyingAgents.controller.gamePlayActions;
 
 import lyingAgents.model.Game;
 
 import java.awt.*;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 
 /**
@@ -89,7 +86,7 @@ public class ForwardAction implements ForwardListener {
      * Progress worker to make the progress bar update and repaint.
      */
     private void makeProgressWorker() {
-        pw = new ProgressWorker(game, rounds);
+        pw = new ProgressWorker(game, GamePlaySettings.FORWARD_ACTION, rounds);
         pw.addPropertyChangeListener(evt -> {
             String name = evt.getPropertyName();
             if (name.equals("progress")) {
@@ -119,11 +116,11 @@ public class ForwardAction implements ForwardListener {
      * @param listener the ForwardListener to be added to the progress worker
      */
     public void addListenerToProgressWorker(ForwardListener listener) {
-        pw.addListener(listener);
+        pw.addForwardListener(listener);
     }
 
     @Override
-    public void executionStarted() {
+    public void forwardExecutionStarted() {
     }
 
     @Override
@@ -133,104 +130,8 @@ public class ForwardAction implements ForwardListener {
     }
 
     @Override
-    public void executionAborted() {
+    public void forwardExecutionAborted() {
         frame.setVisible(false);
         frame.dispose();
-    }
-}
-
-/**
- * Class ProgressWorker: class to progress the work that has to be done: forwarding rounds in the game
- */
-class ProgressWorker extends SwingWorker<Object, Object> {
-
-    /**
-     * The number of rounds to be forwarded
-     */
-    private final int rounds;
-
-    /**
-     * The game model
-     */
-    private final Game game;
-
-    /**
-     * The set of listeners that listen to changes in the progress worker
-     */
-    private final Set<ForwardListener> listeners;
-
-    /**
-     * Boolean check for when the execution has to be canceled
-     */
-    private boolean cancel = false;
-
-    /**
-     * Constructor
-     *
-     * @param game   The game model
-     * @param rounds The number of rounds to be forwarded
-     */
-    public ProgressWorker(Game game, int rounds) {
-        this.rounds = rounds;
-        this.game = game;
-        this.listeners = new HashSet<>();
-    }
-
-    /**
-     * Adds a listener to the set of listeners
-     *
-     * @param listener The listener to be added
-     */
-    public void addListener(ForwardListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Notifies all listeners that execution starts
-     */
-    public void startExecution() {
-        for (ForwardListener listener : listeners) {
-            listener.executionStarted();
-        }
-    }
-
-    /**
-     * Sets boolean cancel to true and cancels the execution before the next round.
-     */
-    public void cancelExecution() {
-        this.cancel = true;
-    }
-
-    @Override
-    protected Object doInBackground() {
-        for (int i = 0; i < rounds; i++) {
-            if (this.cancel) {
-                break;
-            }
-            game.playTillEnd();
-            game.newRound();
-            this.setProgress((int) ((i + 1.0) / rounds * 100));
-        }
-        return null;
-    }
-
-    @Override
-    protected void done() {
-        super.done();
-        try {
-            get();
-        } catch (InterruptedException | ExecutionException ex) {
-            ex.printStackTrace();
-            System.out.println("Bad: " + ex.getMessage());
-        }
-        if (this.cancel) {
-            for (ForwardListener listener : listeners) {
-                listener.executionAborted();
-            }
-        } else {
-            for (ForwardListener listener : listeners) {
-                listener.forwardActionDone(rounds);
-            }
-        }
     }
 }

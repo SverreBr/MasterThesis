@@ -1,7 +1,9 @@
 package lyingAgents.view;
 
-import lyingAgents.controller.ForwardAction;
-import lyingAgents.controller.ForwardListener;
+import lyingAgents.controller.gamePlayActions.ForwardAction;
+import lyingAgents.controller.gamePlayActions.ForwardListener;
+import lyingAgents.controller.gamePlayActions.PlayAction;
+import lyingAgents.controller.gamePlayActions.PlayListener;
 import lyingAgents.model.Game;
 import lyingAgents.model.GameListener;
 import lyingAgents.model.player.PlayerLying;
@@ -14,7 +16,7 @@ import java.awt.event.ActionListener;
 /**
  * ButtonPanel: the panel with buttons
  */
-public class ButtonPanel extends JPanel implements ActionListener, GameListener, ForwardListener {
+public class ButtonPanel extends JPanel implements ActionListener, GameListener, ForwardListener, PlayListener {
 
     /**
      * The game model
@@ -172,6 +174,12 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         forwardAction.execute();
     }
 
+    private void play() {
+        PlayAction playAction = new PlayAction(game);
+        playAction.addListenerToProgressWorker(this);
+        playAction.execute();
+    }
+
     /**
      * Restarts the game with new agents
      */
@@ -186,7 +194,6 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
                 resp.isCanLie());
     }
 
-
     /**
      * Action corresponding with a button event
      *
@@ -199,7 +206,7 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
             case "new round" -> this.game.newRound();
             case "exit" -> System.exit(0);
             case "step" -> this.game.step();
-            case "play" -> this.game.playTillEnd();
+            case "play" -> play();
             case "forward" -> forward();
         }
     }
@@ -222,22 +229,27 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         step.setEnabled(setEnabled);
     }
 
+    private void setButtonBooleans(boolean truthVal) {
+        play.setEnabled(truthVal);
+        step.setEnabled(truthVal);
+        restart.setEnabled(truthVal);
+        forward.setEnabled(truthVal);
+        newNeg.setEnabled(truthVal);
+    }
+
     @Override
-    public void executionStarted() {
-        play.setEnabled(false);
-        step.setEnabled(false);
-        restart.setEnabled(false);
-        forward.setEnabled(false);
-        newNeg.setEnabled(false);
+    public void forwardExecutionStarted() {
+        setButtonBooleans(false);
+    }
+
+    @Override
+    public void playExecutionStarted() {
+        setButtonBooleans(false);
     }
 
     @Override
     public void forwardActionDone(int rounds) {
-        play.setEnabled(true);
-        step.setEnabled(true);
-        restart.setEnabled(true);
-        forward.setEnabled(true);
-        newNeg.setEnabled(true);
+        setButtonBooleans(true);
 
         game.setSimulationOn();
         game.notifyListenersNewGame();
@@ -245,15 +257,28 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
     }
 
     @Override
-    public void executionAborted() {
-        play.setEnabled(true);
-        step.setEnabled(true);
-        restart.setEnabled(true);
-        forward.setEnabled(true);
-        newNeg.setEnabled(true);
+    public void playActionDone() {
+        setButtonBooleans(true);
+        boolean setEnabled = !(this.game.isGameFinished());
+        play.setEnabled(setEnabled);
+        step.setEnabled(setEnabled);
+        // TODO: popup that play action is done.
+    }
 
+    @Override
+    public void forwardExecutionAborted() {
+        setButtonBooleans(true);
         game.setSimulationOn();
         game.notifyListenersNewGame();
         Popups.showForwardingCancelled();
+    }
+
+    @Override
+    public void playExecutionAborted() {
+        setButtonBooleans(true);
+        boolean setEnabled = !(this.game.isGameFinished());
+        play.setEnabled(setEnabled);
+        step.setEnabled(setEnabled);
+        // TODO: add popup that play is cancelled.
     }
 }

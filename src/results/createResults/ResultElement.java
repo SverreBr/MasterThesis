@@ -25,7 +25,9 @@ public class ResultElement {
     private final int respInitialPoints;
 
     private final int nrOffers;
-    private final boolean isPE;
+    private boolean isPE;
+    private boolean isBestSW;
+    private boolean isNegotiationSuccess;
     private final double timePassed;
 
     public ResultElement(Game game, double timePassed) {
@@ -45,18 +47,45 @@ public class ResultElement {
         respInitialPoints = resp.getInitialPoints();
 
         nrOffers = game.getNrOffers();
-        isPE = calcIfOutcomeIsMaxPE(game);
+        calcIfNegotiationIsSuccess(game);
+
+        List<OfferOutcome> peList = game.getParetoOutcomes();
+        calcIfOutcomeIsPE(peList, game);
+        calcIfOutcomeIsBestSW(peList, game);
+
         this.timePassed = timePassed;
     }
-    private boolean calcIfOutcomeIsMaxPE(Game game) {
-        List<OfferOutcome> outcomeList = game.getParetoOutcomes();
-        if (outcomeList.size() == 0) return true;
-        int highestSW = outcomeList.get(0).getSocialWelfare();
-        for (OfferOutcome outcome : outcomeList) {
+
+    private void calcIfOutcomeIsPE(List<OfferOutcome> peList, Game game) {
+        isPE = true;
+        if (peList.size() == 0) return;
+
+        int respUtil = game.getResponder().getUtilityValue();
+        int initUtil = game.getInitiator().getUtilityValue();
+
+        for (OfferOutcome outcome : peList) {
+            if ((outcome.getValueInit() > initUtil) && (outcome.getValueResp() > respUtil)) {
+                isPE = false;
+                break;
+            }
+        }
+    }
+
+    private void calcIfOutcomeIsBestSW(List<OfferOutcome> peList, Game game) {
+        isBestSW = true;
+        if (peList.size() == 0) return;
+        int highestSW = peList.get(0).getSocialWelfare();
+        for (OfferOutcome outcome : peList) {
             highestSW = Math.max(highestSW, outcome.getSocialWelfare());
         }
         int sw = game.getResponder().getUtilityValue() + game.getInitiator().getUtilityValue();
-        return highestSW == sw;
+        isBestSW = (highestSW == sw);
+    }
+
+    private void calcIfNegotiationIsSuccess(Game game) {
+        int initInitialChips = game.getInitiator().getInitialChips();
+        int initFinalChips = game.getInitiator().getChips();
+        isNegotiationSuccess = (initInitialChips != initFinalChips);
     }
 
     public int getInitGain() {
@@ -118,5 +147,13 @@ public class ResultElement {
 
     public double getTimePassed() {
         return timePassed;
+    }
+
+    public boolean isBestSW() {
+        return isBestSW;
+    }
+
+    public boolean isNegotiationSuccess() {
+        return isNegotiationSuccess;
     }
 }

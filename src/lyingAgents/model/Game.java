@@ -305,8 +305,10 @@ public class Game {
         flippedOffer = flipOffer(tmpNewOffer);
         if (negotiationEnds) { // Negotiation terminated
             negotiationTerminates();
+//            printFinalStatements();
         } else if (tmpNewOffer == newOffer) { // Offer is accepted
             offerAccepted(flippedOffer);
+//            printFinalStatements();
         } else { // Negotiation continues with new offer
             nrOffers++;
             newOffer = flippedOffer;
@@ -315,6 +317,37 @@ public class Game {
         }
 
         if (simulationOn) notifyListeners();
+    }
+
+    private void printFinalStatements() {
+        List<OfferOutcome> peList = getParetoOutcomes();
+
+        for (OfferOutcome offerOutcome : peList) {
+            System.out.println(Arrays.toString(Chips.getBins(offerOutcome.getOfferForInit(), getBinMaxChips())) +
+                    " - " + Arrays.toString(Chips.getBins(flipOffer(offerOutcome.getOfferForInit()), getBinMaxChips())) +
+                    "; " + offerOutcome.getValueInit() + " - " + offerOutcome.getValueResp() +
+                    "; sw=" + offerOutcome.getSocialWelfare());
+        }
+
+        if (peList.size() == 0) {
+            System.out.println("\tTHERE WAS NO STRICT PARETO IMPROVEMENT FROM THE INITIAL SETTING");
+            System.out.println("\tTHERE WAS NO STRICT SOCIAL WELFARE IMPROVEMENT FROM THE INITIAL SETTING");
+        } else {
+            boolean isPE = true;
+            int sw = responder.getUtilityValue() + initiator.getUtilityValue();
+            int respUtil = responder.getUtilityValue();
+            int initUtil = initiator.getUtilityValue();
+            int highestSW = peList.get(0).getSocialWelfare();
+
+            for (OfferOutcome outcome : peList) {
+                highestSW = Math.max(highestSW, outcome.getSocialWelfare());
+                if ((outcome.getValueInit() > initUtil) && (outcome.getValueResp() > respUtil)) {
+                    isPE = false;
+                }
+            }
+            System.out.println("\tTHERE WAS NO STRICT PARETO IMPROVEMENT ANYMORE: " + isPE);
+            System.out.println("\tTHERE WAS NO HIGHER SW POSSIBLE: " + (highestSW == sw));
+        }
     }
 
     /**
@@ -522,7 +555,7 @@ public class Game {
         return this.board;
     }
 
-    public int[][] getInitialChipSets() {
+    public int[][] getInitialChipSets() {  // TODO: change this (also within gameSettings, this will result in not being able to use the existing GameSettings)
         int[][] binChipSets = new int[2][Settings.CHIP_DIVERSITY];
         for (int i = 0; i < initialChipSets.length; i++) {
             binChipSets[i] = Chips.getBins(initialChipSets[i], binMaxChips);

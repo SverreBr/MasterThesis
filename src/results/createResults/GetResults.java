@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 
 public class GetResults {
 
-    String CSV_FILE_NAME = "results.csv";
+    String ID = "0412_endOfDay";
+
+    String CSV_FILE_NAME = "results_" + ID + ".csv";
     String SAVE_DIRECTORY = "results";
 
     private final List<ResultElement> data = new ArrayList<>();
@@ -58,7 +60,7 @@ public class GetResults {
                     }
                 }
             }
-            System.out.println("Finished iteration " + cnt + ".\n");
+            System.out.println("################### Finished iteration " + cnt + " ###################\n");
         }
     }
 
@@ -120,7 +122,8 @@ public class GetResults {
                 ResultSettings.initInitPoints, ResultSettings.respInitPoints,
                 ResultSettings.initFinalPoints, ResultSettings.respFinalPoints,
                 ResultSettings.initGain, ResultSettings.respGain,
-                ResultSettings.nrOffers, ResultSettings.isPE, ResultSettings.timePassed};
+                ResultSettings.nrOffers, ResultSettings.isPE, ResultSettings.isBestSW,
+                ResultSettings.isNegotiationSuccess, ResultSettings.timePassed};
         dataString.add(cell_headers);
     }
 
@@ -146,8 +149,11 @@ public class GetResults {
 
                     String.valueOf(resultElement.getInitGain()),
                     String.valueOf(resultElement.getRespGain()),
+
                     String.valueOf(resultElement.getNrOffers()),
                     String.valueOf(resultElement.isPE()),
+                    String.valueOf(resultElement.isBestSW()),
+                    String.valueOf(resultElement.isNegotiationSuccess()),
                     String.valueOf(resultElement.getTimePassed())
             };
             dataString.add(dataLine);

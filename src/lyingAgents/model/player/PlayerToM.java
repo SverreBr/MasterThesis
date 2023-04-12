@@ -50,11 +50,6 @@ public class PlayerToM extends Player {
     private boolean confidenceLocked;
 
     /**
-     * The initial point of this player
-     */
-    private int initialPoints;
-
-    /**
      * Boolean value for whether this agent received a message or not
      */
     protected boolean receivedMessage = false;
@@ -92,7 +87,6 @@ public class PlayerToM extends Player {
         this.savedLocationBeliefs = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
         this.savedLocationBeliefsWithoutMessage = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
         this.locationBeliefsWithoutMessage = new double[this.game.getNumberOfGoalPositions()];
-        this.initialPoints = getUtilityValue();
 
         if (this.orderToM > 0) {
             Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
@@ -115,7 +109,6 @@ public class PlayerToM extends Player {
      */
     public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
         super.initNewRound(chipsSelf, chipsOther, utilityFunction);
-        this.initialPoints = getUtilityValue();
         this.receivedMessage = false;
         this.hasSentMessage = false;
         if (orderToM > 0) {
@@ -279,11 +272,10 @@ public class PlayerToM extends Player {
         super.receiveOffer(offerReceived);
         if (this.orderToM > 0) {
             updateLocationBeliefs(offerReceived);
-            if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) // TODO: also not believed when multiple not consistent messages have been sent
-            { // offer is not consistent with what is offered...
+            if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with what is offered...
                 restoreLocationBeliefsDueToUnbelievedMessage();  // TODO: restores every time when message is received?
                 if (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME)) {
-                    System.out.println(getName() + " does not believe trading partner.");
+                    System.out.println(getName() + " does not believe trading partner ###########################");
                     this.addMessage("(I don't believe you.)", false);
                 }
             }
@@ -453,7 +445,7 @@ public class PlayerToM extends Player {
      * @return Initial points of this agent
      */
     public int getInitialPoints() {
-        return initialPoints;
+        return utilityFunction[this.getInitialChips()];
     }
 
     /**
@@ -532,10 +524,9 @@ public class PlayerToM extends Player {
      * @param location The location that the trading partner announced
      */
     private void receiveLocationMessage(int location) {
-        boolean believeLoc = false;
-
         if (this.orderToM > 0) { // Models goal location of trading partner
             if (!this.receivedMessage) { // First message received
+                boolean believeLoc = false;
                 storeLocationBeliefsDueToBelievedMessage();
                 if (locationBeliefs[location] - Settings.EPSILON > 0.0) believeLoc = true;
                 for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
@@ -547,7 +538,7 @@ public class PlayerToM extends Player {
                     for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
                         locationBeliefs[loc] = 0.0;
                     }
-                } // else, still believe trading partner.
+                } // else, agent can still believe trading partner, or already disbelieved the trading partner.
             }
         }
         this.receivedMessage = true;

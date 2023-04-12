@@ -1,12 +1,10 @@
 package lyingAgents.model.player;
 
 import lyingAgents.model.Game;
-import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.Messages;
 import lyingAgents.utilities.Settings;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -94,16 +92,16 @@ public class PlayerLying extends PlayerToM {
         bestOffers = new ArrayList<>();
         OfferType bestLyingOfferType;
         int bestOffer, bestLoc, goalPosition;
-        double noMessageOfferValue;
+//        double noMessageOfferValue;
 
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
         bestOffers.add(new OfferType(this.chips, tmpSelectOfferValue, -1));
         addOffersWithoutMessage();  // send no message
 
         // Choose offer without message if at least as good as with a message.
-        List<OfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
+//        List<OfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
         bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
-        noMessageOfferValue = tmpSelectOfferValue;
+//        noMessageOfferValue = tmpSelectOfferValue;
         thereIsBestOfferWithoutMessage = true;
 
         if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
@@ -117,46 +115,37 @@ public class PlayerLying extends PlayerToM {
             }
         }
 
-//        System.out.println("-> Offers that are optimal without message:");
-//        for (OfferType smt : bestOffersWithoutMessage) {
-//            System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
-//                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
-//                    ", loc=" + smt.getLoc());
-//        }
-//        System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
-//                Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())));
-//        System.out.println("-> Offers that are optimal:");
+//        System.out.println("\n\n-> Offers that are optimal (including messages):");
 //        for (OfferType smt : bestOffers) {
 //            System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
 //                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
 //                    ", loc=" + smt.getLoc());
 //        }
         if (!thereIsBestOfferWithoutMessage) {
-//            boolean lyingIsBetter = true;
-//            System.out.println("But there are offers that give " + this.getName() + " a better value than using no message.");
-//
-//            // choose offer with message
             bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
-//            System.out.println("-> Offers that are optimal with message are:");
+
+//            boolean lyingIsBetter = true;
+//            System.out.println("--- THERE IS AN OFFER WITH MESSAGE THAT IS BETTER THAN SENDING NO MESSAGE ---");
+//            System.out.println("-> Offers that are optimal without message:");
+//            for (OfferType smt : bestOffersWithoutMessage) {
+//                System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
+//                        Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
+//                        ", loc=" + smt.getLoc());
+//            }
+//
+//             // choose offer with message
 //            for (OfferType something : bestOffers) {
-//                System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + ", offer to self=" + something.getOffer() + "; " +
-//                        Arrays.toString(Chips.getBins(something.getOffer(), game.getBinMaxChips())) +
-//                        ", loc=" + something.getLoc());
 //                if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
 //                    lyingIsBetter = false;
 //                }
 //            }
-//            System.out.println("\t- Chosen is offer to self: " + bestLyingOfferType.getOffer() + "; " +
-//                    Arrays.toString(Chips.getBins(bestLyingOfferType.getOffer(), game.getBinMaxChips())) +
-//                    ", loc=" + bestLyingOfferType.getLoc());
-//            if (lyingIsBetter)
-//                System.out.println("--- THERE IS A COMBINATION WHERE LYING IS BETTER THAN TELLING THE TRUTH. ---");
+//            if (lyingIsBetter) System.out.println("--- LYING IS BETTER THAN TELLING THE TRUTH. ---");
         }
 
         bestOffer = bestLyingOfferType.getOffer();
         bestLoc = bestLyingOfferType.getLoc();
 
-//        System.out.println(getName() + ": Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
+//        System.out.println(getName() + " chooses: Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
 //                "; location=" + bestLoc +
 //                ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer)) +
 //                ";\n\ttmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
@@ -164,19 +153,19 @@ public class PlayerLying extends PlayerToM {
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
 //            System.out.println("ACCEPT");
-//            if (bestOffer == offerReceived) System.out.println("!!! BEST OFFER IS ALREADY OFFER RECEIVED !!!");
+//            if (bestOffer == offerReceived) System.out.println("--- BEST OFFER IS ALREADY OFFER RECEIVED ---");
             bestOffer = offerReceived;
         } else if ((utilityFunction[this.chips] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
             // withdraw from negotiation
 //            System.out.println("WITHDRAW");
-//            if (bestOffer == this.chips) System.out.println("BEST OFFER IS ALREADY CURRENT CHIPS");
+//            if (bestOffer == this.chips) System.out.println("--- BEST OFFER IS ALREADY CURRENT CHIPS ---");
             bestOffer = this.chips;
         } else {  // else, make the best offer with possibly a message
             if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
         }
 
-        return bestOffer; // TODO: Check this...
+        return bestOffer;
     }
 
     /**
