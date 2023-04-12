@@ -47,9 +47,9 @@ public class ResultElement {
         respInitialPoints = resp.getInitialPoints();
 
         nrOffers = game.getNrOffers();
-        calcIfNegotiationIsSuccess(game);
 
         List<OfferOutcome> peList = game.getParetoOutcomes();
+        calcIfNegotiationIsSuccess(peList.size(), game);
         calcIfOutcomeIsPE(peList, game);
         calcIfOutcomeIsBestSW(peList, game);
 
@@ -82,7 +82,9 @@ public class ResultElement {
         isBestSW = (highestSW == sw);
     }
 
-    private void calcIfNegotiationIsSuccess(Game game) {
+    private void calcIfNegotiationIsSuccess(int numBetterOutcomes, Game game) {
+        isNegotiationSuccess = true;
+        if (numBetterOutcomes == 0) return;
         int initInitialChips = game.getInitiator().getInitialChips();
         int initFinalChips = game.getInitiator().getChips();
         isNegotiationSuccess = (initInitialChips != initFinalChips);
