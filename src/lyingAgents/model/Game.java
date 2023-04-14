@@ -107,6 +107,8 @@ public class Game {
      */
     private String messageSend;
 
+    private boolean reachedMaxNumOffers;
+
     /**
      * Constructor
      */
@@ -270,6 +272,7 @@ public class Game {
         this.newOffer = -1;
         this.nrOffers = 0;
         this.turn = Settings.INITIATOR_NAME;
+        this.reachedMaxNumOffers = false;
     }
 
     //////////////////////////////
@@ -330,23 +333,25 @@ public class Game {
         }
 
         if (peList.size() == 0) {
-            System.out.println("\tTHERE WAS NO STRICT PARETO IMPROVEMENT FROM THE INITIAL SETTING");
-            System.out.println("\tTHERE WAS NO STRICT SOCIAL WELFARE IMPROVEMENT FROM THE INITIAL SETTING");
+            System.out.println("\t- THERE WAS NO STRICT PARETO IMPROVEMENT FROM THE INITIAL SETTING");
+            System.out.println("\t- THERE WAS NO STRICT SOCIAL WELFARE IMPROVEMENT FROM THE INITIAL SETTING");
         } else {
             boolean isPE = true;
             int sw = responder.getUtilityValue() + initiator.getUtilityValue();
+            System.out.println("\t- Current sw = " + sw);
             int respUtil = responder.getUtilityValue();
             int initUtil = initiator.getUtilityValue();
             int highestSW = peList.get(0).getSocialWelfare();
 
             for (OfferOutcome outcome : peList) {
                 highestSW = Math.max(highestSW, outcome.getSocialWelfare());
-                if ((outcome.getValueInit() > initUtil) && (outcome.getValueResp() > respUtil)) {
+                if ((((outcome.getValueInit() > initUtil) && (outcome.getValueResp() >= respUtil))) ||
+                        (((outcome.getValueInit() >= initUtil) && (outcome.getValueResp() > respUtil)))) {
                     isPE = false;
                 }
             }
-            System.out.println("\tTHERE WAS NO STRICT PARETO IMPROVEMENT ANYMORE: " + isPE);
-            System.out.println("\tTHERE WAS NO HIGHER SW POSSIBLE: " + (highestSW == sw));
+            System.out.println("\t- THERE WAS NO PARETO IMPROVEMENT ANYMORE: " + isPE);
+            System.out.println("\t- THERE WAS NO HIGHER SW POSSIBLE: " + (highestSW == sw));
         }
     }
 
@@ -359,8 +364,10 @@ public class Game {
             step();
             i++;
         }
-        if (i >= Settings.MAX_NUMBER_OFFERS)
+        if (i >= Settings.MAX_NUMBER_OFFERS) {
             System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " steps performed. ---");
+            reachedMaxNumOffers = true;
+        }
     }
 
     /**
@@ -699,5 +706,9 @@ public class Game {
         GameSetting gameSetting = new GameSetting();
         gameSetting.getSettingsFromGame(this);
         return gameSetting;
+    }
+
+    public boolean isReachedMaxNumOffers() {
+        return reachedMaxNumOffers;
     }
 }

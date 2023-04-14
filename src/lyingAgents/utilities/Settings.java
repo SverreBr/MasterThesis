@@ -93,7 +93,7 @@ public class Settings {
     /**
      * The maximum number of offers after which negotiation is terminated
      */
-    public static final int MAX_NUMBER_OFFERS = 50;
+    public static final int MAX_NUMBER_OFFERS = 10;
 
     /**
      * Shown when a general exception occurs
@@ -149,4 +149,19 @@ public class Settings {
                 new Point(0, 1)
         );
     }
+
+    /**
+     * The directory where the saved games are placed
+     */
+    public static final String SAVELOAD_DIRECTORY_NAME = "saved_gameSettings";
+
+    /**
+     * maximum number of characters a file name may have
+     */
+    public static final int MAX_FILE_NAME = 20;
+
+    /**
+     * minimum number of characters a file name may have
+     */
+    public static final int MIN_FILE_NAME = 2;
 }

@@ -28,6 +28,8 @@ public class ResultElement {
     private boolean isPE;
     private boolean isBestSW;
     private boolean isNegotiationSuccess;
+    private final boolean thereIsBetterOutcome;
+    private final boolean reachedMaxNumOffers;
     private final double timePassed;
 
     public ResultElement(Game game, double timePassed) {
@@ -49,9 +51,11 @@ public class ResultElement {
         nrOffers = game.getNrOffers();
 
         List<OfferOutcome> peList = game.getParetoOutcomes();
+        thereIsBetterOutcome = !peList.isEmpty();
         calcIfNegotiationIsSuccess(peList.size(), game);
         calcIfOutcomeIsPE(peList, game);
         calcIfOutcomeIsBestSW(peList, game);
+        reachedMaxNumOffers = game.isReachedMaxNumOffers();
 
         this.timePassed = timePassed;
     }
@@ -157,5 +161,13 @@ public class ResultElement {
 
     public boolean isNegotiationSuccess() {
         return isNegotiationSuccess;
+    }
+
+    public boolean isThereIsBetterOutcome() {
+        return thereIsBetterOutcome;
+    }
+
+    public boolean isReachedMaxNumOffers() {
+        return reachedMaxNumOffers;
     }
 }

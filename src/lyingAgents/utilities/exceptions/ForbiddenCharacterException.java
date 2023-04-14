@@ -1,4 +1,4 @@
-package lyingAgents.controller.saveload.exceptions;
+package lyingAgents.utilities.exceptions;
 
 /**
  * ForbiddenCharacterException class: Exception for when a filename contains a forbidden character

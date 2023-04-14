@@ -10,17 +10,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GetResults {
-
-    String ID = "0412_endOfDay";
-
-    String CSV_FILE_NAME = "results_" + ID + ".csv";
-    String SAVE_DIRECTORY = "results";
+    String SAVE_DIRECTORY = "tmp_results";
 
     private final List<ResultElement> data = new ArrayList<>();
 
     private List<String[]> dataString;
 
-    public GetResults() {
+    private final String csvFileName;
+
+    public GetResults(String csvFileName) {
+        this.csvFileName = csvFileName;
         makeFolder();
     }
 
@@ -106,7 +105,7 @@ public class GetResults {
         this.dataString = new ArrayList<>();
         addHeaders();
         createDataString();
-        File csvOutputFile = new File(SAVE_DIRECTORY + File.separator + CSV_FILE_NAME);
+        File csvOutputFile = new File(SAVE_DIRECTORY + File.separator + csvFileName);
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             dataString.stream()
                     .map(this::convertToCSV)
@@ -122,8 +121,9 @@ public class GetResults {
                 ResultSettings.initInitPoints, ResultSettings.respInitPoints,
                 ResultSettings.initFinalPoints, ResultSettings.respFinalPoints,
                 ResultSettings.initGain, ResultSettings.respGain,
-                ResultSettings.nrOffers, ResultSettings.isPE, ResultSettings.isBestSW,
-                ResultSettings.isNegotiationSuccess, ResultSettings.timePassed};
+                ResultSettings.nrOffers, ResultSettings.outcomeIsPE, ResultSettings.isBestSW,
+                ResultSettings.isNegotiationSuccess, ResultSettings.thereIsABetterOutcome,
+                ResultSettings.reachedMaxNumOffers, ResultSettings.timePassed};
         dataString.add(cell_headers);
     }
 
@@ -154,6 +154,8 @@ public class GetResults {
                     String.valueOf(resultElement.isPE()),
                     String.valueOf(resultElement.isBestSW()),
                     String.valueOf(resultElement.isNegotiationSuccess()),
+                    String.valueOf(resultElement.isThereIsBetterOutcome()),
+                    String.valueOf(resultElement.isReachedMaxNumOffers()),
                     String.valueOf(resultElement.getTimePassed())
             };
             dataString.add(dataLine);

@@ -18,10 +18,12 @@ public class ResultSettings {
     public static final String respFinalPoints = "resp_finalPoints";
     public static final String respGain = "resp_gain";
     public static final String nrOffers = "nr_offers";
-    public static final String isPE = "outcome_is_PE";
+    public static final String outcomeIsPE = "outcome_is_PE";
     public static final String isBestSW = "is_best_sw_outcome";
     public static final String isNegotiationSuccess = "negotiation_success";
     public static final String timePassed = "passed_time";
+    public static final String thereIsABetterOutcome = "there_is_better_outcome";
+    public static final String reachedMaxNumOffers = "reached_max_num_offers";
     public static final List<Integer> initTomList = Arrays.asList(0, 1, 2);
     public static final List<Integer> respTomList = Arrays.asList(0, 1, 2);
     public static final List<Double> initLRList = List.of(0.5);  // TODO: maybe make this normally distributed?

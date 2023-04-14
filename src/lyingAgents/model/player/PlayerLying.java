@@ -1,10 +1,12 @@
 package lyingAgents.model.player;
 
 import lyingAgents.model.Game;
+import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.Messages;
 import lyingAgents.utilities.Settings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -92,16 +94,16 @@ public class PlayerLying extends PlayerToM {
         bestOffers = new ArrayList<>();
         OfferType bestLyingOfferType;
         int bestOffer, bestLoc, goalPosition;
-//        double noMessageOfferValue;
+        double noMessageOfferValue;
 
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
         bestOffers.add(new OfferType(this.chips, tmpSelectOfferValue, -1));
         addOffersWithoutMessage();  // send no message
 
         // Choose offer without message if at least as good as with a message.
-//        List<OfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
+        List<OfferType> bestOffersWithoutMessage = new ArrayList<>(bestOffers);
         bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
-//        noMessageOfferValue = tmpSelectOfferValue;
+        noMessageOfferValue = tmpSelectOfferValue;
         thereIsBestOfferWithoutMessage = true;
 
         if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
@@ -133,7 +135,7 @@ public class PlayerLying extends PlayerToM {
 //                        ", loc=" + smt.getLoc());
 //            }
 //
-//             // choose offer with message
+             // choose offer with message
 //            for (OfferType something : bestOffers) {
 //                if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
 //                    lyingIsBetter = false;
