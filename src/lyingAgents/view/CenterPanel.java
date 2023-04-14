@@ -10,7 +10,6 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CenterPanel extends JPanel implements GameListener {
@@ -60,17 +59,31 @@ public class CenterPanel extends JPanel implements GameListener {
     }
 
     private void updateInfo() {
+        List<OfferOutcome> strictParetoOutcomes = game.getStrictParetoOutcomes();
         List<OfferOutcome> paretoOutcomes = game.getParetoOutcomes();
-        Collections.sort(paretoOutcomes);
-        Collections.reverse(paretoOutcomes);
-        String[] content = new String[paretoOutcomes.size() + 2];
-        String[] style = new String[paretoOutcomes.size() + 2];
+        String[] content = new String[(strictParetoOutcomes.size()+1) + (paretoOutcomes.size()+1) + 1];
+        String[] style = new String[strictParetoOutcomes.size()+1 + paretoOutcomes.size()+1 + 1];
 
         int idx = 0;
         style[idx] = "bold";
         content[idx++] = "Additional Information";
-        style[idx] = "italic";
 
+        style[idx] = "italic";
+        if (strictParetoOutcomes.size() == 0) {
+            content[idx++] = "- No strict pareto improvements:";
+        } else {
+            content[idx++] = "- Strict pareto improvements:";
+            for (OfferOutcome paretoOutcome : strictParetoOutcomes) {
+                style[idx] = "regular";
+                content[idx++] = "  * " +
+                        Arrays.toString(Chips.getBins(paretoOutcome.getOfferForInit(), game.getBinMaxChips())) +
+                        " - " + Arrays.toString(Chips.getBins(game.flipOffer(paretoOutcome.getOfferForInit()), game.getBinMaxChips())) +
+                        "; " + paretoOutcome.getValueInit() + " - " + paretoOutcome.getValueResp() +
+                        "; sw=" + paretoOutcome.getSocialWelfare();
+            }
+        }
+
+        style[idx] = "italic";
         if (paretoOutcomes.size() == 0) {
             content[idx] = "- No pareto improvements:";
         } else {

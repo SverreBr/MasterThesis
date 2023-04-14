@@ -117,40 +117,48 @@ public class PlayerLying extends PlayerToM {
             }
         }
 
-//        System.out.println("\n\n-> Offers that are optimal (including messages):");
-//        for (OfferType smt : bestOffers) {
-//            System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
-//                    Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
-//                    ", loc=" + smt.getLoc());
-//        }
+        if (Game.DEBUG) {
+            System.out.println("\n\n-> Offers that are optimal for " + getName() + " (including messages):");
+            for (OfferType smt : bestOffers) {
+                System.out.println("\t- value=" + Settings.PRINT_DF.format(tmpSelectOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
+                        Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
+                        ", loc=" + smt.getLoc());
+            }
+        }
+
         if (!thereIsBestOfferWithoutMessage) {
             bestLyingOfferType = bestOffers.get((int) (Math.random() * bestOffers.size()));
 
-//            boolean lyingIsBetter = true;
-//            System.out.println("--- THERE IS AN OFFER WITH MESSAGE THAT IS BETTER THAN SENDING NO MESSAGE ---");
-//            System.out.println("-> Offers that are optimal without message:");
-//            for (OfferType smt : bestOffersWithoutMessage) {
-//                System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
-//                        Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
-//                        ", loc=" + smt.getLoc());
-//            }
-//
-             // choose offer with message
-//            for (OfferType something : bestOffers) {
-//                if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
-//                    lyingIsBetter = false;
-//                }
-//            }
-//            if (lyingIsBetter) System.out.println("--- LYING IS BETTER THAN TELLING THE TRUTH. ---");
+            if (Game.DEBUG) {
+                boolean lyingIsBetter = true;
+                System.out.println("--- THERE IS AN OFFER WITH MESSAGE THAT IS BETTER THAN SENDING NO MESSAGE ---");
+                System.out.println("-> Offers that are optimal without message:");
+                for (OfferType smt : bestOffersWithoutMessage) {
+                    System.out.println("\t- value=" + Settings.PRINT_DF.format(noMessageOfferValue) + "; offer to self=" + smt.getOffer() + "; " +
+                            Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
+                            ", loc=" + smt.getLoc());
+                }
+
+                // choose offer with message
+                for (OfferType something : bestOffers) {
+                    if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
+                        lyingIsBetter = false;
+                    }
+                }
+                if (lyingIsBetter) System.out.println("--- LYING IS BETTER THAN TELLING THE TRUTH. ---");
+            }
         }
 
         bestOffer = bestLyingOfferType.getOffer();
         bestLoc = bestLyingOfferType.getLoc();
 
-//        System.out.println(getName() + " chooses: Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
-//                "; location=" + bestLoc +
-//                ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer)) +
-//                ";\n\ttmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
+        if (Game.DEBUG) {
+            System.out.println(getName() + " chooses: Offer=" + Arrays.toString(Chips.getBins(bestOffer, game.getBinMaxChips())) +
+                    "; location=" + bestLoc +
+                    ";\n\tValue without message = " + Settings.PRINT_DF.format(getValue(bestOffer)) +
+                    ";\n\ttmpSelectOfferValue = " + Settings.PRINT_DF.format(tmpSelectOfferValue));
+        }
+
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing

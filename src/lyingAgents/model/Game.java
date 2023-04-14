@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class Game {
 
+    public static final boolean DEBUG = true;
+
     /**
      * bin with all the chips in the game
      */
@@ -180,7 +182,7 @@ public class Game {
      * @param chipsResp The chips for the responder
      */
     private void calculateSetting(int[] chipsInit, int[] chipsResp) {
-//        System.out.println("\n-------------------- NEW ROUND --------------------");
+        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         int numIndexCodes, pos;
         this.binMaxChips = Chips.makeNewChipBin();
 
@@ -291,6 +293,7 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             if (isMessageSend) {
+                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + " receives message!");
                 this.initiator.receiveMessage(messageSend);
                 isMessageSend = false;
             }
@@ -298,6 +301,7 @@ public class Game {
             if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
         } else {
             if (isMessageSend) {
+                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + "receives message!");
                 this.responder.receiveMessage(messageSend);
                 isMessageSend = false;
             }
@@ -308,10 +312,10 @@ public class Game {
         flippedOffer = flipOffer(tmpNewOffer);
         if (negotiationEnds) { // Negotiation terminated
             negotiationTerminates();
-//            printFinalStatements();
+            if (DEBUG) printFinalStatements();
         } else if (tmpNewOffer == newOffer) { // Offer is accepted
             offerAccepted(flippedOffer);
-//            printFinalStatements();
+            if (DEBUG) printFinalStatements();
         } else { // Negotiation continues with new offer
             nrOffers++;
             newOffer = flippedOffer;
@@ -323,10 +327,11 @@ public class Game {
     }
 
     private void printFinalStatements() {
-        List<OfferOutcome> peList = getParetoOutcomes();
+        List<OfferOutcome> peList = getStrictParetoOutcomes();
 
+        System.out.println("\nPossible better outcomes:");
         for (OfferOutcome offerOutcome : peList) {
-            System.out.println(Arrays.toString(Chips.getBins(offerOutcome.getOfferForInit(), getBinMaxChips())) +
+            System.out.println("\t " + Arrays.toString(Chips.getBins(offerOutcome.getOfferForInit(), getBinMaxChips())) +
                     " - " + Arrays.toString(Chips.getBins(flipOffer(offerOutcome.getOfferForInit()), getBinMaxChips())) +
                     "; " + offerOutcome.getValueInit() + " - " + offerOutcome.getValueResp() +
                     "; sw=" + offerOutcome.getSocialWelfare());
@@ -489,6 +494,27 @@ public class Game {
         this.listeners.add(listener);
     }
 
+    public List<OfferOutcome> getStrictParetoOutcomes() {
+        OfferOutcome newOffer;
+
+        List<OfferOutcome> strictParetoOutcomes = new ArrayList<>();
+        int[] utilityFuncInit = getUtilityFunction(getGoalPositionPlayer(Settings.INITIATOR_NAME));
+        int[] utilityFuncResp = getUtilityFunction(getGoalPositionPlayer(Settings.RESPONDER_NAME));
+        OfferOutcome initOutcome = new OfferOutcome(initialChipSets[0],
+                utilityFuncInit[initialChipSets[0]],
+                utilityFuncResp[initialChipSets[1]]);
+        for (int offer = 0; offer < utilityFuncInit.length; offer++) {
+            newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
+            if (((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp()))) {
+                strictParetoOutcomes.add(newOffer);
+            }
+        }
+        Collections.sort(strictParetoOutcomes);
+        Collections.reverse(strictParetoOutcomes);
+
+        return strictParetoOutcomes;
+    }
+
     public List<OfferOutcome> getParetoOutcomes() {
         OfferOutcome newOffer;
 
@@ -500,10 +526,14 @@ public class Game {
                 utilityFuncResp[initialChipSets[1]]);
         for (int offer = 0; offer < utilityFuncInit.length; offer++) {
             newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
-            if (((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp()))) {
+            if (((newOffer.getValueInit() >= initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp())) ||
+                    ((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() >= initOutcome.getValueResp()))) {
                 paretoOutcomes.add(newOffer);
             }
         }
+        Collections.sort(paretoOutcomes);
+        Collections.reverse(paretoOutcomes);
+
         return paretoOutcomes;
     }
 

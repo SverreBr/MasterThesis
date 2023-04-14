@@ -50,7 +50,7 @@ public class ResultElement {
 
         nrOffers = game.getNrOffers();
 
-        List<OfferOutcome> peList = game.getParetoOutcomes();
+        List<OfferOutcome> peList = game.getStrictParetoOutcomes();
         thereIsBetterOutcome = !peList.isEmpty();
         calcIfNegotiationIsSuccess(peList.size(), game);
         calcIfOutcomeIsPE(peList, game);
