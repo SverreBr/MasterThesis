@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class Game {
 
+    public static final boolean DEBUG = true;
+
     /**
      * bin with all the chips in the game
      */
@@ -107,6 +109,8 @@ public class Game {
      */
     private String messageSend;
 
+    private boolean reachedMaxNumOffers;
+
     /**
      * Constructor
      */
@@ -178,7 +182,7 @@ public class Game {
      * @param chipsResp The chips for the responder
      */
     private void calculateSetting(int[] chipsInit, int[] chipsResp) {
-        System.out.println("\n-------------------- NEW ROUND --------------------");
+        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         int numIndexCodes, pos;
         this.binMaxChips = Chips.makeNewChipBin();
 
@@ -270,6 +274,7 @@ public class Game {
         this.newOffer = -1;
         this.nrOffers = 0;
         this.turn = Settings.INITIATOR_NAME;
+        this.reachedMaxNumOffers = false;
     }
 
     //////////////////////////////
@@ -288,6 +293,7 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             if (isMessageSend) {
+                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + " receives message!");
                 this.initiator.receiveMessage(messageSend);
                 isMessageSend = false;
             }
@@ -295,6 +301,7 @@ public class Game {
             if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
         } else {
             if (isMessageSend) {
+                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + "receives message!");
                 this.responder.receiveMessage(messageSend);
                 isMessageSend = false;
             }
@@ -305,8 +312,10 @@ public class Game {
         flippedOffer = flipOffer(tmpNewOffer);
         if (negotiationEnds) { // Negotiation terminated
             negotiationTerminates();
+            if (DEBUG) printFinalStatements();
         } else if (tmpNewOffer == newOffer) { // Offer is accepted
             offerAccepted(flippedOffer);
+            if (DEBUG) printFinalStatements();
         } else { // Negotiation continues with new offer
             nrOffers++;
             newOffer = flippedOffer;
@@ -315,6 +324,40 @@ public class Game {
         }
 
         if (simulationOn) notifyListeners();
+    }
+
+    private void printFinalStatements() {
+        List<OfferOutcome> peList = getStrictParetoOutcomes();
+
+        System.out.println("\nPossible better outcomes:");
+        for (OfferOutcome offerOutcome : peList) {
+            System.out.println("\t " + Arrays.toString(Chips.getBins(offerOutcome.getOfferForInit(), getBinMaxChips())) +
+                    " - " + Arrays.toString(Chips.getBins(flipOffer(offerOutcome.getOfferForInit()), getBinMaxChips())) +
+                    "; " + offerOutcome.getValueInit() + " - " + offerOutcome.getValueResp() +
+                    "; sw=" + offerOutcome.getSocialWelfare());
+        }
+
+        if (peList.size() == 0) {
+            System.out.println("\t- THERE WAS NO STRICT PARETO IMPROVEMENT FROM THE INITIAL SETTING");
+            System.out.println("\t- THERE WAS NO STRICT SOCIAL WELFARE IMPROVEMENT FROM THE INITIAL SETTING");
+        } else {
+            boolean isPE = true;
+            int sw = responder.getUtilityValue() + initiator.getUtilityValue();
+            System.out.println("\t- Current sw = " + sw);
+            int respUtil = responder.getUtilityValue();
+            int initUtil = initiator.getUtilityValue();
+            int highestSW = peList.get(0).getSocialWelfare();
+
+            for (OfferOutcome outcome : peList) {
+                highestSW = Math.max(highestSW, outcome.getSocialWelfare());
+                if ((((outcome.getValueInit() > initUtil) && (outcome.getValueResp() >= respUtil))) ||
+                        (((outcome.getValueInit() >= initUtil) && (outcome.getValueResp() > respUtil)))) {
+                    isPE = false;
+                }
+            }
+            System.out.println("\t- THERE WAS NO PARETO IMPROVEMENT ANYMORE: " + isPE);
+            System.out.println("\t- THERE WAS NO HIGHER SW POSSIBLE: " + (highestSW == sw));
+        }
     }
 
     /**
@@ -326,8 +369,10 @@ public class Game {
             step();
             i++;
         }
-        if (i >= Settings.MAX_NUMBER_OFFERS)
+        if (i >= Settings.MAX_NUMBER_OFFERS) {
             System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " steps performed. ---");
+            reachedMaxNumOffers = true;
+        }
     }
 
     /**
@@ -449,6 +494,27 @@ public class Game {
         this.listeners.add(listener);
     }
 
+    public List<OfferOutcome> getStrictParetoOutcomes() {
+        OfferOutcome newOffer;
+
+        List<OfferOutcome> strictParetoOutcomes = new ArrayList<>();
+        int[] utilityFuncInit = getUtilityFunction(getGoalPositionPlayer(Settings.INITIATOR_NAME));
+        int[] utilityFuncResp = getUtilityFunction(getGoalPositionPlayer(Settings.RESPONDER_NAME));
+        OfferOutcome initOutcome = new OfferOutcome(initialChipSets[0],
+                utilityFuncInit[initialChipSets[0]],
+                utilityFuncResp[initialChipSets[1]]);
+        for (int offer = 0; offer < utilityFuncInit.length; offer++) {
+            newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
+            if (((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp()))) {
+                strictParetoOutcomes.add(newOffer);
+            }
+        }
+        Collections.sort(strictParetoOutcomes);
+        Collections.reverse(strictParetoOutcomes);
+
+        return strictParetoOutcomes;
+    }
+
     public List<OfferOutcome> getParetoOutcomes() {
         OfferOutcome newOffer;
 
@@ -460,10 +526,14 @@ public class Game {
                 utilityFuncResp[initialChipSets[1]]);
         for (int offer = 0; offer < utilityFuncInit.length; offer++) {
             newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
-            if (((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp()))) {
+            if (((newOffer.getValueInit() >= initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp())) ||
+                    ((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() >= initOutcome.getValueResp()))) {
                 paretoOutcomes.add(newOffer);
             }
         }
+        Collections.sort(paretoOutcomes);
+        Collections.reverse(paretoOutcomes);
+
         return paretoOutcomes;
     }
 
@@ -522,7 +592,7 @@ public class Game {
         return this.board;
     }
 
-    public int[][] getInitialChipSets() {
+    public int[][] getInitialChipSets() {  // TODO: change this (also within gameSettings, this will result in not being able to use the existing GameSettings)
         int[][] binChipSets = new int[2][Settings.CHIP_DIVERSITY];
         for (int i = 0; i < initialChipSets.length; i++) {
             binChipSets[i] = Chips.getBins(initialChipSets[i], binMaxChips);
@@ -666,5 +736,9 @@ public class Game {
         GameSetting gameSetting = new GameSetting();
         gameSetting.getSettingsFromGame(this);
         return gameSetting;
+    }
+
+    public boolean isReachedMaxNumOffers() {
+        return reachedMaxNumOffers;
     }
 }

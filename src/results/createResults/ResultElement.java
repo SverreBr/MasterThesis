@@ -2,6 +2,9 @@ package results.createResults;
 
 import lyingAgents.model.Game;
 import lyingAgents.model.player.PlayerLying;
+import lyingAgents.utilities.OfferOutcome;
+
+import java.util.List;
 
 public class ResultElement {
 
@@ -22,8 +25,14 @@ public class ResultElement {
     private final int respInitialPoints;
 
     private final int nrOffers;
+    private boolean isPE;
+    private boolean isBestSW;
+    private boolean isNegotiationSuccess;
+    private final boolean thereIsBetterOutcome;
+    private final boolean reachedMaxNumOffers;
+    private final double timePassed;
 
-    public ResultElement(Game game) {
+    public ResultElement(Game game, double timePassed) {
         PlayerLying init = game.getInitiator();
         PlayerLying resp = game.getResponder();
 
@@ -40,6 +49,49 @@ public class ResultElement {
         respInitialPoints = resp.getInitialPoints();
 
         nrOffers = game.getNrOffers();
+
+        List<OfferOutcome> peList = game.getStrictParetoOutcomes();
+        thereIsBetterOutcome = !peList.isEmpty();
+        calcIfNegotiationIsSuccess(peList.size(), game);
+        calcIfOutcomeIsPE(peList, game);
+        calcIfOutcomeIsBestSW(peList, game);
+        reachedMaxNumOffers = game.isReachedMaxNumOffers();
+
+        this.timePassed = timePassed;
+    }
+
+    private void calcIfOutcomeIsPE(List<OfferOutcome> peList, Game game) {
+        isPE = true;
+        if (peList.size() == 0) return;
+
+        int respUtil = game.getResponder().getUtilityValue();
+        int initUtil = game.getInitiator().getUtilityValue();
+
+        for (OfferOutcome outcome : peList) {
+            if ((outcome.getValueInit() > initUtil) && (outcome.getValueResp() > respUtil)) {
+                isPE = false;
+                break;
+            }
+        }
+    }
+
+    private void calcIfOutcomeIsBestSW(List<OfferOutcome> peList, Game game) {
+        isBestSW = true;
+        if (peList.size() == 0) return;
+        int highestSW = peList.get(0).getSocialWelfare();
+        for (OfferOutcome outcome : peList) {
+            highestSW = Math.max(highestSW, outcome.getSocialWelfare());
+        }
+        int sw = game.getResponder().getUtilityValue() + game.getInitiator().getUtilityValue();
+        isBestSW = (highestSW == sw);
+    }
+
+    private void calcIfNegotiationIsSuccess(int numBetterOutcomes, Game game) {
+        isNegotiationSuccess = true;
+        if (numBetterOutcomes == 0) return;
+        int initInitialChips = game.getInitiator().getInitialChips();
+        int initFinalChips = game.getInitiator().getChips();
+        isNegotiationSuccess = (initInitialChips != initFinalChips);
     }
 
     public int getInitGain() {
@@ -93,5 +145,29 @@ public class ResultElement {
 
     public boolean isRespCanLie() {
         return respCanLie;
+    }
+
+    public boolean isPE() {
+        return isPE;
+    }
+
+    public double getTimePassed() {
+        return timePassed;
+    }
+
+    public boolean isBestSW() {
+        return isBestSW;
+    }
+
+    public boolean isNegotiationSuccess() {
+        return isNegotiationSuccess;
+    }
+
+    public boolean isThereIsBetterOutcome() {
+        return thereIsBetterOutcome;
+    }
+
+    public boolean isReachedMaxNumOffers() {
+        return reachedMaxNumOffers;
     }
 }

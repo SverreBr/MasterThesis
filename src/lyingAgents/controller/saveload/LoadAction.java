@@ -49,7 +49,7 @@ public class LoadAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         int fcReturnVal;
-        File saveDirectory = new File(SaveLoadSettings.SAVE_DIRECTORY_NAME);
+        File saveDirectory = new File(Settings.SAVELOAD_DIRECTORY_NAME);
         if (!saveDirectory.exists()) {
             boolean wasSuccessful = saveDirectory.mkdir();
             if (!wasSuccessful) Popups.showGeneralException(Settings.GENERAL_EXCEPTION);

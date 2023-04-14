@@ -99,6 +99,11 @@ public abstract class Player {
     protected int saveCount = 0;
 
     /**
+     * The initial point of this player
+     */
+    private int initialChips;
+
+    /**
      * Constructor
      *
      * @param namePlayer name of the agent
@@ -112,6 +117,7 @@ public abstract class Player {
         this.messages = new ArrayList<>();
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
+        this.initialChips = chipsSelf;
         beliefOffer = new double[utilityFunction.length];
         beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
         setupNewBeliefs();
@@ -159,6 +165,7 @@ public abstract class Player {
         this.saveCount = 0;
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
+        this.initialChips = chipsSelf;
         beliefOffer = new double[utilityFunction.length];
         beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
 
@@ -478,5 +485,9 @@ public abstract class Player {
      */
     public List<String> getMessages() {
         return this.messages;
+    }
+
+    public int getInitialChips() {
+        return initialChips;
     }
 }

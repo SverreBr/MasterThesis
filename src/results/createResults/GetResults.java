@@ -10,17 +10,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GetResults {
-
-    String CSV_FILE_NAME = "results.csv";
-    String SAVE_DIRECTORY = "results";
+    String SAVE_DIRECTORY = "tmp_results";
 
     private final List<ResultElement> data = new ArrayList<>();
 
-    private final List<String[]> dataString;
+    private List<String[]> dataString;
 
-    public GetResults() {
-        this.dataString = new ArrayList<>();
-        addHeaders();
+    private final String csvFileName;
+
+    public GetResults(String csvFileName) {
+        this.csvFileName = csvFileName;
         makeFolder();
     }
 
@@ -36,6 +35,7 @@ public class GetResults {
         int cnt = 0;
 
         while (cnt++ < ResultSettings.NUM_REP) {
+            System.out.println("--- Repetition " + cnt + " ---");
             for (int initTom : ResultSettings.initTomList) {
                 for (int respTom : ResultSettings.respTomList) {
                     for (double initLR : ResultSettings.initLRList) {
@@ -46,6 +46,11 @@ public class GetResults {
                                         System.out.println("\t  Skipping [" + initTom + ", " + respTom + ", " + initLR + ", " + respLR + ", " + initCanLie + ", " + respCanLie + "] Done;");
                                     } else {
                                         generateNewGame(initTom, respTom, initLR, respLR, initCanLie, respCanLie);
+                                        try {
+                                            writeExcel();
+                                        } catch (IOException exception) {
+                                            System.out.println("writing to excel did not succeed.");
+                                        }
                                         System.out.println("\t[" + initTom + ", " + respTom + ", " + initLR + ", " + respLR + ", " + initCanLie + ", " + respCanLie + "] Done;");
                                     }
                                 }
@@ -54,12 +59,7 @@ public class GetResults {
                     }
                 }
             }
-            System.out.println("Finished iteration " + cnt + ".\n");
-            try {
-                writeExcel();
-            } catch (IOException exception) {
-                System.out.println("writing to excel did not succeed.");
-            }
+            System.out.println("################### Finished iteration " + cnt + " ###################\n");
         }
     }
 
@@ -79,24 +79,33 @@ public class GetResults {
     }
 
     private void generateNewGame(int initTom, int respTom, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
+        long startTime = System.currentTimeMillis();
         Game game = new Game(initTom, respTom, initLR, respLR, initCanLie, respCanLie);
+        // TODO: might only generate games where there is a pareto optimal outcome?
         for (int i = 0; i < ResultSettings.WARMUP_ROUNDS; i++) {
             game.playTillEnd();
             game.newRound();
         }
 
-        for (int i = 0; i < ResultSettings.KEEP_RESULTS_NR_ROUNDS; i++) {
+        game.newRound();
+        game.playTillEnd();
+        long endTime = System.currentTimeMillis();
+        ResultElement resultElement = new ResultElement(game, (endTime - startTime) / 1000.0);
+        data.add(resultElement);
+
+        for (int i = 1; i < ResultSettings.KEEP_RESULTS_NR_ROUNDS; i++) {
             game.newRound();
             game.playTillEnd();
+            resultElement = new ResultElement(game, -1);
+            data.add(resultElement);
         }
-
-        ResultElement resultElement = new ResultElement(game);
-        data.add(resultElement);
     }
 
     public void writeExcel() throws IOException {
+        this.dataString = new ArrayList<>();
+        addHeaders();
         createDataString();
-        File csvOutputFile = new File(SAVE_DIRECTORY + File.separator + CSV_FILE_NAME);
+        File csvOutputFile = new File(SAVE_DIRECTORY + File.separator + csvFileName);
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             dataString.stream()
                     .map(this::convertToCSV)
@@ -111,7 +120,10 @@ public class GetResults {
                 ResultSettings.initCanLie, ResultSettings.respCanLie,
                 ResultSettings.initInitPoints, ResultSettings.respInitPoints,
                 ResultSettings.initFinalPoints, ResultSettings.respFinalPoints,
-                ResultSettings.initGain, ResultSettings.respGain, ResultSettings.nrOffers};
+                ResultSettings.initGain, ResultSettings.respGain,
+                ResultSettings.nrOffers, ResultSettings.outcomeIsPE, ResultSettings.isBestSW,
+                ResultSettings.isNegotiationSuccess, ResultSettings.thereIsABetterOutcome,
+                ResultSettings.reachedMaxNumOffers, ResultSettings.timePassed};
         dataString.add(cell_headers);
     }
 
@@ -121,18 +133,30 @@ public class GetResults {
         for (ResultElement resultElement : data) {
             dataLine = new String[] {
                     String.valueOf(resultElement.getInitToM()),
-                    String.valueOf(resultElement.getInitLR()),
-                    String.valueOf(resultElement.isInitCanLie()),
-                    String.valueOf(resultElement.getInitInitialPoints()),
-                    String.valueOf(resultElement.getInitFinalPoints()),
                     String.valueOf(resultElement.getRespToM()),
+
+                    String.valueOf(resultElement.getInitLR()),
                     String.valueOf(resultElement.getRespLR()),
+
+                    String.valueOf(resultElement.isInitCanLie()),
                     String.valueOf(resultElement.isRespCanLie()),
+
+                    String.valueOf(resultElement.getInitInitialPoints()),
                     String.valueOf(resultElement.getRespInitialPoints()),
+
+                    String.valueOf(resultElement.getInitFinalPoints()),
                     String.valueOf(resultElement.getRespFinalPoints()),
+
                     String.valueOf(resultElement.getInitGain()),
                     String.valueOf(resultElement.getRespGain()),
-                    String.valueOf(resultElement.getNrOffers())
+
+                    String.valueOf(resultElement.getNrOffers()),
+                    String.valueOf(resultElement.isPE()),
+                    String.valueOf(resultElement.isBestSW()),
+                    String.valueOf(resultElement.isNegotiationSuccess()),
+                    String.valueOf(resultElement.isThereIsBetterOutcome()),
+                    String.valueOf(resultElement.isReachedMaxNumOffers()),
+                    String.valueOf(resultElement.getTimePassed())
             };
             dataString.add(dataLine);
         }

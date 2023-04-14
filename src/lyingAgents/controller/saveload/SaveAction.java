@@ -1,9 +1,9 @@
 package lyingAgents.controller.saveload;
 
-import lyingAgents.controller.saveload.exceptions.FileAlreadyExistsException;
-import lyingAgents.controller.saveload.exceptions.ForbiddenCharacterException;
-import lyingAgents.controller.saveload.exceptions.NameTooLongException;
-import lyingAgents.controller.saveload.exceptions.NameTooShortException;
+import lyingAgents.utilities.exceptions.FileAlreadyExistsException;
+import lyingAgents.utilities.exceptions.ForbiddenCharacterException;
+import lyingAgents.utilities.exceptions.NameTooLongException;
+import lyingAgents.utilities.exceptions.NameTooShortException;
 import lyingAgents.model.Game;
 import lyingAgents.utilities.Settings;
 import lyingAgents.view.Popups;
@@ -73,9 +73,9 @@ public class SaveAction extends AbstractAction {
             saveGameSettings(filename);
             return true;
         } catch (NameTooLongException e) {
-            Popups.showErrorSaving("Filename is too long.\nPlease enter a shorter description (<" + (SaveLoadSettings.MAX_FILE_NAME + 1) + ").");
+            Popups.showErrorSaving("Filename is too long.\nPlease enter a shorter description (<" + (Settings.MAX_FILE_NAME + 1) + ").");
         } catch (NameTooShortException e) {
-            Popups.showErrorSaving("Filename is too short.\nPlease use at least " + (SaveLoadSettings.MIN_FILE_NAME + 1) + " character(s).");
+            Popups.showErrorSaving("Filename is too short.\nPlease use at least " + (Settings.MIN_FILE_NAME + 1) + " character(s).");
         } catch (ForbiddenCharacterException e) {
             Popups.showErrorSaving("There is a forbidden character in the filename you entered.\nPlease use only letters and numbers for the filename.");
         } catch (FileAlreadyExistsException e) {
@@ -95,7 +95,7 @@ public class SaveAction extends AbstractAction {
      * @param fileName Name of the file where to save it to.
      */
     private void saveGameSettings(String fileName) {
-        File saveDirectory = new File(SaveLoadSettings.SAVE_DIRECTORY_NAME);
+        File saveDirectory = new File(Settings.SAVELOAD_DIRECTORY_NAME);
         if (!saveDirectory.exists()) {
             boolean wasSuccessful = saveDirectory.mkdir();
             if (!wasSuccessful) Popups.showGeneralException(Settings.GENERAL_EXCEPTION);
@@ -124,15 +124,15 @@ public class SaveAction extends AbstractAction {
      */
     private void validate(String filename) throws NameTooLongException, ForbiddenCharacterException, FileAlreadyExistsException, NameTooShortException {
 
-        if (filename.length() > SaveLoadSettings.MAX_FILE_NAME) throw new NameTooLongException(filename);
-        if (filename.length() < SaveLoadSettings.MIN_FILE_NAME) throw new NameTooShortException(filename);
+        if (filename.length() > Settings.MAX_FILE_NAME) throw new NameTooLongException(filename);
+        if (filename.length() < Settings.MIN_FILE_NAME) throw new NameTooShortException(filename);
 
         Pattern allowedCharacters = Pattern.compile("[^A-Za-z0-9-_]");
         Matcher match = allowedCharacters.matcher(filename);
         boolean matchBoolean = match.find();
         if (matchBoolean) throw new ForbiddenCharacterException(filename);
 
-        File tempFile = new File(SaveLoadSettings.SAVE_DIRECTORY_NAME + File.separator + filename + ".ser");
+        File tempFile = new File(Settings.SAVELOAD_DIRECTORY_NAME + File.separator + filename + ".ser");
         boolean existsBoolean = tempFile.exists();
         if (existsBoolean) throw new FileAlreadyExistsException(filename);
     }

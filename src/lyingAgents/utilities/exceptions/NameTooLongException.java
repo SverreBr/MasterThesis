@@ -1,4 +1,4 @@
-package lyingAgents.controller.saveload.exceptions;
+package lyingAgents.utilities.exceptions;
 
 /**
  * NameTooLongException class: Exception for when a filename is too long
