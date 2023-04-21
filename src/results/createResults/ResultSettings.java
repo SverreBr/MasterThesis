@@ -30,7 +30,7 @@ public class ResultSettings {
     public static final List<Double> respLRList = List.of(0.5);
     public static final List<Boolean> initCanLieList = Arrays.asList(true, false);
     public static final List<Boolean> respCanLieList = Arrays.asList(true, false);
-    public static final int NUM_REP = 20;
+    public static final int NUM_REP = 1;
     public static final int WARMUP_ROUNDS = 100;
     public static final int KEEP_RESULTS_NR_ROUNDS = 20;
 }

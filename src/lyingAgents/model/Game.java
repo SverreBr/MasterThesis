@@ -204,6 +204,10 @@ public class Game {
             calcUtilityFunction(utilityFunctions[pos], goalPosition);
         }
         makeNewFlipArrayOffer(numIndexCodes);
+
+        for (int i = 0; i < flipArray.length; i++) {
+            System.out.println(i + ": " + Arrays.toString(Chips.getBins(i, binMaxChips)));
+        }
     }
 
     /**
@@ -293,7 +297,6 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             if (isMessageSend) {
-                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + " receives message!");
                 this.initiator.receiveMessage(messageSend);
                 isMessageSend = false;
             }
@@ -301,7 +304,6 @@ public class Game {
             if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
         } else {
             if (isMessageSend) {
-                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + "receives message!");
                 this.responder.receiveMessage(messageSend);
                 isMessageSend = false;
             }

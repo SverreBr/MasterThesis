@@ -20,6 +20,8 @@ public class PlayerLying extends PlayerToM {
      */
     private final boolean canLie;
 
+    private final boolean canSendMessages;
+
     /**
      * List of best offers
      */
@@ -47,11 +49,12 @@ public class PlayerLying extends PlayerToM {
     public PlayerLying(String playerName, Game game, int orderToM, double learningSpeed, int chipsSelf, int chipsOther,
                        int[] utilityFunction, boolean agentCanLie) {
         super(playerName, game, orderToM, learningSpeed, chipsSelf, chipsOther, utilityFunction);
-        if (agentCanLie && (orderToM < 2)) {
-            System.out.println("Agent cannot lie if not theory of mind greater than 1.");
-            agentCanLie = false;
-        }
+//        if (agentCanLie && (orderToM < 2)) {
+//            System.out.println("Agent cannot lie if not theory of mind greater than 1.");
+//            agentCanLie = false;
+//        }
         this.canLie = agentCanLie;
+        this.canSendMessages = false; // TODO: make constructor parameter for this.
     }
 
     /**
@@ -91,9 +94,12 @@ public class PlayerLying extends PlayerToM {
      * @return The best offer as a response to offerReceived.
      */
     public int chooseOffer(int offerReceived) {
+
+//        if (!canSendMessages) return super.chooseOffer(offerReceived);  // Does not produce terminal outputs
+
         bestOffers = new ArrayList<>();
         OfferType bestLyingOfferType;
-        int bestOffer, bestLoc, goalPosition;
+        int bestOffer, bestLoc;
         double noMessageOfferValue;
 
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
@@ -106,14 +112,9 @@ public class PlayerLying extends PlayerToM {
         noMessageOfferValue = tmpSelectOfferValue;
         thereIsBestOfferWithoutMessage = true;
 
-        if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
-            if (canLie) {
-                for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
-                    addOffers(loc);
-                }
-            } else {
-                goalPosition = game.getGoalPositionPlayer(this.getName());
-                addOffers(goalPosition);
+        if (canSendMessages) {
+            for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
+                addOffers(loc);
             }
         }
 
@@ -162,19 +163,25 @@ public class PlayerLying extends PlayerToM {
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
-//            System.out.println("ACCEPT");
-//            if (bestOffer == offerReceived) System.out.println("--- BEST OFFER IS ALREADY OFFER RECEIVED ---");
             bestOffer = offerReceived;
         } else if ((utilityFunction[this.chips] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
             // withdraw from negotiation
-//            System.out.println("WITHDRAW");
-//            if (bestOffer == this.chips) System.out.println("--- BEST OFFER IS ALREADY CURRENT CHIPS ---");
             bestOffer = this.chips;
         } else {  // else, make the best offer with possibly a message
             if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
+            if (Game.DEBUG) {
+                if (getOrderToM() > 0) {
+                    partnerModel.saveBeliefs();
+                    partnerModel.sendOffer(bestOffer);
+                    List<Integer> expectedResponses = partnerModel.selectOffer(bestOffer);
+                    for (int expectedResponse : expectedResponses) {
+                        System.out.println(getName() + " expects response: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse), game.getBinMaxChips())));
+                    }
+                    partnerModel.restoreBeliefs();
+                }
+            }
         }
-
         return bestOffer;
     }
 
@@ -185,7 +192,9 @@ public class PlayerLying extends PlayerToM {
      */
     private void addOffers(int loc) {
         double curValue;
-        boolean saveHasSentMessage = this.hasSentMessage;
+        boolean savedHasSentMessage = this.hasSentMessage;
+
+        if ((!canLie) && (loc != game.getGoalPositionPlayer(this.getName()))) return;
 
         if (getOrderToM() > 0) {
             for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
@@ -193,10 +202,20 @@ public class PlayerLying extends PlayerToM {
                 partnerModel.receiveMessage(Messages.createLocationMessage(loc));
                 curValue = getValue(i);
                 partnerModel.restoreBeliefs();
-                this.setHasSentMessage(saveHasSentMessage);
+                this.setHasSentMessage(savedHasSentMessage);
                 processOffer(i, curValue, loc);
             }
         }
+//        else {
+//            for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
+//                saveBeliefs();
+//                super.sendMessage(Messages.createLocationMessage(loc));
+//                curValue = getValue(i);
+//                restoreBeliefs();
+//                this.setHasSentMessage(savedHasSentMessage);
+//                processOffer(i, curValue, loc);
+//            }
+//        }
     }
 
     /**

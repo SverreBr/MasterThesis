@@ -27,7 +27,7 @@ public abstract class Player {
      * True if belief type offer must be initialized with absolute frequency, or
      * false if belief type offer must be initialized with relative frequency.
      */
-    private static final boolean beliefTypeAbsolute = true;
+    private static final boolean BELIEF_TYPE_IS_ABSOLUTE = true;
 
     /**
      * RELATIVE
@@ -37,6 +37,7 @@ public abstract class Player {
      * This field is essentially to be able to learn across games.
      */
     private double[][] beliefsOfferType;
+    private double[][][] beliefsOfferTypeSaved;
 
     /**
      * ABSOLUTE (offer accepted count)
@@ -46,6 +47,7 @@ public abstract class Player {
      * This field is essentially to be able to learn across games.
      */
     private int[][] countBeliefsOfferType;
+    private int[][][] countBeliefsOfferTypeSaved;
 
     /**
      * ABSOLUTE (total offers count)
@@ -55,6 +57,7 @@ public abstract class Player {
      * This field is essentially to be able to learn across games.
      */
     private int[][] countTotalOfferType;
+    private int[][][] countTotalOfferTypeSaved;
 
     /**
      * Initialized before each negotiation with the beliefsOfferType. In each negotiation,
@@ -128,18 +131,21 @@ public abstract class Player {
      */
     private void setupNewBeliefs() {
         int i, j, nrPossibleChips = Settings.CHIPS_PER_PLAYER * 2 + 1;
-        if (beliefTypeAbsolute) {
+        if (BELIEF_TYPE_IS_ABSOLUTE) {
             countBeliefsOfferType = new int[nrPossibleChips][nrPossibleChips];
+            countBeliefsOfferTypeSaved = new int[Settings.SAVE_NUMBER][nrPossibleChips][nrPossibleChips];
             countTotalOfferType = new int[nrPossibleChips][nrPossibleChips];
+            countTotalOfferTypeSaved = new int[Settings.SAVE_NUMBER][nrPossibleChips][nrPossibleChips];
             // Initialize beliefs to 5 positive encounters to make sure the agent's experience doesn't crash immediately to disbelief
             for (i = 0; i < nrPossibleChips; i++) {
                 for (j = 0; j < nrPossibleChips; j++) {
-                    countBeliefsOfferType[i][j] = 5;
-                    countTotalOfferType[i][j] = 5;
+                    countBeliefsOfferType[i][j] = 1;
+                    countTotalOfferType[i][j] = 1;
                 }
             }
         } else {
             beliefsOfferType = new double[nrPossibleChips][nrPossibleChips];
+            beliefsOfferTypeSaved = new double[Settings.SAVE_NUMBER][nrPossibleChips][nrPossibleChips];
             for (i = 0; i < nrPossibleChips; i++) {
                 for (j = 0; j < nrPossibleChips; j++) {
                     beliefsOfferType[i][j] = 1.0;
@@ -188,7 +194,7 @@ public abstract class Player {
         int pos = Chips.getPositiveAmount(diff);
         int neg = Chips.getNegativeAmount(diff);
         double retVal;
-        if (beliefTypeAbsolute) {
+        if (BELIEF_TYPE_IS_ABSOLUTE) {
             retVal = ((double) countBeliefsOfferType[pos][neg]) / countTotalOfferType[pos][neg];
         } else {
             retVal = beliefsOfferType[pos][neg];
@@ -228,6 +234,15 @@ public abstract class Player {
      */
     protected void saveBeliefs() {
         beliefOfferSaved[saveCount] = beliefOffer.clone();
+        if (BELIEF_TYPE_IS_ABSOLUTE) {
+            for (int i = 0; i < countBeliefsOfferType.length; i++) {
+                countBeliefsOfferTypeSaved[saveCount][i] = countBeliefsOfferType[i].clone();
+                countTotalOfferTypeSaved[saveCount][i] = countTotalOfferType[i].clone();
+            }
+
+        } else {
+            beliefsOfferTypeSaved[saveCount] = beliefsOfferType.clone();
+        }
         saveCount++;
     }
 
@@ -237,6 +252,18 @@ public abstract class Player {
     protected void restoreBeliefs() {
         saveCount--;
         beliefOffer = beliefOfferSaved[saveCount].clone();
+        if (BELIEF_TYPE_IS_ABSOLUTE) {
+            for (int i = 0; i < countBeliefsOfferType.length; i++) {
+                countBeliefsOfferType[i] = countBeliefsOfferTypeSaved[saveCount][i].clone();
+                countTotalOfferType[i] = countTotalOfferTypeSaved[saveCount][i].clone();
+            }
+
+        } else {
+            for (int i = 0; i < beliefsOfferType.length; i++) {
+                beliefsOfferType[i] = beliefsOfferTypeSaved[saveCount][i].clone();
+            }
+
+        }
     }
 
     /**
@@ -250,20 +277,11 @@ public abstract class Player {
         int[] diff = Chips.getDifference(chips, newOwnChips, game.getBinMaxChips());
         pos = Chips.getPositiveAmount(diff);
         neg = Chips.getNegativeAmount(diff);
-        if (beliefTypeAbsolute) {
+        if (BELIEF_TYPE_IS_ABSOLUTE) {
             countTotalOfferType[pos][neg]++;
         } else {
             beliefsOfferType[pos][neg] *= (1 - learningSpeed);
         }
-    }
-
-    /**
-     * Increases the belief of offers of a similar type to be more likely to be accepted too.
-     *
-     * @param newOwnChips The offer to this agent self.
-     */
-    private void increaseOfferTypeBelief(int newOwnChips) {
-        increaseOfferTypeBelief(newOwnChips, false);
     }
 
     /**
@@ -277,31 +295,31 @@ public abstract class Player {
         int[] diff = Chips.getDifference(chips, newOwnChips, game.getBinMaxChips());
         pos = Chips.getPositiveAmount(diff);
         neg = Chips.getNegativeAmount(diff);
-        if (beliefTypeAbsolute) {
+        if (BELIEF_TYPE_IS_ABSOLUTE) {
             if (!revokeRejection) {
                 countTotalOfferType[pos][neg]++;
             }
             countBeliefsOfferType[pos][neg]++;
         } else {
-            beliefsOfferType[pos][neg] = beliefsOfferType[pos][neg] * (1 - learningSpeed) + learningSpeed;  // TODO: check this
+            beliefsOfferType[pos][neg] = beliefsOfferType[pos][neg] * (1 - learningSpeed) + learningSpeed;
         }
     }
 
     /**
      * Decreases the belief of a specific offer being accepted.
      *
-     * @param newOwnChips The new set of offer that has been offered.
+     * @param newOwnChips The new set of chips that has been offered.
      */
     private void decreaseColorBeliefRejected(int newOwnChips) {
         int i, j;
         int[] newOwnBins = Chips.getBins(newOwnChips, game.getBinMaxChips());
         int[] curOffer;
         for (i = 0; i < beliefOffer.length; i++) {
-            // curOffer represents offer that agent wants himself
+            // curOffer represents chips that agent wants himself
             curOffer = Chips.getBins(i, game.getBinMaxChips());
             for (j = 0; j < Settings.CHIP_DIVERSITY; j++) {
                 if (curOffer[j] >= newOwnBins[j]) {
-                    // curOffer demands at least as much offer of color j
+                    // curOffer demands at least as much chips of color j
                     // as the offer newOwnChips of the trading partner.
                     // It's likely to be rejected as well
                     beliefOffer[i] *= (1 - learningSpeed);
@@ -325,11 +343,39 @@ public abstract class Player {
             curOffer = Chips.getBins(i, game.getBinMaxChips());
             for (j = 0; j < Settings.CHIP_DIVERSITY; j++) {
                 if (curOffer[j] > newOwnBins[j]) {
-                    // curOffer demands more offer of color j than the
+                    // curOffer demands more chips of color j than the
                     // offer newOwnChips of the trading partner.
                     // It's less likely to be accepted.
                     beliefOffer[i] *= (1 - learningSpeed);
                 }
+            }
+        }
+    }
+
+    protected void increaseColorBeliefLocMessage(int location, boolean receivedMessage) {
+        int flippedOffer;
+        int[] locationUtility = game.getUtilityFunction(location);
+        int initOffer = receivedMessage ? game.flipOffer(chips) : chips;
+
+        for (int i = 0; i < beliefOffer.length; i++) {
+            flippedOffer = receivedMessage ? game.flipOffer(i) : i;
+            if (locationUtility[flippedOffer] - Settings.EPSILON > locationUtility[initOffer]) {
+                // Decrease belief of an offer being accepted when the score goes down when having that goal location
+                beliefOffer[i] = beliefOffer[i] * (1 - learningSpeed) + learningSpeed;
+            }
+        }
+    }
+
+    protected void decreaseColorBeliefLocMessage(int location, boolean receivedMessage) {
+        int flippedOffer;
+        int[] locationUtility = game.getUtilityFunction(location);
+        int initOffer = receivedMessage ? game.flipOffer(chips) : chips;
+
+        for (int i = 0; i < beliefOffer.length; i++) {
+            flippedOffer = receivedMessage ? game.flipOffer(i) : i;
+            if (locationUtility[flippedOffer] - Settings.EPSILON <= locationUtility[initOffer]) {
+                // Decrease belief of an offer being accepted when the score goes down when having that goal location
+                beliefOffer[i] *= (1 - learningSpeed);
             }
         }
     }
@@ -346,18 +392,18 @@ public abstract class Player {
     }
 
     /**
-     * This method is called when an offer is received. It updates the beliefs of offers being accepted.
+     * This method is called when an offer is received. It updates the beliefs of offers as if the offer were accepted.
      *
      * @param offerReceived the offer received
      */
     protected void receiveOffer(int offerReceived) {
-        increaseOfferTypeBelief(offerReceived);
+        increaseOfferTypeBelief(offerReceived, false);
         decreaseColorBeliefReceived(offerReceived);
     }
 
     /**
      * This method is called when this agent sends an offer. The beliefs are updated for when this offer
-     * is rejected. If this offer is not rejected, the values are revoked.
+     * is rejected. If this offer is not rejected, then the values are revoked.
      *
      * @param offerToSelf The offer this agent makes with respect to himself.
      */

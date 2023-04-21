@@ -117,18 +117,23 @@ public class Settings {
         switch (x) {
             case 0:
                 color = Color.decode("#6248DA");
+//                color = Color.decode("#0173b2");
                 break;
             case 1:
                 color = Color.decode("#DC267F");
+//                color = Color.decode("#de8f05");
                 break;
             case 2:
                 color = Color.decode("#FE6100");
+//                color = Color.decode("#029e73");
                 break;
             case 3:
                 color = Color.decode("#96B1F7");
+//                color = Color.decode("#d55e00");
                 break;
             case 4:
                 color = Color.decode("#fccc60");
+//                color = Color.decode("#cc78bc");
                 break;
             default:
                 color = Color.BLACK;

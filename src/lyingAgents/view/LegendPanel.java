@@ -245,6 +245,9 @@ public class LegendPanel extends JPanel implements GameListener {
         content.add("* " + ViewSettings.START_LOCATION_SYMBOL + ": Start location both agents.");
         style.add("regular");
 
+        content.add("* Offer: [Chips Init] - [Chips Resp]");
+        style.add("regular");
+
         StyledDocument doc = info.getStyledDocument();
         try {
             doc.remove(0, doc.getLength());
