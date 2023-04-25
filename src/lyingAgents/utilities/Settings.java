@@ -169,4 +169,11 @@ public class Settings {
      * minimum number of characters a file name may have
      */
     public static final int MIN_FILE_NAME = 2;
+
+    /**
+     * Probability mass the other locations get for sending messages.
+     */
+    public static final double PROB_MASS_OTHER_LOCS = 0.01;
+
+    public static final double PROB_SENDING_MESSAGES = 0.25;
 }

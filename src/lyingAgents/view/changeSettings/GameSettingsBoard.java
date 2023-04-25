@@ -1,5 +1,6 @@
 package lyingAgents.view.changeSettings;
 
+import lyingAgents.model.Board;
 import lyingAgents.utilities.MiscFunc;
 import lyingAgents.utilities.Settings;
 import lyingAgents.view.ViewSettings;
@@ -35,16 +36,16 @@ public class GameSettingsBoard extends JComponent {
     /**
      * Constructor of the board panel
      */
-    public GameSettingsBoard() {
+    public GameSettingsBoard(Board board) {
         this.setBackground(ViewSettings.getBackGroundColor());
         setPreferredSize(new Dimension(300, 300));
-        addTextFields();
+        addTextFields(board);
     }
 
     /**
      * Adds the text field to the panel
      */
-    private void addTextFields() {
+    private void addTextFields(Board board) {
         JTextField textField;
 
         setLayout(new GridBagLayout());
@@ -53,7 +54,7 @@ public class GameSettingsBoard extends JComponent {
 
         for (int row = 0; row < Settings.BOARD_WIDTH; row++) {
             for (int column = 0; column < Settings.BOARD_HEIGHT; column++) {
-                textField = new JTextField("", 1);
+                textField = new JTextField(String.valueOf(board.getTileColorNumber(new Point(row, column))), 1);
 
                 // Listen for changes in the text
                 textField.getDocument().addDocumentListener(new DocumentListener() {
@@ -91,6 +92,16 @@ public class GameSettingsBoard extends JComponent {
                 gbc.gridy++;
             }
             gbc.gridx++;
+        }
+    }
+
+    public void removeAllValues() {
+        JTextField textField;
+        for (int row = 0; row < Settings.BOARD_WIDTH; row++) {
+            for (int column = 0; column < Settings.BOARD_HEIGHT; column++) {
+                textField = boardTextMap.get(row * Settings.BOARD_WIDTH + column);
+                textField.setText("");
+            }
         }
     }
 

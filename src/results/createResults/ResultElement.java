@@ -48,7 +48,7 @@ public class ResultElement {
         respFinalPoints = resp.getFinalPoints();
         respInitialPoints = resp.getInitialPoints();
 
-        nrOffers = game.getNrOffers();
+        nrOffers = game.getTotalNrOffersMade();
 
         List<OfferOutcome> peList = game.getStrictParetoOutcomes();
         thereIsBetterOutcome = !peList.isEmpty();

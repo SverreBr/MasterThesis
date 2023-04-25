@@ -106,13 +106,15 @@ public abstract class Player {
      */
     private int initialChips;
 
+    private final boolean hasZeroOrderBeliefs;
+
     /**
      * Constructor
      *
      * @param namePlayer name of the agent
      * @param game       lyingAgents.model of the game
      */
-    public Player(String namePlayer, Game game, double learningSpeed, int chipsSelf, int[] utilityFunction) {
+    public Player(String namePlayer, Game game, double learningSpeed, int chipsSelf, int[] utilityFunction, boolean hasZeroOrderBeliefs) {
         this.name = namePlayer;
         this.game = game;
         this.learningSpeed = learningSpeed;
@@ -121,9 +123,12 @@ public abstract class Player {
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
         this.initialChips = chipsSelf;
-        beliefOffer = new double[utilityFunction.length];
-        beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
-        setupNewBeliefs();
+        this.hasZeroOrderBeliefs = hasZeroOrderBeliefs;
+        if (hasZeroOrderBeliefs) {
+            beliefOffer = new double[utilityFunction.length];
+            beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
+            setupNewBeliefs();
+        }
     }
 
     /**
@@ -172,12 +177,15 @@ public abstract class Player {
         this.chips = chipsSelf;
         this.utilityFunction = utilityFunction.clone();
         this.initialChips = chipsSelf;
-        beliefOffer = new double[utilityFunction.length];
-        beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
 
-        // Beliefs about specific colors are reset
-        for (int i = 0; i < utilityFunction.length; i++) {
-            beliefOffer[i] = getBeliefOfferType(i);
+        if (hasZeroOrderBeliefs) {
+            beliefOffer = new double[utilityFunction.length];
+            beliefOfferSaved = new double[Settings.SAVE_NUMBER][beliefOffer.length];
+
+            // Beliefs about specific colors are reset
+            for (int i = 0; i < utilityFunction.length; i++) {
+                beliefOffer[i] = getBeliefOfferType(i);
+            }
         }
     }
 
@@ -296,9 +304,7 @@ public abstract class Player {
         pos = Chips.getPositiveAmount(diff);
         neg = Chips.getNegativeAmount(diff);
         if (BELIEF_TYPE_IS_ABSOLUTE) {
-            if (!revokeRejection) {
-                countTotalOfferType[pos][neg]++;
-            }
+            if (!revokeRejection) countTotalOfferType[pos][neg]++;
             countBeliefsOfferType[pos][neg]++;
         } else {
             beliefsOfferType[pos][neg] = beliefsOfferType[pos][neg] * (1 - learningSpeed) + learningSpeed;
@@ -352,30 +358,11 @@ public abstract class Player {
         }
     }
 
-    protected void increaseColorBeliefLocMessage(int location, boolean receivedMessage) {
-        int flippedOffer;
-        int[] locationUtility = game.getUtilityFunction(location);
-        int initOffer = receivedMessage ? game.flipOffer(chips) : chips;
-
-        for (int i = 0; i < beliefOffer.length; i++) {
-            flippedOffer = receivedMessage ? game.flipOffer(i) : i;
-            if (locationUtility[flippedOffer] - Settings.EPSILON > locationUtility[initOffer]) {
-                // Decrease belief of an offer being accepted when the score goes down when having that goal location
-                beliefOffer[i] = beliefOffer[i] * (1 - learningSpeed) + learningSpeed;
-            }
-        }
-    }
-
-    protected void decreaseColorBeliefLocMessage(int location, boolean receivedMessage) {
-        int flippedOffer;
-        int[] locationUtility = game.getUtilityFunction(location);
-        int initOffer = receivedMessage ? game.flipOffer(chips) : chips;
-
-        for (int i = 0; i < beliefOffer.length; i++) {
-            flippedOffer = receivedMessage ? game.flipOffer(i) : i;
-            if (locationUtility[flippedOffer] - Settings.EPSILON <= locationUtility[initOffer]) {
-                // Decrease belief of an offer being accepted when the score goes down when having that goal location
-                beliefOffer[i] *= (1 - learningSpeed);
+    protected void decreaseColorBeliefMessage(int location) {
+        int tileColor = game.getBoard().getTileColorNumber(game.getGoalPositionsDict().get(location));
+        for (int offer = 0; offer < utilityFunction.length; offer++) {
+            if (Chips.getBins(offer, game.getBinMaxChips())[tileColor] == 0) {
+                beliefOffer[offer] *= (1 - learningSpeed);
             }
         }
     }
@@ -388,7 +375,6 @@ public abstract class Player {
      */
     public void processOfferAccepted(int offerMade) {
         increaseOfferTypeBelief(offerMade, true);
-        setNewChips(offerMade);
     }
 
     /**
@@ -454,7 +440,7 @@ public abstract class Player {
      * @return the final score of this agent after negotiation
      */
     public int getFinalPoints() {
-        return utilityFunction[chips] + game.getNrOffers() * Settings.SCORE_NEGOTIATION_STEP;
+        return utilityFunction[chips] + game.getTotalNrOffersMade() * Settings.SCORE_NEGOTIATION_STEP;
     }
 
 

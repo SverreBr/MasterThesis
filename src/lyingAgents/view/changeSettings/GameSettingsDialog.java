@@ -1,5 +1,8 @@
 package lyingAgents.view.changeSettings;
 
+import lyingAgents.model.Board;
+import lyingAgents.model.Game;
+import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.MiscFunc;
 import lyingAgents.view.Popups;
 import lyingAgents.utilities.Settings;
@@ -68,14 +71,14 @@ public class GameSettingsDialog extends JDialog {
      * @param owner Frame that this dialog is put on top
      * @param title Title of this dialog
      */
-    public GameSettingsDialog(JFrame owner, String title) {
+    public GameSettingsDialog(JFrame owner, String title, Game game) {
         super(owner, title, true);
 
-        gameSettingsBoard = new GameSettingsBoard();
-        gameSettingsChipsInitiator = new GameSettingsChips();
-        gameSettingsChipsResponder = new GameSettingsChips();
+        gameSettingsBoard = new GameSettingsBoard(game.getBoard());
+        gameSettingsChipsInitiator = new GameSettingsChips(Chips.getBins(game.getInitiator().getInitialChips(), game.getBinMaxChips()));
+        gameSettingsChipsResponder = new GameSettingsChips(Chips.getBins(game.getResponder().getInitialChips(), game.getBinMaxChips()));
         agentSettingsPanel = new JPanel();
-        createAgentSettingsPanel();
+        createAgentSettingsPanel(game);
 
         btnPanel = new JPanel();
         createButtonPanel();
@@ -91,7 +94,7 @@ public class GameSettingsDialog extends JDialog {
     /**
      * Creates the agent settings panel
      */
-    private void createAgentSettingsPanel() {
+    private void createAgentSettingsPanel(Game game) {
         agentSettingsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         agentSettingsPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -112,7 +115,7 @@ public class GameSettingsDialog extends JDialog {
         MiscFunc.addStylesToDoc(someText, "- Initiator goal position: ", "regular");
         agentSettingsPanel.add(someText, gbc);
         gbc.gridx++;
-        initiatorGPField = new JTextField("", 2);
+        initiatorGPField = new JTextField(String.valueOf(game.getGoalPositionPlayer(Settings.INITIATOR_NAME)), 2);
         agentSettingsPanel.add(initiatorGPField, gbc);
         gbc.gridy++;
         gbc.gridx = 0;
@@ -121,7 +124,7 @@ public class GameSettingsDialog extends JDialog {
         MiscFunc.addStylesToDoc(someText, "- Responder goal position: ", "regular");
         agentSettingsPanel.add(someText, gbc);
         gbc.gridx++;
-        responderGPField = new JTextField("", 2);
+        responderGPField = new JTextField(String.valueOf(game.getGoalPositionPlayer(Settings.RESPONDER_NAME)), 2);
         agentSettingsPanel.add(responderGPField, gbc);
         gbc.gridy++;
         gbc.gridx = 0;
@@ -145,13 +148,32 @@ public class GameSettingsDialog extends JDialog {
      * Creates the button panel
      */
     private void createButtonPanel() {
+        btnPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5,5,5,5);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+
+        JButton removeAllBtn = new JButton("Remove all values");
+        removeAllBtn.addActionListener(e -> removeAllValues());
+        btnPanel.add(removeAllBtn, gbc);
+
+        gbc.gridy++; gbc.gridwidth = 1;
         JButton okBtn = new JButton("Accept");
         okBtn.addActionListener(e -> okButton());
-        btnPanel.add(okBtn);
+        btnPanel.add(okBtn, gbc);
 
+        gbc.gridx++;
         JButton noBtn = new JButton("Cancel");
         noBtn.addActionListener(e -> noButton());
-        btnPanel.add(noBtn);
+        btnPanel.add(noBtn, gbc);
+    }
+
+    private void removeAllValues() {
+        gameSettingsBoard.removeAllValues();
+        gameSettingsChipsInitiator.removeAllValues();
+        gameSettingsChipsResponder.removeAllValues();
+        initiatorGPField.setText("");
+        responderGPField.setText("");
     }
 
     /**

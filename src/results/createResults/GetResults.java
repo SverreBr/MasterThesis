@@ -33,6 +33,8 @@ public class GetResults {
 
     public void makeResults() {
         int cnt = 0;
+        boolean initCanSendMessages = true;
+        boolean respCanSendMessages = true;
 
         while (cnt++ < ResultSettings.NUM_REP) {
             System.out.println("--- Repetition " + cnt + " ---");
@@ -45,7 +47,7 @@ public class GetResults {
                                     if ((initCanLie && (initTom < 2)) || (respCanLie && (respTom < 2))) { // agents without 2nd order tom cannot lie
                                         System.out.println("\t  Skipping [" + initTom + ", " + respTom + ", " + initLR + ", " + respLR + ", " + initCanLie + ", " + respCanLie + "] Done;");
                                     } else {
-                                        generateNewGame(initTom, respTom, initLR, respLR, initCanLie, respCanLie);
+                                        generateNewGame(initTom, respTom, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
                                         try {
                                             writeExcel();
                                         } catch (IOException exception) {
@@ -78,9 +80,9 @@ public class GetResults {
         return escapedData;
     }
 
-    private void generateNewGame(int initTom, int respTom, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
+    private void generateNewGame(int initTom, int respTom, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
         long startTime = System.currentTimeMillis();
-        Game game = new Game(initTom, respTom, initLR, respLR, initCanLie, respCanLie);
+        Game game = new Game(initTom, respTom, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
         // TODO: might only generate games where there is a pareto optimal outcome?
         for (int i = 0; i < ResultSettings.WARMUP_ROUNDS; i++) {
             game.playTillEnd();

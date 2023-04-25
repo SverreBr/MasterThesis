@@ -61,8 +61,17 @@ public class GameSetting implements Serializable {
      * @param game The game model where to take the game settings from
      */
     public void getSettingsFromGame(Game game) {
-        board = game.getBoard().getBoard();
-        chipSets = game.getInitialChipSets();
+        int[][] boardToCopy = game.getBoard().getBoard();
+        board = new int[boardToCopy.length][boardToCopy[0].length];
+        for (int i = 0; i < board.length; i++) {
+            board[i] = boardToCopy[i].clone();
+        }
+
+        int[][] chipSetsToCopy = game.getInitialChipSets();
+        chipSets = new int[chipSetsToCopy.length][chipSetsToCopy[0].length];
+        for (int i = 0; i < chipSetsToCopy.length; i++) {
+            chipSets[i] = chipSetsToCopy[i].clone();
+        }
         goalPositions = game.getGoalPositions().clone();
     }
 

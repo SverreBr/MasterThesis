@@ -3,6 +3,7 @@ package lyingAgents.model.player;
 import lyingAgents.model.Game;
 import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.Messages;
+import lyingAgents.utilities.RandomNumGen;
 import lyingAgents.utilities.Settings;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ public class PlayerLying extends PlayerToM {
      */
     private boolean thereIsBestOfferWithoutMessage;
 
+    private RandomNumGen rng;
+
     /**
      * @param playerName      name of the player
      * @param game            game model
@@ -47,14 +50,35 @@ public class PlayerLying extends PlayerToM {
      * @param utilityFunction utility function for this player
      */
     public PlayerLying(String playerName, Game game, int orderToM, double learningSpeed, int chipsSelf, int chipsOther,
-                       int[] utilityFunction, boolean agentCanLie) {
+                       int[] utilityFunction, boolean agentCanLie, boolean canSendMessages) {
         super(playerName, game, orderToM, learningSpeed, chipsSelf, chipsOther, utilityFunction);
-//        if (agentCanLie && (orderToM < 2)) {
-//            System.out.println("Agent cannot lie if not theory of mind greater than 1.");
-//            agentCanLie = false;
-//        }
+        if (agentCanLie & !canSendMessages) {
+            System.err.println("Agent cannot lie if it cannot send messages. Agent can lie set to false.");
+            agentCanLie = false;
+        }
         this.canLie = agentCanLie;
-        this.canSendMessages = false; // TODO: make constructor parameter for this.
+        this.canSendMessages = canSendMessages;
+        if (canSendMessages && (orderToM == 0)) makeRng();
+    }
+
+    @Override
+    public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
+        super.initNewRound(chipsSelf, chipsOther, utilityFunction);
+        if (getOrderToM() == 0) makeRng();
+    }
+
+    private void makeRng() {
+        double[] zeroOrderProbSendingMessages = new double[game.getNumberOfGoalPositions()];
+        int[] goalPositionsArray = new int[game.getNumberOfGoalPositions()];
+        int goalPosition = this.game.getGoalPositionPlayer(this.getName());
+
+        Arrays.fill(zeroOrderProbSendingMessages, Settings.PROB_MASS_OTHER_LOCS);
+        zeroOrderProbSendingMessages[goalPosition] = 1 - Settings.PROB_MASS_OTHER_LOCS * (zeroOrderProbSendingMessages.length - 1);
+
+        for (int i = 0; i < goalPositionsArray.length; i++) {
+            goalPositionsArray[i] = i;
+        }
+        rng = new RandomNumGen(goalPositionsArray, zeroOrderProbSendingMessages);
     }
 
     /**
@@ -95,7 +119,8 @@ public class PlayerLying extends PlayerToM {
      */
     public int chooseOffer(int offerReceived) {
 
-//        if (!canSendMessages) return super.chooseOffer(offerReceived);  // Does not produce terminal outputs
+        if (!Game.DEBUG && !canSendMessages) return super.chooseOffer(offerReceived);  // Does not produce terminal outputs
+//        if (!canSendMessages) return super.chooseOffer(offerReceived);
 
         bestOffers = new ArrayList<>();
         OfferType bestLyingOfferType;
@@ -113,8 +138,15 @@ public class PlayerLying extends PlayerToM {
         thereIsBestOfferWithoutMessage = true;
 
         if (canSendMessages) {
-            for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
-                addOffers(loc);
+            if (getOrderToM() > 0) {
+                for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
+                    addOffers(loc);
+                }
+            } else {
+                if (Math.random() < Settings.PROB_SENDING_MESSAGES) {
+                    int newLoc = rng.random();
+                    bestLyingOfferType = new OfferType(bestLyingOfferType.getOffer(), bestLyingOfferType.getValue(), newLoc);
+                }
             }
         }
 
@@ -173,10 +205,10 @@ public class PlayerLying extends PlayerToM {
             if (Game.DEBUG) {
                 if (getOrderToM() > 0) {
                     partnerModel.saveBeliefs();
-                    partnerModel.sendOffer(bestOffer);
-                    List<Integer> expectedResponses = partnerModel.selectOffer(bestOffer);
+                    partnerModel.sendOffer(game.flipOffer(bestOffer));
+                    List<Integer> expectedResponses = partnerModel.selectOffer(game.flipOffer(bestOffer));
                     for (int expectedResponse : expectedResponses) {
-                        System.out.println(getName() + " expects response: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse), game.getBinMaxChips())));
+                        System.out.println(getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse), game.getBinMaxChips())) + "\n\n");
                     }
                     partnerModel.restoreBeliefs();
                 }
@@ -195,27 +227,17 @@ public class PlayerLying extends PlayerToM {
         boolean savedHasSentMessage = this.hasSentMessage;
 
         if ((!canLie) && (loc != game.getGoalPositionPlayer(this.getName()))) return;
+        assert (getOrderToM() > 0) : "Theory of mind zero agent cannot reason about sending messages...";
 
-        if (getOrderToM() > 0) {
-            for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-                partnerModel.saveBeliefs();
-                partnerModel.receiveMessage(Messages.createLocationMessage(loc));
-                curValue = getValue(i);
-                partnerModel.restoreBeliefs();
-                this.setHasSentMessage(savedHasSentMessage);
-                processOffer(i, curValue, loc);
-            }
+        for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
+            partnerModel.saveBeliefs();
+            partnerModel.receiveMessage(Messages.createLocationMessage(loc));
+            curValue = getValue(i);
+            partnerModel.restoreBeliefs();
+            this.setHasSentMessage(savedHasSentMessage);
+            processOffer(i, curValue, loc);
         }
-//        else {
-//            for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-//                saveBeliefs();
-//                super.sendMessage(Messages.createLocationMessage(loc));
-//                curValue = getValue(i);
-//                restoreBeliefs();
-//                this.setHasSentMessage(savedHasSentMessage);
-//                processOffer(i, curValue, loc);
-//            }
-//        }
+
     }
 
     /**
@@ -268,5 +290,9 @@ public class PlayerLying extends PlayerToM {
      */
     public boolean isCanLie() {
         return canLie;
+    }
+
+    public boolean isCanSendMessages() {
+        return canSendMessages;
     }
 }

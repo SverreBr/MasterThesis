@@ -26,19 +26,6 @@ public class Popups extends JOptionPane {
     }
 
     /**
-     * Popup to be shown when an invalid order of theory of mind has been chosen
-     *
-     * @param name Name of the agent for which an invalid order of ToM has been chosen
-     */
-    public static void showInvalidOrderToM(String name) {
-        showMessageDialog(null,
-                "Provided an invalid order for theory of mind for the " + name + ".\n" +
-                        "Please insert a number from the set {0, 1, 2}.\n" +
-                        "For now, no changes have been made to the game.",
-                "Invalid input", JOptionPane.ERROR_MESSAGE);
-    }
-
-    /**
      * Popup to be shown when an invalid learning rate has been chosen
      *
      * @param name Name of the agent for which an invalid learning rate has been chosen
@@ -55,12 +42,11 @@ public class Popups extends JOptionPane {
      * Popup to be shown when an invalid boolean value for whether an agent can lie
      *
      * @param name Name of the player
-     * @param tom  The theory of mind of the agent
      */
-    public static void showInvalidCanLieToM(String name, int tom) {
+    public static void showInvalidCanLieToM(String name) {
         showMessageDialog(null,
                 "Provided an invalid boolean value that the " + name + " can lie.\n" +
-                        "Only an agent with a higher-order theory of mind can lie (2+), but you provided " + tom + ".\n" +
+                        "Only an agent that can send messages with a higher-order theory of mind can lie (2+).\n" +
                         "For now, no changes have been made to the game.",
                 "Invalid input", JOptionPane.ERROR_MESSAGE);
     }

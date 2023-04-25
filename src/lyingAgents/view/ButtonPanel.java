@@ -7,6 +7,7 @@ import lyingAgents.controller.gamePlayActions.PlayListener;
 import lyingAgents.model.Game;
 import lyingAgents.model.GameListener;
 import lyingAgents.model.player.PlayerLying;
+import lyingAgents.utilities.GameSetting;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,9 +86,9 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         southButtons.setLayout(new BoxLayout(southButtons, BoxLayout.LINE_AXIS));
         southButtons.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        restart = new JButton("Restart");
+        restart = new JButton("Full restart");
         restart.setActionCommand("restart");
-        restart.setToolTipText("Click to reset the agents completely.");
+        restart.setToolTipText("Click to reset the beliefs of the agents completely.");
         restart.addActionListener(this);
 
         JButton exit = new JButton("Exit");
@@ -186,12 +187,16 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
     private void restart() {
         PlayerLying init = game.getInitiator();
         PlayerLying resp = game.getResponder();
+        GameSetting gameSetting = game.getGameSetting();
         game.reset(init.getOrderToM(),
                 resp.getOrderToM(),
                 init.getLearningSpeed(),
                 resp.getLearningSpeed(),
                 init.isCanLie(),
-                resp.isCanLie());
+                resp.isCanLie(),
+                init.isCanSendMessages(),
+                resp.isCanSendMessages());
+        game.newGameSettings(gameSetting);
     }
 
     /**
