@@ -35,11 +35,6 @@ public class Game {
     private final int[] chipSets = new int[2];
 
     /**
-     * An array that contains the initial chips of the players
-     */
-    private final int[] initialChipSets = new int[2];
-
-    /**
      * A 2-dimensional array which contains two goal positions for the initiator and the responder
      */
     private final int[] goalPositions = new int[2];
@@ -186,9 +181,7 @@ public class Game {
             numIndexCodes *= (this.binMaxChips[i] + 1);
         }
         chipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
-        initialChipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
         chipSets[1] = Chips.getIndex(chipsResp, this.binMaxChips);
-        initialChipSets[1] = Chips.getIndex(chipsResp, this.binMaxChips);
 
         Point goalPosition;
         utilityFunctions = new int[this.goalPositionsDict.size()][numIndexCodes];
@@ -353,7 +346,7 @@ public class Game {
     }
 
     /**
-     * Plays the negotiation until 10 steps have been performed or the game ended
+     * Plays the negotiation until MAX_NUMBER_OFFERS of steps have been performed or the game ended
      */
     public void playTillEnd() {
         int i = 0;
@@ -362,7 +355,7 @@ public class Game {
             i++;
         }
         if (i >= Settings.MAX_NUMBER_OFFERS) {
-            System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " steps performed. ---");
+            System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " STEPS PERFORMED. ---");
             reachedMaxNumOffers = true;
         }
     }
@@ -491,15 +484,13 @@ public class Game {
         List<OfferOutcome> strictParetoOutcomes = new ArrayList<>();
         int[] utilityFuncInit = getUtilityFunction(getGoalPositionPlayer(Settings.INITIATOR_NAME));
         int[] utilityFuncResp = getUtilityFunction(getGoalPositionPlayer(Settings.RESPONDER_NAME));
-        OfferOutcome initOutcome = new OfferOutcome(initialChipSets[0], utilityFuncInit[initialChipSets[0]], utilityFuncResp[initialChipSets[1]]);
+        OfferOutcome initOutcome = new OfferOutcome(initiator.getInitialChips(), utilityFuncInit[initiator.getInitialChips()], utilityFuncResp[responder.getInitialChips()]);
         for (int offer = 0; offer < utilityFuncInit.length; offer++) {
             newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
             if (((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp()))) {
                 strictParetoOutcomes.add(newOffer);
             }
         }
-        Collections.sort(strictParetoOutcomes);
-        Collections.reverse(strictParetoOutcomes);
 
         return strictParetoOutcomes;
     }
@@ -509,7 +500,7 @@ public class Game {
         List<OfferOutcome> paretoOutcomes = new ArrayList<>();
         int[] utilityFuncInit = getUtilityFunction(getGoalPositionPlayer(Settings.INITIATOR_NAME));
         int[] utilityFuncResp = getUtilityFunction(getGoalPositionPlayer(Settings.RESPONDER_NAME));
-        OfferOutcome initOutcome = new OfferOutcome(initialChipSets[0], utilityFuncInit[initialChipSets[0]], utilityFuncResp[initialChipSets[1]]);
+        OfferOutcome initOutcome = new OfferOutcome(initiator.getInitialChips(), utilityFuncInit[initiator.getInitialChips()], utilityFuncResp[responder.getInitialChips()]);
         for (int offer = 0; offer < utilityFuncInit.length; offer++) {
             newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
             if (((newOffer.getValueInit() >= initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp())) ||
@@ -517,8 +508,6 @@ public class Game {
                 paretoOutcomes.add(newOffer);
             }
         }
-        Collections.sort(paretoOutcomes);
-        Collections.reverse(paretoOutcomes);
 
         return paretoOutcomes;
     }
@@ -576,14 +565,6 @@ public class Game {
      */
     public Board getBoard() {
         return this.board;
-    }
-
-    public int[][] getInitialChipSets() {  // TODO: change this (also within gameSettings, this will result in not being able to use the existing GameSettings)
-        int[][] binChipSets = new int[2][Settings.CHIP_DIVERSITY];
-        for (int i = 0; i < initialChipSets.length; i++) {
-            binChipSets[i] = Chips.getBins(initialChipSets[i], binMaxChips);
-        }
-        return binChipSets;
     }
 
     /**

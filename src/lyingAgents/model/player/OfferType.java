@@ -10,12 +10,6 @@ public class OfferType {
         this.loc = loc;
     }
 
-    public OfferType(int offer, double value) {
-        this.offer = offer;
-        this.value = value;
-        this.loc = -1;
-    }
-
     public int getOffer() {
         return offer;
     }

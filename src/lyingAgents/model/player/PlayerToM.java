@@ -275,8 +275,8 @@ public class PlayerToM extends Player {
         } else {
             updateLocationBeliefs(offerReceived);
             if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with what is offered...
-                restoreLocationBeliefsDueToUnbelievedMessage();  // TODO: restores every time when message is received?
-                if (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME)) {
+                restoreLocationBeliefsDueToUnbelievedMessage();
+                if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
                     System.out.println(getName() + " does not believe trading partner ###########################");
                     addMessage("(Agent doesn't believe trading partner.)", false);
                 }
@@ -340,7 +340,7 @@ public class PlayerToM extends Player {
                 curExpVal = partnerModel.getValue(offerPartnerChips);
 
                 // Agent's guess for partner's value of offerReceived
-                if (maxExpVal - Settings.EPSILON > utilityOffer) { // TODO: add this in the text!
+                if (maxExpVal - Settings.EPSILON > utilityOffer) {
                     newBelief = Math.max(0.0, Math.min(1.0, (1 + curExpVal) / (1 + maxExpVal)));
                     locationBeliefs[loc] *= newBelief;
                     if (this.receivedMessage) locationBeliefsWithoutMessage[loc] *= newBelief;
@@ -369,9 +369,6 @@ public class PlayerToM extends Player {
             }
         }
 
-        if (getName().equals(Settings.RESPONDER_NAME) || getName().equals(Settings.INITIATOR_NAME)) {
-            System.out.println("- ACCURACY RATING = " + accuracyRating);
-        }
         if (!confidenceLocked) {
             double learningSpeed = getLearningSpeed();
             confidence = Math.min(1.0, Math.max(0.0, (1 - learningSpeed) * confidence + learningSpeed * accuracyRating));

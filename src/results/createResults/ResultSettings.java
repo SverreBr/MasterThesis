@@ -26,7 +26,7 @@ public class ResultSettings {
     public static final String reachedMaxNumOffers = "reached_max_num_offers";
     public static final List<Integer> initTomList = Arrays.asList(0, 1, 2);
     public static final List<Integer> respTomList = Arrays.asList(0, 1, 2);
-    public static final List<Double> initLRList = List.of(0.5);  // TODO: maybe make this normally distributed?
+    public static final List<Double> initLRList = List.of(0.5);
     public static final List<Double> respLRList = List.of(0.5);
     public static final List<Boolean> initCanLieList = Arrays.asList(true, false);
     public static final List<Boolean> respCanLieList = Arrays.asList(true, false);

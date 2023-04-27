@@ -93,7 +93,7 @@ public class Settings {
     /**
      * The maximum number of offers after which negotiation is terminated
      */
-    public static final int MAX_NUMBER_OFFERS = 10;
+    public static final int MAX_NUMBER_OFFERS = 100;
 
     /**
      * Shown when a general exception occurs

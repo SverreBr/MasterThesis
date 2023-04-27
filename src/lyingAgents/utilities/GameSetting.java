@@ -3,7 +3,6 @@ package lyingAgents.utilities;
 import lyingAgents.model.Game;
 import lyingAgents.view.changeSettings.GameSettingsDialog;
 
-//import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -67,11 +66,10 @@ public class GameSetting implements Serializable {
             board[i] = boardToCopy[i].clone();
         }
 
-        int[][] chipSetsToCopy = game.getInitialChipSets();
-        chipSets = new int[chipSetsToCopy.length][chipSetsToCopy[0].length];
-        for (int i = 0; i < chipSetsToCopy.length; i++) {
-            chipSets[i] = chipSetsToCopy[i].clone();
-        }
+        chipSets = new int[2][Settings.CHIP_DIVERSITY];
+        chipSets[0] = Chips.getBins(game.getInitiator().getInitialChips(), game.getBinMaxChips());
+        chipSets[1] = Chips.getBins(game.getResponder().getInitialChips(), game.getBinMaxChips());
+
         goalPositions = game.getGoalPositions().clone();
     }
 

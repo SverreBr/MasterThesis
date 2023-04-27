@@ -83,7 +83,6 @@ public class GetResults {
     private void generateNewGame(int initTom, int respTom, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
         long startTime = System.currentTimeMillis();
         Game game = new Game(initTom, respTom, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-        // TODO: might only generate games where there is a pareto optimal outcome?
         for (int i = 0; i < ResultSettings.WARMUP_ROUNDS; i++) {
             game.playTillEnd();
             game.newRound();

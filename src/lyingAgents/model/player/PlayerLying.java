@@ -208,9 +208,10 @@ public class PlayerLying extends PlayerToM {
                     partnerModel.sendOffer(game.flipOffer(bestOffer));
                     List<Integer> expectedResponses = partnerModel.selectOffer(game.flipOffer(bestOffer));
                     for (int expectedResponse : expectedResponses) {
-                        System.out.println(getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse), game.getBinMaxChips())) + "\n\n");
+                        System.out.println(getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse), game.getBinMaxChips())));
                     }
                     partnerModel.restoreBeliefs();
+                    System.out.println("\n");
                 }
             }
         }

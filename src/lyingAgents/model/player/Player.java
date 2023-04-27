@@ -488,7 +488,6 @@ public abstract class Player {
      * @return The offer of this player in the form of bins.
      */
     public int[] getChipsBin() {
-        // TODO: Is it maybe faster to also save chipsBin in player?
         return Chips.getBins(chips, game.getBinMaxChips());
     }
 

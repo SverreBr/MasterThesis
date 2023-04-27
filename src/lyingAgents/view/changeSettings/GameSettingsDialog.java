@@ -1,6 +1,5 @@
 package lyingAgents.view.changeSettings;
 
-import lyingAgents.model.Board;
 import lyingAgents.model.Game;
 import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.MiscFunc;

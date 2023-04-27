@@ -114,10 +114,6 @@ public class Chips {
      * @return empty bin initializes with zeros
      */
     public static int[] makeNewChipBin() {
-        int[] newChipBin = new int[Settings.CHIP_DIVERSITY];
-        for (int i = 0; i < Settings.CHIP_DIVERSITY; i++) {
-            newChipBin[i] = 0;
-        }
-        return newChipBin;
+        return new int[Settings.CHIP_DIVERSITY];
     }
 }

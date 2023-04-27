@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CenterPanel extends JPanel implements GameListener {
@@ -60,7 +61,11 @@ public class CenterPanel extends JPanel implements GameListener {
 
     private void updateInfo() {
         List<OfferOutcome> strictParetoOutcomes = game.getStrictParetoOutcomes();
+        Collections.sort(strictParetoOutcomes);
+        Collections.reverse(strictParetoOutcomes);
         List<OfferOutcome> paretoOutcomes = game.getParetoOutcomes();
+        Collections.sort(paretoOutcomes);
+        Collections.reverse(paretoOutcomes);
         String[] content = new String[(strictParetoOutcomes.size()+1) + (paretoOutcomes.size()+1) + 1];
         String[] style = new String[strictParetoOutcomes.size()+1 + paretoOutcomes.size()+1 + 1];
 
@@ -73,14 +78,7 @@ public class CenterPanel extends JPanel implements GameListener {
             content[idx++] = "- No strict pareto improvements:";
         } else {
             content[idx++] = "- Strict pareto improvements:";
-            for (OfferOutcome paretoOutcome : strictParetoOutcomes) {
-                style[idx] = "regular";
-                content[idx++] = "  * " +
-                        Arrays.toString(Chips.getBins(paretoOutcome.getOfferForInit(), game.getBinMaxChips())) +
-                        " - " + Arrays.toString(Chips.getBins(game.flipOffer(paretoOutcome.getOfferForInit()), game.getBinMaxChips())) +
-                        "; " + paretoOutcome.getValueInit() + " - " + paretoOutcome.getValueResp() +
-                        "; sw=" + paretoOutcome.getSocialWelfare();
-            }
+            idx = addParetoOutcomesToPanel(strictParetoOutcomes, content, style, idx);
         }
 
         style[idx] = "italic";
@@ -88,17 +86,22 @@ public class CenterPanel extends JPanel implements GameListener {
             content[idx] = "- No pareto improvements:";
         } else {
             content[idx++] = "- Pareto improvements:";
-            for (OfferOutcome paretoOutcome : paretoOutcomes) {
-                style[idx] = "regular";
-                content[idx++] = "  * " +
-                        Arrays.toString(Chips.getBins(paretoOutcome.getOfferForInit(), game.getBinMaxChips())) +
-                        " - " + Arrays.toString(Chips.getBins(game.flipOffer(paretoOutcome.getOfferForInit()), game.getBinMaxChips())) +
-                        "; " + paretoOutcome.getValueInit() + " - " + paretoOutcome.getValueResp() +
-                        "; sw=" + paretoOutcome.getSocialWelfare();
-            }
+            addParetoOutcomesToPanel(paretoOutcomes, content, style, idx);
         }
 
         MiscFunc.addStylesToDocMulti(informationPane, content, style);
+    }
+
+    private int addParetoOutcomesToPanel(List<OfferOutcome> strictParetoOutcomes, String[] content, String[] style, int idx) {
+        for (OfferOutcome paretoOutcome : strictParetoOutcomes) {
+            style[idx] = "regular";
+            content[idx++] = "  * " +
+                    Arrays.toString(Chips.getBins(paretoOutcome.getOfferForInit(), game.getBinMaxChips())) +
+                    " - " + Arrays.toString(Chips.getBins(game.flipOffer(paretoOutcome.getOfferForInit()), game.getBinMaxChips())) +
+                    "; " + paretoOutcome.getValueInit() + " - " + paretoOutcome.getValueResp() +
+                    "; sw=" + paretoOutcome.getSocialWelfare();
+        }
+        return idx;
     }
 
 
