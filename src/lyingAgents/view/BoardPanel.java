@@ -97,15 +97,7 @@ public class BoardPanel extends JComponent implements GameListener {
      * @param g2 graphics
      */
     private void paintStartLocation(Graphics2D g2) {
-        int OFFSET = 1;
-        Dimension siteSize = getTileSize();
-
         Point start = Settings.STARTING_POSITION;
-
-        g2.setColor(Color.WHITE);
-        g2.fillRect(
-                start.x * siteSize.width + OFFSET, start.y * siteSize.height + OFFSET,
-                siteSize.width - OFFSET, siteSize.height - OFFSET);
         drawSymbol(ViewSettings.START_LOCATION_SYMBOL, g2, start);
     }
 

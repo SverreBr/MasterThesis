@@ -3,7 +3,6 @@ package lyingAgents.utilities;
 import lyingAgents.model.Game;
 import lyingAgents.view.changeSettings.GameSettingsDialog;
 
-//import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -61,8 +60,16 @@ public class GameSetting implements Serializable {
      * @param game The game model where to take the game settings from
      */
     public void getSettingsFromGame(Game game) {
-        board = game.getBoard().getBoard();
-        chipSets = game.getInitialChipSets();
+        int[][] boardToCopy = game.getBoard().getBoard();
+        board = new int[boardToCopy.length][boardToCopy[0].length];
+        for (int i = 0; i < board.length; i++) {
+            board[i] = boardToCopy[i].clone();
+        }
+
+        chipSets = new int[2][Settings.CHIP_DIVERSITY];
+        chipSets[0] = Chips.getBins(game.getInitiator().getInitialChips(), game.getBinMaxChips());
+        chipSets[1] = Chips.getBins(game.getResponder().getInitialChips(), game.getBinMaxChips());
+
         goalPositions = game.getGoalPositions().clone();
     }
 

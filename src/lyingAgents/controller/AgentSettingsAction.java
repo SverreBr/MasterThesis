@@ -1,5 +1,6 @@
 package lyingAgents.controller;
 
+import lyingAgents.utilities.GameSetting;
 import lyingAgents.view.changeSettings.AgentSettingsDialog;
 import lyingAgents.view.Popups;
 import lyingAgents.model.Game;
@@ -43,16 +44,20 @@ public class AgentSettingsAction extends AbstractAction {
     private void changeGame(AgentSettingsDialog sd) {
         int initToM, respToM;
         double initLR, respLR;
-        boolean initCanLie, respCanLie;
+        boolean initCanLie, respCanLie, initCanSendMessages, respCanSendMessages;
 
         initToM = sd.getInitiatorToMFieldValue();
         initLR = sd.getInitiatorLRFieldValue();
-        initCanLie = sd.isInitiatorLieFieldValue();
+        initCanLie = sd.isInitiatorCanLieFieldValue();
+        initCanSendMessages = sd.isInitiatorCanSendMessagesValue();
         respToM = sd.getResponderToMFieldValue();
         respLR = sd.getResponderLRFieldValue();
-        respCanLie = sd.isResponderLieFieldValue();
+        respCanLie = sd.isResponderCanLieFieldValue();
+        respCanSendMessages = sd.isResponderCanSendMessagesValue();
 
-        game.reset(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
+        GameSetting gameSetting = game.getGameSetting();
+        game.reset(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+        game.newGameSettings(gameSetting);
     }
 
     @Override
@@ -62,7 +67,7 @@ public class AgentSettingsAction extends AbstractAction {
             return;
         }
 
-        AgentSettingsDialog sd = new AgentSettingsDialog(mainFrame, "Game player settings");
+        AgentSettingsDialog sd = new AgentSettingsDialog(mainFrame, "Game player settings", game);
         sd.setVisible(true);
 
         if (sd.gameHasChanged) changeGame(sd);

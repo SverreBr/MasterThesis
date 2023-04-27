@@ -47,7 +47,7 @@ public class PlayerToM extends Player {
     /**
      * Lock the confidence in using their theory of mind capability of this agent
      */
-    private boolean confidenceLocked;
+    protected boolean confidenceLocked = false;
 
     /**
      * Boolean value for whether this agent received a message or not
@@ -81,7 +81,7 @@ public class PlayerToM extends Player {
      * @param utilityFunction utility function for this player
      */
     public PlayerToM(String playerName, Game game, int orderToM, double learningSpeed, int chipsSelf, int chipsOther, int[] utilityFunction) {
-        super(playerName, game, learningSpeed, chipsSelf, utilityFunction);
+        super(playerName, game, learningSpeed, chipsSelf, utilityFunction, (orderToM == 0));
         this.orderToM = orderToM;
         this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
         this.savedLocationBeliefs = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
@@ -107,6 +107,7 @@ public class PlayerToM extends Player {
      * @param chipsOther      The offer to the other player
      * @param utilityFunction The utility function for this player
      */
+    @Override
     public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
         super.initNewRound(chipsSelf, chipsOther, utilityFunction);
         this.receivedMessage = false;
@@ -180,7 +181,6 @@ public class PlayerToM extends Player {
                 bestOffers.add(i);
             }
         }
-//        int bestOffer = bestOffers.get((int) (Math.random() * bestOffers.size()));
 
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
@@ -239,21 +239,21 @@ public class PlayerToM extends Player {
      * @return the value associated to making the offer
      */
     private double getLocationValue(int offerToSelf, int offerToOther) {
-        List<Integer> responses = partnerModel.selectOffer(offerToOther);
-        double chance = 1.0 / responses.size();
+        List<Integer> expectedResponses = partnerModel.selectOffer(offerToOther);
+        double chance = 1.0 / expectedResponses.size();
         double curValue, totValue;
         totValue = 0.0;
-        for (int response : responses) {
-            if (response == offerToOther) {
+        for (int expectedResponse : expectedResponses) {
+            if (expectedResponse == offerToOther) {
                 // Partner accepts.
                 curValue = utilityFunction[offerToSelf] - 1;
-            } else if (response == partnerModel.chips) {
+            } else if (expectedResponse == partnerModel.chips) {
                 // Offer equals partner its offer, so partner has withdrawn from negotiation
                 curValue = utilityFunction[this.chips] - 1;
             } else {
                 // Offer is not equal to partner its offer, so new offer has been made
-                response = game.flipOffer(response);
-                curValue = Math.max(utilityFunction[response], utilityFunction[this.chips]) - 2;
+                expectedResponse = game.flipOffer(expectedResponse);
+                curValue = Math.max(utilityFunction[expectedResponse], utilityFunction[this.chips]) - 2;
                 // minus one for current offer and one for offer from partner
             }
             totValue += chance * curValue;
@@ -267,23 +267,25 @@ public class PlayerToM extends Player {
      *
      * @param offerReceived the offer received.
      */
+    @Override
     protected void receiveOffer(int offerReceived) {
         int inverseOffer;
-        super.receiveOffer(offerReceived);
-        if (this.orderToM > 0) {
+        if (this.orderToM == 0) {
+            super.receiveOffer(offerReceived);
+        } else {
             updateLocationBeliefs(offerReceived);
             if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with what is offered...
-                restoreLocationBeliefsDueToUnbelievedMessage();  // TODO: restores every time when message is received?
-                if (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME)) {
+                restoreLocationBeliefsDueToUnbelievedMessage();
+                if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
                     System.out.println(getName() + " does not believe trading partner ###########################");
-                    this.addMessage("(I don't believe you.)", false);
+                    addMessage("(Agent doesn't believe trading partner.)", false);
                 }
             }
-            this.selfModel.receiveOffer(offerReceived);
+            selfModel.receiveOffer(offerReceived);
 
             // Update partner lyingAgents.model for the fact that they had send the offer that was just received
             inverseOffer = this.game.flipOffer(offerReceived);
-            this.partnerModel.sendOffer(inverseOffer);
+            partnerModel.sendOffer(inverseOffer);
         }
     }
 
@@ -300,10 +302,12 @@ public class PlayerToM extends Player {
      *
      * @param offerToSelf The offer this agent makes with respect to himself.
      */
+    @Override
     protected void sendOffer(int offerToSelf) {
         int inverseOffer;
-        super.sendOffer(offerToSelf);
-        if (orderToM > 0) {
+        if (orderToM == 0) {
+            super.sendOffer(offerToSelf);
+        } else {
             selfModel.sendOffer(offerToSelf);
 
             // Update the partner lyingAgents.model for receiving the offer that was made
@@ -327,22 +331,22 @@ public class PlayerToM extends Player {
         accuracyRating = 0.0;
         for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
             partnerModel.utilityFunction = game.getUtilityFunction(loc);
-            utilityOffer = partnerModel.utilityFunction[offerPartnerChips] - Settings.SCORE_NEGOTIATION_STEP;
+            utilityOffer = partnerModel.utilityFunction[offerPartnerChips] + Settings.SCORE_NEGOTIATION_STEP;
             if (utilityOffer - Settings.EPSILON > partnerModel.utilityFunction[partnerModel.chips]) {
                 // Given loc, offerReceived gives the partner a higher score than the initial situation
                 partnerAlternative = partnerModel.chooseOffer(0); // 0 since worst possible offer
                 // Agent's guess for partner's best option given location l
                 maxExpVal = partnerModel.getValue(partnerAlternative);
                 curExpVal = partnerModel.getValue(offerPartnerChips);
+
                 // Agent's guess for partner's value of offerReceived
-                if (maxExpVal - Settings.EPSILON > -1) {
+                if (maxExpVal - Settings.EPSILON > utilityOffer) {
                     newBelief = Math.max(0.0, Math.min(1.0, (1 + curExpVal) / (1 + maxExpVal)));
                     locationBeliefs[loc] *= newBelief;
                     if (this.receivedMessage) locationBeliefsWithoutMessage[loc] *= newBelief;
                     accuracyRating += locationBeliefs[loc];
-                } else { // else: No offer is expected as the minimal value is greater than -1.
-                    System.out.println("///--- Hmm, I thought it was not possible to get here. ---///");
-                }
+                } // else: No offer is expected as the maxvalue is not greater than withdrawing from negotiation. Hence, partnerModel is incorrect.
+
             } else {
                 // Making the offer "offerReceived" is not rational, the score would decrease.
                 // This is considered to be impossible; so set belief to zero.
@@ -395,6 +399,12 @@ public class PlayerToM extends Player {
             partnerModel.restoreBeliefs();
             selfModel.restoreBeliefs();
         }
+    }
+
+    @Override
+    public void processOfferAccepted(int offerMade) {
+        if (orderToM == 0) super.processOfferAccepted(offerMade);
+        setNewChips(offerMade);
     }
 
     ///////////////////////////////
@@ -526,13 +536,12 @@ public class PlayerToM extends Player {
     private void receiveLocationMessage(int location) {
         if (this.orderToM > 0) { // Models goal location of trading partner
             if (!this.receivedMessage) { // First message received
-                boolean believeLoc = false;
+                double savedLocationBelief = locationBeliefs[location];
                 storeLocationBeliefsDueToBelievedMessage();
-                if (locationBeliefs[location] - Settings.EPSILON > 0.0) believeLoc = true;
                 for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
                     locationBeliefs[loc] = 0.0;
                 }
-                if (believeLoc) locationBeliefs[location] = 1.0;
+                if (savedLocationBelief - Settings.EPSILON > 0.0) locationBeliefs[location] = 1.0;
             } else {  // already received a message
                 if (locationBeliefs[location] - Settings.EPSILON <= 0.0) {
                     for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
@@ -540,6 +549,8 @@ public class PlayerToM extends Player {
                     }
                 } // else, agent can still believe trading partner, or already disbelieved the trading partner.
             }
+        } else {
+            decreaseColorBeliefMessage(location);
         }
         this.receivedMessage = true;
     }
@@ -570,6 +581,7 @@ public class PlayerToM extends Player {
      */
     public void sendMessage(String message) {
         this.hasSentMessage = true;
+
         if (orderToM > 0) {
             partnerModel.receiveMessage(message);
             selfModel.sendMessage(message);

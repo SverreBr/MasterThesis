@@ -3,6 +3,7 @@ package lyingAgents.model.player;
 import lyingAgents.model.Game;
 import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.Messages;
+import lyingAgents.utilities.RandomNumGen;
 import lyingAgents.utilities.Settings;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ public class PlayerLying extends PlayerToM {
      */
     private final boolean canLie;
 
+    private final boolean canSendMessages;
+
     /**
      * List of best offers
      */
@@ -35,6 +38,8 @@ public class PlayerLying extends PlayerToM {
      */
     private boolean thereIsBestOfferWithoutMessage;
 
+    private RandomNumGen rng;
+
     /**
      * @param playerName      name of the player
      * @param game            game model
@@ -45,13 +50,35 @@ public class PlayerLying extends PlayerToM {
      * @param utilityFunction utility function for this player
      */
     public PlayerLying(String playerName, Game game, int orderToM, double learningSpeed, int chipsSelf, int chipsOther,
-                       int[] utilityFunction, boolean agentCanLie) {
+                       int[] utilityFunction, boolean agentCanLie, boolean canSendMessages) {
         super(playerName, game, orderToM, learningSpeed, chipsSelf, chipsOther, utilityFunction);
-        if (agentCanLie && (orderToM < 2)) {
-            System.out.println("Agent cannot lie if not theory of mind greater than 1.");
+        if (agentCanLie & !canSendMessages) {
+            System.err.println("Agent cannot lie if it cannot send messages. Agent can lie set to false.");
             agentCanLie = false;
         }
         this.canLie = agentCanLie;
+        this.canSendMessages = canSendMessages;
+        if (canSendMessages && (orderToM == 0)) makeRng();
+    }
+
+    @Override
+    public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
+        super.initNewRound(chipsSelf, chipsOther, utilityFunction);
+        if (getOrderToM() == 0) makeRng();
+    }
+
+    private void makeRng() {
+        double[] zeroOrderProbSendingMessages = new double[game.getNumberOfGoalPositions()];
+        int[] goalPositionsArray = new int[game.getNumberOfGoalPositions()];
+        int goalPosition = this.game.getGoalPositionPlayer(this.getName());
+
+        Arrays.fill(zeroOrderProbSendingMessages, Settings.PROB_MASS_OTHER_LOCS);
+        zeroOrderProbSendingMessages[goalPosition] = 1 - Settings.PROB_MASS_OTHER_LOCS * (zeroOrderProbSendingMessages.length - 1);
+
+        for (int i = 0; i < goalPositionsArray.length; i++) {
+            goalPositionsArray[i] = i;
+        }
+        rng = new RandomNumGen(goalPositionsArray, zeroOrderProbSendingMessages);
     }
 
     /**
@@ -91,9 +118,13 @@ public class PlayerLying extends PlayerToM {
      * @return The best offer as a response to offerReceived.
      */
     public int chooseOffer(int offerReceived) {
+
+        if (!Game.DEBUG && !canSendMessages) return super.chooseOffer(offerReceived);  // Does not produce terminal outputs
+//        if (!canSendMessages) return super.chooseOffer(offerReceived);
+
         bestOffers = new ArrayList<>();
         OfferType bestLyingOfferType;
-        int bestOffer, bestLoc, goalPosition;
+        int bestOffer, bestLoc;
         double noMessageOfferValue;
 
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
@@ -106,14 +137,16 @@ public class PlayerLying extends PlayerToM {
         noMessageOfferValue = tmpSelectOfferValue;
         thereIsBestOfferWithoutMessage = true;
 
-        if (getOrderToM() > 1) {  // agent models that trading partner beliefs this agent has a goal position
-            if (canLie) {
+        if (canSendMessages) {
+            if (getOrderToM() > 0) {
                 for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
                     addOffers(loc);
                 }
             } else {
-                goalPosition = game.getGoalPositionPlayer(this.getName());
-                addOffers(goalPosition);
+                if (Math.random() < Settings.PROB_SENDING_MESSAGES) {
+                    int newLoc = rng.random();
+                    bestLyingOfferType = new OfferType(bestLyingOfferType.getOffer(), bestLyingOfferType.getValue(), newLoc);
+                }
             }
         }
 
@@ -162,19 +195,26 @@ public class PlayerLying extends PlayerToM {
         if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
-//            System.out.println("ACCEPT");
-//            if (bestOffer == offerReceived) System.out.println("--- BEST OFFER IS ALREADY OFFER RECEIVED ---");
             bestOffer = offerReceived;
         } else if ((utilityFunction[this.chips] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
             // withdraw from negotiation
-//            System.out.println("WITHDRAW");
-//            if (bestOffer == this.chips) System.out.println("--- BEST OFFER IS ALREADY CURRENT CHIPS ---");
             bestOffer = this.chips;
         } else {  // else, make the best offer with possibly a message
             if (bestLoc != -1) sendMessage(Messages.createLocationMessage(bestLoc));
+            if (Game.DEBUG) {
+                if (getOrderToM() > 0) {
+                    partnerModel.saveBeliefs();
+                    partnerModel.sendOffer(game.flipOffer(bestOffer));
+                    List<Integer> expectedResponses = partnerModel.selectOffer(game.flipOffer(bestOffer));
+                    for (int expectedResponse : expectedResponses) {
+                        System.out.println(getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse), game.getBinMaxChips())));
+                    }
+                    partnerModel.restoreBeliefs();
+                    System.out.println("\n");
+                }
+            }
         }
-
         return bestOffer;
     }
 
@@ -185,18 +225,20 @@ public class PlayerLying extends PlayerToM {
      */
     private void addOffers(int loc) {
         double curValue;
-        boolean saveHasSentMessage = this.hasSentMessage;
+        boolean savedHasSentMessage = this.hasSentMessage;
 
-        if (getOrderToM() > 0) {
-            for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
-                partnerModel.saveBeliefs();
-                partnerModel.receiveMessage(Messages.createLocationMessage(loc));
-                curValue = getValue(i);
-                partnerModel.restoreBeliefs();
-                this.setHasSentMessage(saveHasSentMessage);
-                processOffer(i, curValue, loc);
-            }
+        if ((!canLie) && (loc != game.getGoalPositionPlayer(this.getName()))) return;
+        assert (getOrderToM() > 0) : "Theory of mind zero agent cannot reason about sending messages...";
+
+        for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
+            partnerModel.saveBeliefs();
+            partnerModel.receiveMessage(Messages.createLocationMessage(loc));
+            curValue = getValue(i);
+            partnerModel.restoreBeliefs();
+            this.setHasSentMessage(savedHasSentMessage);
+            processOffer(i, curValue, loc);
         }
+
     }
 
     /**
@@ -249,5 +291,9 @@ public class PlayerLying extends PlayerToM {
      */
     public boolean isCanLie() {
         return canLie;
+    }
+
+    public boolean isCanSendMessages() {
+        return canSendMessages;
     }
 }

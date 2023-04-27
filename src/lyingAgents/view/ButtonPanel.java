@@ -7,6 +7,7 @@ import lyingAgents.controller.gamePlayActions.PlayListener;
 import lyingAgents.model.Game;
 import lyingAgents.model.GameListener;
 import lyingAgents.model.player.PlayerLying;
+import lyingAgents.utilities.GameSetting;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,16 +23,6 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
      * The game model
      */
     private final Game game;
-
-    /**
-     * Panel with the buttons that are located south
-     */
-    private JPanel southButtons;
-
-    /**
-     * The main body of the button panel
-     */
-    private JPanel body;
 
     /**
      * The number of rounds forward
@@ -58,10 +49,14 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
      */
     private JButton newNeg;
 
+    private JButton newNegPlay;
+
     /**
      * Button to forward a specified number of rounds
      */
     private JButton forward;
+
+    private JButton exit;
 
     /**
      * Constructor: creates the button panel
@@ -78,30 +73,15 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
      * Creates the buttons on the button panel
      */
     private void createButtonPanel() {
-        this.setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        southButtons = new JPanel();
-        southButtons.setLayout(new BoxLayout(southButtons, BoxLayout.LINE_AXIS));
-        southButtons.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-
-        restart = new JButton("Restart");
+        restart = new JButton("Full restart");
         restart.setActionCommand("restart");
-        restart.setToolTipText("Click to reset the agents completely.");
+        restart.setToolTipText("Click to reset the beliefs of the agents completely.");
         restart.addActionListener(this);
 
-        JButton exit = new JButton("Exit");
+        exit = new JButton("Exit");
         exit.setActionCommand("exit");
         exit.setToolTipText("Click to exit the game.");
         exit.addActionListener(this);
-
-        southButtons.setLayout(new GridLayout(1, 0, 5, 0));
-        southButtons.add(restart);
-        southButtons.add(exit);
-
-        body = new JPanel();
-        body.setLayout(new GridLayout(0, 1, 0, 5));
-        body.setBorder(BorderFactory.createEmptyBorder(5, 0, 20, 0));
 
         step = new JButton("Step");
         step.setActionCommand("step");
@@ -118,6 +98,11 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         newNeg.setToolTipText("Click to start a new round in the negotiation.");
         newNeg.addActionListener(this);
 
+        newNegPlay = new JButton("Play new round");
+        newNegPlay.setActionCommand("play new round");
+        newNegPlay.setToolTipText("Click to start a new round in the negotiation and play.");
+        newNegPlay.addActionListener(this);
+
         forwardPlays = new JTextField("100");
 
         forward = new JButton("Rounds forward");
@@ -125,20 +110,43 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         forward.setToolTipText("Click to forward the number of rounds provided in the text field.");
         forward.addActionListener(this);
 
-        JPanel forwardPanel = new JPanel();
-        forwardPanel.setLayout(new GridLayout(1, 0, 5, 0));
-        forwardPanel.add(forwardPlays);
-        forwardPanel.add(forward);
-
-        body.add(step);
-        body.add(play);
-        body.add(newNeg);
-        body.add(forwardPanel);
-
+        addButtonsToPanel();
         changeBackgrounds();
+    }
 
-        this.add(body, BorderLayout.CENTER);
-        this.add(southButtons, BorderLayout.SOUTH);
+    private void addButtonsToPanel() {
+        this.setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(2,2,2,2);
+        gbc.gridwidth = 2;
+        gbc.weightx = 0.5;
+        gbc.gridy = 0; gbc.gridx = 0;
+
+        add(step, gbc);
+        gbc.gridy++;
+
+        add(play, gbc);
+        gbc.gridy++;
+
+        gbc.gridwidth = 1;
+        add(newNeg, gbc);
+        gbc.gridx++;
+        add(newNegPlay, gbc);
+        gbc.gridy++; gbc.gridx = 0;
+
+        add(forwardPlays, gbc);
+        gbc.gridx++;
+        add(forward, gbc);
+        gbc.gridy++; gbc.gridx = 0;
+
+        gbc.insets = new Insets(12, 2, 0, 2);
+
+        add(restart, gbc);
+        gbc.gridx++;
+        add(exit, gbc);
     }
 
     /**
@@ -147,8 +155,6 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
     private void changeBackgrounds() {
         Color color = ViewSettings.getBackGroundColor();
         setBackground(color);
-        southButtons.setBackground(color);
-        body.setBackground(color);
     }
 
     /**
@@ -186,12 +192,21 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
     private void restart() {
         PlayerLying init = game.getInitiator();
         PlayerLying resp = game.getResponder();
+        GameSetting gameSetting = game.getGameSetting();
         game.reset(init.getOrderToM(),
                 resp.getOrderToM(),
                 init.getLearningSpeed(),
                 resp.getLearningSpeed(),
                 init.isCanLie(),
-                resp.isCanLie());
+                resp.isCanLie(),
+                init.isCanSendMessages(),
+                resp.isCanSendMessages());
+        game.newGameSettings(gameSetting);
+    }
+
+    private void newRoundAndPlay() {
+        game.newRound();
+        play();
     }
 
     /**
@@ -204,6 +219,7 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         switch (e.getActionCommand()) {
             case "restart" -> restart();
             case "new round" -> this.game.newRound();
+            case "play new round" -> newRoundAndPlay();
             case "exit" -> System.exit(0);
             case "step" -> this.game.step();
             case "play" -> play();
@@ -235,6 +251,7 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         restart.setEnabled(truthVal);
         forward.setEnabled(truthVal);
         newNeg.setEnabled(truthVal);
+        newNegPlay.setEnabled(truthVal);
     }
 
     @Override
@@ -262,7 +279,6 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         boolean setEnabled = !(this.game.isGameFinished());
         play.setEnabled(setEnabled);
         step.setEnabled(setEnabled);
-        // TODO: popup that play action is done.
     }
 
     @Override
@@ -279,6 +295,5 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         boolean setEnabled = !(this.game.isGameFinished());
         play.setEnabled(setEnabled);
         step.setEnabled(setEnabled);
-        // TODO: add popup that play is cancelled.
     }
 }

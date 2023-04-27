@@ -21,7 +21,7 @@ public class ViewSettings {
     /**
      * determines the height of the legend panel
      */
-    public static final int LEGEND_PANEL_HEIGHT = 210;
+    public static final int LEGEND_PANEL_HEIGHT = 230;
 
     /**
      * Size of the board panel

@@ -35,11 +35,6 @@ public class Game {
     private final int[] chipSets = new int[2];
 
     /**
-     * An array that contains the initial chips of the players
-     */
-    private final int[] initialChipSets = new int[2];
-
-    /**
      * A 2-dimensional array which contains two goal positions for the initiator and the responder
      */
     private final int[] goalPositions = new int[2];
@@ -50,11 +45,6 @@ public class Game {
     private final Map<Integer, Point> goalPositionsDict;
 
     /**
-     * The total number of goal positions possible for an agent
-     */
-    private final int nrGoalPositions;
-
-    /**
      * the initiator agent
      */
     private PlayerLying initiator;
@@ -62,12 +52,12 @@ public class Game {
     /**
      * the last offer made
      */
-    private int newOffer;
+    private int lastOfferMade;
 
     /**
      * Total number of offers made in negotiation
      */
-    private int nrOffers;
+    private int totalNrOffersMade;
 
     /**
      * the responding agent
@@ -114,20 +104,19 @@ public class Game {
     /**
      * Constructor
      */
-    public Game(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
+    public Game(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
         this.listeners = new HashSet<>();
         this.board = new Board();
         this.goalPositionsDict = MiscFunc.makeGoalPositionDictionary();
-        this.nrGoalPositions = this.goalPositionsDict.size();
-        initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
+        initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
     }
 
     /**
      * resets the board to a new initialization
      */
-    public void reset(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
+    public void reset(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
         this.board.resetBoard();
-        this.initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie);
+        this.initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
         if (simulationOn)
             notifyListenersNewGame();
     }
@@ -135,15 +124,15 @@ public class Game {
     /**
      * Initializes a fully new game, where the agents are also fully reset
      */
-    private void initNewGame(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie) {
+    private void initNewGame(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
         generateNewNegotiationSetting();
         int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
         int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
 
         this.initiator = new PlayerLying(Settings.INITIATOR_NAME, this, initToM, initLR,
-                chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]], initCanLie);
+                chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]], initCanLie, initCanSendMessages);
         this.responder = new PlayerLying(Settings.RESPONDER_NAME, this, respToM, respLR,
-                chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]], respCanLie);
+                chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]], respCanLie, respCanSendMessages);
     }
 
     /**
@@ -192,12 +181,10 @@ public class Game {
             numIndexCodes *= (this.binMaxChips[i] + 1);
         }
         chipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
-        initialChipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
         chipSets[1] = Chips.getIndex(chipsResp, this.binMaxChips);
-        initialChipSets[1] = Chips.getIndex(chipsResp, this.binMaxChips);
 
         Point goalPosition;
-        utilityFunctions = new int[this.nrGoalPositions][numIndexCodes];
+        utilityFunctions = new int[this.goalPositionsDict.size()][numIndexCodes];
         for (Map.Entry<Integer, Point> entry : goalPositionsDict.entrySet()) {
             pos = entry.getKey();
             goalPosition = entry.getValue();
@@ -271,8 +258,8 @@ public class Game {
      */
     private void setBasicNewGameSettings() {
         setBooleanGameFinished(false);
-        this.newOffer = -1;
-        this.nrOffers = 0;
+        this.lastOfferMade = -1;
+        this.totalNrOffersMade = 0;
         this.turn = Settings.INITIATOR_NAME;
         this.reachedMaxNumOffers = false;
     }
@@ -293,19 +280,17 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             if (isMessageSend) {
-                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + " receives message!");
                 this.initiator.receiveMessage(messageSend);
                 isMessageSend = false;
             }
-            tmpNewOffer = this.initiator.makeOffer(newOffer);
+            tmpNewOffer = this.initiator.makeOffer(lastOfferMade);
             if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
         } else {
             if (isMessageSend) {
-                if (DEBUG) System.out.println(Settings.INITIATOR_NAME + "receives message!");
                 this.responder.receiveMessage(messageSend);
                 isMessageSend = false;
             }
-            tmpNewOffer = this.responder.makeOffer(newOffer);
+            tmpNewOffer = this.responder.makeOffer(lastOfferMade);
             if (tmpNewOffer == this.responder.getChips()) negotiationEnds = true;
         }
 
@@ -313,12 +298,12 @@ public class Game {
         if (negotiationEnds) { // Negotiation terminated
             negotiationTerminates();
             if (DEBUG) printFinalStatements();
-        } else if (tmpNewOffer == newOffer) { // Offer is accepted
+        } else if (tmpNewOffer == lastOfferMade) { // Offer is accepted
             offerAccepted(flippedOffer);
             if (DEBUG) printFinalStatements();
         } else { // Negotiation continues with new offer
-            nrOffers++;
-            newOffer = flippedOffer;
+            totalNrOffersMade++;
+            lastOfferMade = flippedOffer;
             addOfferMessage(tmpNewOffer);
             switchTurn();
         }
@@ -361,7 +346,7 @@ public class Game {
     }
 
     /**
-     * Plays the negotiation until 10 steps have been performed or the game ended
+     * Plays the negotiation until MAX_NUMBER_OFFERS of steps have been performed or the game ended
      */
     public void playTillEnd() {
         int i = 0;
@@ -370,7 +355,7 @@ public class Game {
             i++;
         }
         if (i >= Settings.MAX_NUMBER_OFFERS) {
-            System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " steps performed. ---");
+            System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " STEPS PERFORMED. ---");
             reachedMaxNumOffers = true;
         }
     }
@@ -416,10 +401,10 @@ public class Game {
         String message;
         if (turn.equals(Settings.INITIATOR_NAME)) {
             message = "I offer: " + Arrays.toString(Chips.getBins(flippedOffer, binMaxChips)) + " - " +
-                    Arrays.toString(Chips.getBins(newOffer, binMaxChips));
+                    Arrays.toString(Chips.getBins(lastOfferMade, binMaxChips));
             this.initiator.addMessage(message, true);
         } else {
-            message = "I offer: " + Arrays.toString(Chips.getBins(newOffer, binMaxChips)) + " - " +
+            message = "I offer: " + Arrays.toString(Chips.getBins(lastOfferMade, binMaxChips)) + " - " +
                     Arrays.toString(Chips.getBins(flippedOffer, binMaxChips));
             this.responder.addMessage(message, true);
         }
@@ -442,15 +427,15 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             // Initiator accepted offer
-            initiator.processOfferAccepted(newOffer);
+            initiator.processOfferAccepted(lastOfferMade);
             responder.processOfferAccepted(flippedOffer);
-            setNewChips(newOffer, flippedOffer);
+            setNewChips(lastOfferMade, flippedOffer);
             this.initiator.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         } else {
             // Responder accepted offer
-            responder.processOfferAccepted(newOffer);
+            responder.processOfferAccepted(lastOfferMade);
             initiator.processOfferAccepted(flippedOffer);
-            setNewChips(flippedOffer, newOffer);
+            setNewChips(flippedOffer, lastOfferMade);
             this.responder.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         }
     }
@@ -496,34 +481,26 @@ public class Game {
 
     public List<OfferOutcome> getStrictParetoOutcomes() {
         OfferOutcome newOffer;
-
         List<OfferOutcome> strictParetoOutcomes = new ArrayList<>();
         int[] utilityFuncInit = getUtilityFunction(getGoalPositionPlayer(Settings.INITIATOR_NAME));
         int[] utilityFuncResp = getUtilityFunction(getGoalPositionPlayer(Settings.RESPONDER_NAME));
-        OfferOutcome initOutcome = new OfferOutcome(initialChipSets[0],
-                utilityFuncInit[initialChipSets[0]],
-                utilityFuncResp[initialChipSets[1]]);
+        OfferOutcome initOutcome = new OfferOutcome(initiator.getInitialChips(), utilityFuncInit[initiator.getInitialChips()], utilityFuncResp[responder.getInitialChips()]);
         for (int offer = 0; offer < utilityFuncInit.length; offer++) {
             newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
             if (((newOffer.getValueInit() > initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp()))) {
                 strictParetoOutcomes.add(newOffer);
             }
         }
-        Collections.sort(strictParetoOutcomes);
-        Collections.reverse(strictParetoOutcomes);
 
         return strictParetoOutcomes;
     }
 
     public List<OfferOutcome> getParetoOutcomes() {
         OfferOutcome newOffer;
-
         List<OfferOutcome> paretoOutcomes = new ArrayList<>();
         int[] utilityFuncInit = getUtilityFunction(getGoalPositionPlayer(Settings.INITIATOR_NAME));
         int[] utilityFuncResp = getUtilityFunction(getGoalPositionPlayer(Settings.RESPONDER_NAME));
-        OfferOutcome initOutcome = new OfferOutcome(initialChipSets[0],
-                utilityFuncInit[initialChipSets[0]],
-                utilityFuncResp[initialChipSets[1]]);
+        OfferOutcome initOutcome = new OfferOutcome(initiator.getInitialChips(), utilityFuncInit[initiator.getInitialChips()], utilityFuncResp[responder.getInitialChips()]);
         for (int offer = 0; offer < utilityFuncInit.length; offer++) {
             newOffer = new OfferOutcome(offer, utilityFuncInit[offer], utilityFuncResp[flipOffer(offer)]);
             if (((newOffer.getValueInit() >= initOutcome.getValueInit()) && (newOffer.getValueResp() > initOutcome.getValueResp())) ||
@@ -531,8 +508,6 @@ public class Game {
                 paretoOutcomes.add(newOffer);
             }
         }
-        Collections.sort(paretoOutcomes);
-        Collections.reverse(paretoOutcomes);
 
         return paretoOutcomes;
     }
@@ -546,8 +521,8 @@ public class Game {
      *
      * @return The number of offers made in this game.
      */
-    public int getNrOffers() {
-        return this.nrOffers;
+    public int getTotalNrOffersMade() {
+        return this.totalNrOffersMade;
     }
 
     /**
@@ -592,14 +567,6 @@ public class Game {
         return this.board;
     }
 
-    public int[][] getInitialChipSets() {  // TODO: change this (also within gameSettings, this will result in not being able to use the existing GameSettings)
-        int[][] binChipSets = new int[2][Settings.CHIP_DIVERSITY];
-        for (int i = 0; i < initialChipSets.length; i++) {
-            binChipSets[i] = Chips.getBins(initialChipSets[i], binMaxChips);
-        }
-        return binChipSets;
-    }
-
     /**
      * Getter for initiator agent
      *
@@ -634,7 +601,7 @@ public class Game {
      * @return The number of goal positions
      */
     public int getNumberOfGoalPositions() {
-        return this.nrGoalPositions;
+        return this.goalPositionsDict.size();
     }
 
     /**

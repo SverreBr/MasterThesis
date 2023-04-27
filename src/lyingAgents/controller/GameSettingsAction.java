@@ -43,7 +43,7 @@ public class GameSettingsAction extends AbstractAction {
             return;
         }
 
-        GameSettingsDialog bsd = new GameSettingsDialog(mainFrame, "Game settings");
+        GameSettingsDialog bsd = new GameSettingsDialog(mainFrame, "Game settings", game);
         bsd.setVisible(true);
 
         if (bsd.isGameHasChanged()) {

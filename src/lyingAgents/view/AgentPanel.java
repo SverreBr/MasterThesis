@@ -266,7 +266,7 @@ public class AgentPanel extends JComponent implements GameListener {
             style[idx] = "regular";
             content[idx++] = "";
             style[idx] = "regular";
-            content[idx++] = "total nr. offers: " + game.getNrOffers();
+            content[idx++] = "total nr. offers: " + game.getTotalNrOffersMade();
             style[idx] = "italic";
             content[idx++] = "final (total) points: " + agent.getUtilityValue() + " (" + agent.getFinalPoints() + ")";
         }

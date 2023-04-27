@@ -34,17 +34,17 @@ public class GameSettingsChips extends JComponent {
     /**
      * Constructor
      */
-    public GameSettingsChips() {
+    public GameSettingsChips(int[] chipsBin) {
         this.setBackground(ViewSettings.getBackGroundColor());
         setPreferredSize(new Dimension(COMPONENT_WIDTH, COMPONENT_HEIGHT));
 
-        addTextFields();
+        addTextFields(chipsBin.clone());
     }
 
     /**
      * Adds text fields to the chips
      */
-    private void addTextFields() {
+    private void addTextFields(int[] chipsBin) {
         JTextField textField;
 
         setLayout(new GridBagLayout());
@@ -52,7 +52,7 @@ public class GameSettingsChips extends JComponent {
         chipTextMap = new HashMap<>();
 
         for (int chipNum = 0; chipNum < Settings.CHIPS_PER_PLAYER; chipNum++) {
-            textField = new JTextField("", 1);
+            textField = new JTextField(String.valueOf(getChipFromBin(chipsBin)), 1);
 
             // Listen for changes in the text
             textField.getDocument().addDocumentListener(new DocumentListener() {
@@ -91,6 +91,24 @@ public class GameSettingsChips extends JComponent {
         }
         gbc.weightx = 1.0;
         add(chipTextMap.get(Settings.CHIPS_PER_PLAYER - 1), gbc);
+    }
+
+    public void removeAllValues() {
+        JTextField textField;
+        for (int chipNum = 0; chipNum < Settings.CHIPS_PER_PLAYER; chipNum++) {
+            textField = chipTextMap.get(chipNum);
+            textField.setText("");
+        }
+    }
+
+    private int getChipFromBin(int[] chipBin) {
+        for (int i = 0; i < chipBin.length; i++) {
+            if (chipBin[i] > 0) {
+                chipBin[i]--;
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
