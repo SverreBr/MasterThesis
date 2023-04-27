@@ -18,7 +18,6 @@ public class PlayAction implements PlayListener {
 
     private ProgressWorker pw;
 
-    private final JScrollPane scrollPane;
     private final JTextPane textPane;
 
     public PlayAction(Game game) {
@@ -30,7 +29,6 @@ public class PlayAction implements PlayListener {
         frame.setLayout(new BorderLayout());
 
         textPane = new JTextPane();
-        scrollPane = new JScrollPane((this.textPane));
         makePane();
         frame.add(pane);
         frame.pack();
@@ -45,7 +43,7 @@ public class PlayAction implements PlayListener {
      * Makes the main panel of the progress bar
      */
     private void makePane() {
-        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+        textPane.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 0, 0, 0),
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
@@ -59,7 +57,7 @@ public class PlayAction implements PlayListener {
         JButton cancel = new JButton("Cancel");
         cancel.addActionListener(e -> pw.cancelExecution());
 
-        pane.add(scrollPane, BorderLayout.NORTH);
+        pane.add(textPane, BorderLayout.NORTH);
         pane.add(cancel, BorderLayout.SOUTH);
     }
 

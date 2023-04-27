@@ -241,16 +241,19 @@ public abstract class Player {
      * Used for prediction using a "fictitious play"-like structure
      */
     protected void saveBeliefs() {
-        beliefOfferSaved[saveCount] = beliefOffer.clone();
-        if (BELIEF_TYPE_IS_ABSOLUTE) {
-            for (int i = 0; i < countBeliefsOfferType.length; i++) {
-                countBeliefsOfferTypeSaved[saveCount][i] = countBeliefsOfferType[i].clone();
-                countTotalOfferTypeSaved[saveCount][i] = countTotalOfferType[i].clone();
-            }
+        if (beliefOffer != null) {
+            beliefOfferSaved[saveCount] = beliefOffer.clone();
+            if (BELIEF_TYPE_IS_ABSOLUTE) {
+                for (int i = 0; i < countBeliefsOfferType.length; i++) {
+                    countBeliefsOfferTypeSaved[saveCount][i] = countBeliefsOfferType[i].clone();
+                    countTotalOfferTypeSaved[saveCount][i] = countTotalOfferType[i].clone();
+                }
 
-        } else {
-            beliefsOfferTypeSaved[saveCount] = beliefsOfferType.clone();
+            } else {
+                beliefsOfferTypeSaved[saveCount] = beliefsOfferType.clone();
+            }
         }
+
         saveCount++;
     }
 
@@ -259,18 +262,19 @@ public abstract class Player {
      */
     protected void restoreBeliefs() {
         saveCount--;
-        beliefOffer = beliefOfferSaved[saveCount].clone();
-        if (BELIEF_TYPE_IS_ABSOLUTE) {
-            for (int i = 0; i < countBeliefsOfferType.length; i++) {
-                countBeliefsOfferType[i] = countBeliefsOfferTypeSaved[saveCount][i].clone();
-                countTotalOfferType[i] = countTotalOfferTypeSaved[saveCount][i].clone();
-            }
+        if (beliefOffer != null) {
+            beliefOffer = beliefOfferSaved[saveCount].clone();
+            if (BELIEF_TYPE_IS_ABSOLUTE) {
+                for (int i = 0; i < countBeliefsOfferType.length; i++) {
+                    countBeliefsOfferType[i] = countBeliefsOfferTypeSaved[saveCount][i].clone();
+                    countTotalOfferType[i] = countTotalOfferTypeSaved[saveCount][i].clone();
+                }
 
-        } else {
-            for (int i = 0; i < beliefsOfferType.length; i++) {
-                beliefsOfferType[i] = beliefsOfferTypeSaved[saveCount][i].clone();
+            } else {
+                for (int i = 0; i < beliefsOfferType.length; i++) {
+                    beliefsOfferType[i] = beliefsOfferTypeSaved[saveCount][i].clone();
+                }
             }
-
         }
     }
 

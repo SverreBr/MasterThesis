@@ -33,8 +33,7 @@ public class Popups extends JOptionPane {
     public static void showInvalidLR(String name) {
         showMessageDialog(null,
                 "Provided an invalid learning rate for the " + name + ".\n" +
-                        "Please insert a number in the range [0, 1].\n" +
-                        "For now, no changes have been made to the game.",
+                        "Please insert a number in the range [0, 1].",
                 "Invalid input", JOptionPane.ERROR_MESSAGE);
     }
 
@@ -45,9 +44,8 @@ public class Popups extends JOptionPane {
      */
     public static void showInvalidCanLieToM(String name) {
         showMessageDialog(null,
-                "Provided an invalid boolean value that the " + name + " can lie.\n" +
-                        "Only an agent that can send messages with a higher-order theory of mind can lie (2+).\n" +
-                        "For now, no changes have been made to the game.",
+                "Provided an invalid boolean value that the " + name + " can make false statements.\n" +
+                        "Only an agent that can send messages can make false statements.",
                 "Invalid input", JOptionPane.ERROR_MESSAGE);
     }
 

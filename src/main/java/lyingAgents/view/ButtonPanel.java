@@ -128,8 +128,10 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         add(step, gbc);
         gbc.gridy++;
 
+        gbc.insets = new Insets(2, 2, 12, 2);
         add(play, gbc);
         gbc.gridy++;
+        gbc.insets = new Insets(2,2,2,2);
 
         gbc.gridwidth = 1;
         add(newNeg, gbc);
@@ -197,8 +199,8 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
                 resp.getOrderToM(),
                 init.getLearningSpeed(),
                 resp.getLearningSpeed(),
-                init.isCanLie(),
-                resp.isCanLie(),
+                init.isCanMakeFalseStatements(),
+                resp.isCanMakeFalseStatements(),
                 init.isCanSendMessages(),
                 resp.isCanSendMessages());
         game.newGameSettings(gameSetting);

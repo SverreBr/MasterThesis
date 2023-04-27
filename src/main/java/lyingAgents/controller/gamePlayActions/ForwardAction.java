@@ -1,6 +1,7 @@
 package lyingAgents.controller.gamePlayActions;
 
 import lyingAgents.model.Game;
+import lyingAgents.utilities.MiscFunc;
 
 import java.awt.*;
 import java.util.Objects;
@@ -70,16 +71,33 @@ public class ForwardAction implements ForwardListener {
      * Makes the main panel of the progress bar
      */
     private void makePane() {
-        pane.setPreferredSize(new Dimension(300, 100));
+        JTextPane textPane = new JTextPane();
+
+        textPane.setEditable(false);
+        textPane.setOpaque(false);
+        MiscFunc.createsStyledDocument(textPane.getStyledDocument());
+
+        String style = "boldalic";
+        String content = "Click on cancel to cancel execution after the current step is done.";
+        MiscFunc.addStylesToDoc(textPane, content, style);
+
         pbProgress = new JProgressBar();
         pbProgress.setPreferredSize(new Dimension(300, 50));
-        pbProgress.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         pbProgress.setStringPainted(true);
-        pane.add(pbProgress, BorderLayout.NORTH);
 
         JButton cancel = new JButton("Cancel");
         cancel.addActionListener(e -> pw.cancelExecution());
-        pane.add(cancel, BorderLayout.CENTER);
+
+        pane.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0; gbc.gridx = 0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        pane.add(textPane, gbc);
+        gbc.gridy++;
+        pane.add(pbProgress, gbc);
+        gbc.gridy++;
+        pane.add(cancel, gbc);
     }
 
     /**

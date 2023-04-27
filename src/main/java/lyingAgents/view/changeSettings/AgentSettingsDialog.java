@@ -160,7 +160,7 @@ public class AgentSettingsDialog extends JDialog {
         JTextPane initiatorLieText = new JTextPane();
         MiscFunc.addStylesToDoc(initiatorLieText, "Initiator can lie: ", "regular");
         initiatorCanLieField = new JComboBox<>(new String[]{"false", "true"});
-        initiatorCanLieField.setSelectedItem(String.valueOf(game.getInitiator().isCanLie()));
+        initiatorCanLieField.setSelectedItem(String.valueOf(game.getInitiator().isCanMakeFalseStatements()));
 
 
         JTextPane responderToMText = new JTextPane();
@@ -180,7 +180,7 @@ public class AgentSettingsDialog extends JDialog {
         JTextPane responderLieText = new JTextPane();
         MiscFunc.addStylesToDoc(responderLieText, "Responder can lie: ", "regular");
         responderCanLieField = new JComboBox<>(new String[]{"false", "true"});
-        responderCanLieField.setSelectedItem(String.valueOf(game.getResponder().isCanLie()));
+        responderCanLieField.setSelectedItem(String.valueOf(game.getResponder().isCanMakeFalseStatements()));
 
         addFieldsToPanel(initiatorToMText, initiatorLRText, initiatorMessagesText, initiatorLieText, initiatorToMField, initiatorLRField, initiatorCanSendMessagesField, initiatorCanLieField);
 
@@ -220,7 +220,7 @@ public class AgentSettingsDialog extends JDialog {
         initiatorCanSendMessagesValue = Boolean.parseBoolean((String) initiatorCanSendMessagesField.getSelectedItem());
 
         initiatorCanLieFieldValue = Boolean.parseBoolean((String) initiatorCanLieField.getSelectedItem());
-        if ((initiatorCanLieFieldValue && !initiatorCanSendMessagesValue) || (initiatorCanLieFieldValue && (initiatorToMFieldValue < 2))) {
+        if (initiatorCanLieFieldValue && !initiatorCanSendMessagesValue) {
             Popups.showInvalidCanLieToM(Settings.INITIATOR_NAME);
             this.gameHasChanged = false;
         }
@@ -241,7 +241,7 @@ public class AgentSettingsDialog extends JDialog {
         responderCanSendMessagesValue = Boolean.parseBoolean((String) responderCanSendMessagesField.getSelectedItem());
 
         responderCanLieFieldValue = Boolean.parseBoolean((String) responderCanLieField.getSelectedItem());
-        if ((responderCanLieFieldValue && !responderCanSendMessagesValue) || (responderCanLieFieldValue && (responderToMFieldValue < 2))) {
+        if (responderCanLieFieldValue && !responderCanSendMessagesValue) {
             Popups.showInvalidCanLieToM(Settings.RESPONDER_NAME);
             this.gameHasChanged = false;
         }

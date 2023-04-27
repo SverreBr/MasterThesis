@@ -13,7 +13,7 @@ public class RandomNumGen {
         double p = Math.random();
         double sum = 0.0;
         int i = 0;
-        while (sum < p) {
+        while (sum + Settings.EPSILON < p) {
             sum += prob[i];
             i++;
         }

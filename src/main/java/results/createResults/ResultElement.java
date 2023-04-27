@@ -38,13 +38,13 @@ public class ResultElement {
 
         initToM = init.getOrderToM();
         initLR = init.getLearningSpeed();
-        initCanLie = init.isCanLie();
+        initCanLie = init.isCanMakeFalseStatements();
         initFinalPoints = init.getFinalPoints();
         initInitialPoints = init.getInitialPoints();
 
         respToM = resp.getOrderToM();
         respLR = resp.getLearningSpeed();
-        respCanLie = resp.isCanLie();
+        respCanLie = resp.isCanMakeFalseStatements();
         respFinalPoints = resp.getFinalPoints();
         respInitialPoints = resp.getInitialPoints();
 

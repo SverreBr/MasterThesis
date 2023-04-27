@@ -246,7 +246,7 @@ public class AgentPanel extends JComponent implements GameListener {
     private void updateInfo() {
         int idx = 0;
         style[idx] = "bold";
-        content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanLie() + ")";
+        content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanMakeFalseStatements() + ")";
         content[idx++] = "initial chips: " + Arrays.toString(this.initialChips);
         content[idx++] = "";
         content[idx++] = "";

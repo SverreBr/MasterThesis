@@ -19,7 +19,7 @@ public class PlayerLying extends PlayerToM {
     /**
      * True if an agent can lie, that is, it can send messages that are not true.
      */
-    private final boolean canLie;
+    private final boolean canMakeFalseStatements;
 
     private final boolean canSendMessages;
 
@@ -56,7 +56,7 @@ public class PlayerLying extends PlayerToM {
             System.err.println("Agent cannot lie if it cannot send messages. Agent can lie set to false.");
             agentCanLie = false;
         }
-        this.canLie = agentCanLie;
+        this.canMakeFalseStatements = agentCanLie;
         this.canSendMessages = canSendMessages;
         if (canSendMessages && (orderToM == 0)) makeRng();
     }
@@ -72,8 +72,13 @@ public class PlayerLying extends PlayerToM {
         int[] goalPositionsArray = new int[game.getNumberOfGoalPositions()];
         int goalPosition = this.game.getGoalPositionPlayer(this.getName());
 
-        Arrays.fill(zeroOrderProbSendingMessages, Settings.PROB_MASS_OTHER_LOCS);
-        zeroOrderProbSendingMessages[goalPosition] = 1 - Settings.PROB_MASS_OTHER_LOCS * (zeroOrderProbSendingMessages.length - 1);
+        if (canMakeFalseStatements) {
+            Arrays.fill(zeroOrderProbSendingMessages, Settings.PROB_MASS_OTHER_LOCS);
+            zeroOrderProbSendingMessages[goalPosition] = 1.0 - Settings.PROB_MASS_OTHER_LOCS * (zeroOrderProbSendingMessages.length - 1);
+        } else {
+            zeroOrderProbSendingMessages[goalPosition] = 1.0;
+        }
+
 
         for (int i = 0; i < goalPositionsArray.length; i++) {
             goalPositionsArray[i] = i;
@@ -119,7 +124,7 @@ public class PlayerLying extends PlayerToM {
      */
     public int chooseOffer(int offerReceived) {
 
-        if (!Game.DEBUG && !canSendMessages) return super.chooseOffer(offerReceived);  // Does not produce terminal outputs
+        if (!Game.DEBUG && !canSendMessages) return super.chooseOffer(offerReceived);
 //        if (!canSendMessages) return super.chooseOffer(offerReceived);
 
         bestOffers = new ArrayList<>();
@@ -227,7 +232,7 @@ public class PlayerLying extends PlayerToM {
         double curValue;
         boolean savedHasSentMessage = this.hasSentMessage;
 
-        if ((!canLie) && (loc != game.getGoalPositionPlayer(this.getName()))) return;
+        if ((!canMakeFalseStatements) && (loc != game.getGoalPositionPlayer(this.getName()))) return;
         assert (getOrderToM() > 0) : "Theory of mind zero agent cannot reason about sending messages...";
 
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
@@ -289,8 +294,8 @@ public class PlayerLying extends PlayerToM {
      *
      * @return True if this agent can lie, false otherwise.
      */
-    public boolean isCanLie() {
-        return canLie;
+    public boolean isCanMakeFalseStatements() {
+        return canMakeFalseStatements;
     }
 
     public boolean isCanSendMessages() {
