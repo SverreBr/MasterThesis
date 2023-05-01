@@ -83,21 +83,26 @@ public class PlayerToM extends Player {
     public PlayerToM(String playerName, Game game, int orderToM, double learningSpeed, int chipsSelf, int chipsOther, int[] utilityFunction) {
         super(playerName, game, learningSpeed, chipsSelf, utilityFunction, (orderToM == 0));
         this.orderToM = orderToM;
-        this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
-        this.savedLocationBeliefs = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
-        this.savedLocationBeliefsWithoutMessage = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
-        this.locationBeliefsWithoutMessage = new double[this.game.getNumberOfGoalPositions()];
 
         if (this.orderToM > 0) {
-            Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
-            confidence = 1.0;  // starting confidence
+            this.locationBeliefs = new double[this.game.getNumberOfGoalPositions()];
+            this.savedLocationBeliefs = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
+            this.savedLocationBeliefsWithoutMessage = new double[Settings.SAVE_NUMBER][this.game.getNumberOfGoalPositions()];
+            this.locationBeliefsWithoutMessage = new double[this.game.getNumberOfGoalPositions()];
+
             selfModel = new PlayerToM("selfModel_" + playerName, game, orderToM - 1, learningSpeed, chipsSelf, chipsOther, utilityFunction);
             partnerModel = new PlayerToM("partnerModel_" + playerName, game, orderToM - 1, learningSpeed, chipsOther, chipsSelf, utilityFunction);
             partnerModel.setConfidenceLockedTo(true);
         } else {
             selfModel = null;
             partnerModel = null;
+            this.locationBeliefs = null;
+            this.savedLocationBeliefs = null;
+            this.savedLocationBeliefsWithoutMessage = null;
+            this.locationBeliefsWithoutMessage = null;
         }
+
+        initNegotiationRound(chipsSelf, chipsOther, utilityFunction);
     }
 
     /**
@@ -108,15 +113,19 @@ public class PlayerToM extends Player {
      * @param utilityFunction The utility function for this player
      */
     @Override
-    public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
-        super.initNewRound(chipsSelf, chipsOther, utilityFunction);
+    public void initNegotiationRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
+        super.initNegotiationRound(chipsSelf, chipsOther, utilityFunction);
         this.receivedMessage = false;
         this.hasSentMessage = false;
         if (orderToM > 0) {
             Arrays.fill(locationBeliefs, 1.0 / locationBeliefs.length);
             Arrays.fill(locationBeliefsWithoutMessage, -1);
-            selfModel.initNewRound(chipsSelf, chipsOther, utilityFunction);
-            partnerModel.initNewRound(chipsOther, chipsSelf, utilityFunction);
+            for (int i = 0; i < Settings.SAVE_NUMBER; i++) {
+                Arrays.fill(savedLocationBeliefs[i], -1);
+                Arrays.fill(savedLocationBeliefsWithoutMessage[i], -1);
+            }
+            selfModel.initNegotiationRound(chipsSelf, chipsOther, utilityFunction);
+            partnerModel.initNegotiationRound(chipsOther, chipsSelf, utilityFunction);
             confidence = 1.0;  // starting confidence
         }
     }
@@ -132,29 +141,20 @@ public class PlayerToM extends Player {
     public int makeOffer(int offerReceived) {
         int curOffer;
 
-        if (offerReceived < 0) {
-            curOffer = selectInitialOffer();
+        if (offerReceived == Settings.ID_NO_OFFER) {
+            curOffer = chooseOffer(Settings.ID_NO_OFFER);
         } else {
             receiveOffer(offerReceived);
             curOffer = chooseOffer(offerReceived);
-//            curOffer = selectOffer(offerReceived);
         }
-        sendOffer(curOffer);
+        if ((curOffer != Settings.ID_ACCEPT_OFFER) && (curOffer != Settings.ID_WITHDRAW_NEGOTIATION)) sendOffer(curOffer);
         return curOffer;
     }
 
-    /**
-     * Makes an initial offer. In this case, it is as if the other agent made the offer to keep offer.
-     *
-     * @return the offer that this agent makes as an initial offer
-     */
-    public int selectInitialOffer() {
-        return chooseOffer(chips);
-    }
-
     public int chooseOffer(int offerReceived) {
-        List<Integer> offerList = selectOffer(offerReceived);
-        return offerList.get((int) (Math.random() * offerList.size()));
+        List<OfferType> offerList = selectBestOffers(offerReceived);
+        OfferType offerType = offerList.get((int) (Math.random() * offerList.size()));
+        return offerType.getOffer();
     }
 
     /**
@@ -164,37 +164,42 @@ public class PlayerToM extends Player {
      * @return The offer offered to the other player from the perspective of this agent.
      * That is, if accepted, this agent gets the offer.
      */
-    public List<Integer> selectOffer(int offerReceived) {
-        List<Integer> bestOffers = new ArrayList<>();
+    public List<OfferType> selectBestOffers(int offerReceived) {
+        List<OfferType> bestOffers = new ArrayList<>();
         double curValue, tmpSelectOfferValue;
 
-        bestOffers.add(this.chips);
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             curValue = getValue(i);
             if (curValue - Settings.EPSILON > tmpSelectOfferValue) {
                 tmpSelectOfferValue = curValue;
                 bestOffers = new ArrayList<>();
-                bestOffers.add(i);
+                bestOffers.add(new OfferType(i, tmpSelectOfferValue, Settings.ID_NO_LOCATION));
             } else if ((curValue >= tmpSelectOfferValue - Settings.EPSILON) &&
                     (curValue <= tmpSelectOfferValue + Settings.EPSILON)) {
-                bestOffers.add(i);
+                bestOffers.add(new OfferType(i, tmpSelectOfferValue, Settings.ID_NO_LOCATION));
             }
         }
 
-        if ((utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
+        return checkPossibleOffers(offerReceived, bestOffers, tmpSelectOfferValue);
+    }
+
+    protected List<OfferType> checkPossibleOffers(int offerReceived, List<OfferType> bestOffers, double tmpSelectOfferValue) {
+        if ((offerReceived != Settings.ID_NO_OFFER) &&
+                (utilityFunction[offerReceived] + Settings.EPSILON >= tmpSelectOfferValue) &&
                 (utilityFunction[offerReceived] - Settings.EPSILON > utilityFunction[this.chips])) {
             // accept offerReceived as it is better than making a new offer or withdrawing
             bestOffers = new ArrayList<>();
-            bestOffers.add(offerReceived);
+            bestOffers.add(new OfferType(Settings.ID_ACCEPT_OFFER, utilityFunction[offerReceived], Settings.ID_NO_LOCATION));
         } else if ((utilityFunction[this.chips] + Settings.EPSILON >= tmpSelectOfferValue) &&
-                (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived])) {
+                ((offerReceived == Settings.ID_NO_OFFER) || (utilityFunction[this.chips] + Settings.EPSILON >= utilityFunction[offerReceived]))) {
             // withdraw from negotiation
             bestOffers = new ArrayList<>();
-            bestOffers.add(this.chips);
+            bestOffers.add(new OfferType(Settings.ID_WITHDRAW_NEGOTIATION, utilityFunction[this.chips], Settings.ID_NO_LOCATION));
         } // else, make (one of) the best offer(s)
         return bestOffers;
     }
+
 
     /**
      * Calculates the expected value of an offer
@@ -239,21 +244,23 @@ public class PlayerToM extends Player {
      * @return the value associated to making the offer
      */
     private double getLocationValue(int offerToSelf, int offerToOther) {
-        List<Integer> expectedResponses = partnerModel.selectOffer(offerToOther);
+        List<OfferType> expectedResponses = partnerModel.selectBestOffers(offerToOther);
         double chance = 1.0 / expectedResponses.size();
         double curValue, totValue;
+        int someOffer;
+
         totValue = 0.0;
-        for (int expectedResponse : expectedResponses) {
-            if (expectedResponse == offerToOther) {
+        for (OfferType expectedResponse : expectedResponses) {
+            if (expectedResponse.getOffer() == Settings.ID_ACCEPT_OFFER) {
                 // Partner accepts.
-                curValue = utilityFunction[offerToSelf] - 1;
-            } else if (expectedResponse == partnerModel.chips) {
+                curValue = utilityFunction[offerToSelf] + Settings.SCORE_NEGOTIATION_STEP;
+            } else if (expectedResponse.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION) {
                 // Offer equals partner its offer, so partner has withdrawn from negotiation
-                curValue = utilityFunction[this.chips] - 1;
+                curValue = utilityFunction[this.chips] + Settings.SCORE_NEGOTIATION_STEP;
             } else {
                 // Offer is not equal to partner its offer, so new offer has been made
-                expectedResponse = game.flipOffer(expectedResponse);
-                curValue = Math.max(utilityFunction[expectedResponse], utilityFunction[this.chips]) - 2;
+                someOffer = game.flipOffer(expectedResponse.getOffer());
+                curValue = Math.max(utilityFunction[someOffer], utilityFunction[this.chips]) + 2*Settings.SCORE_NEGOTIATION_STEP;
                 // minus one for current offer and one for offer from partner
             }
             totValue += chance * curValue;
@@ -274,6 +281,7 @@ public class PlayerToM extends Player {
             super.receiveOffer(offerReceived);
         } else {
             updateLocationBeliefs(offerReceived);
+
             if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with what is offered...
                 restoreLocationBeliefsDueToUnbelievedMessage();
                 if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
@@ -322,22 +330,27 @@ public class PlayerToM extends Player {
      * @param offerReceived The offer received by the partner
      */
     private void updateLocationBeliefs(int offerReceived) {
-        int loc, offerPartnerChips, utilityOffer, partnerAlternative;
+        int loc, flippedOfferReceived, utilityOffer, modeledPartnerAlternative;
         double sumAll, maxExpVal, curExpVal, accuracyRating, newBelief, sumAllSavedBeliefs;
 
-        offerPartnerChips = game.flipOffer(offerReceived);
+        flippedOfferReceived = game.flipOffer(offerReceived);
         sumAll = 0.0;
         sumAllSavedBeliefs = 0.0;
         accuracyRating = 0.0;
         for (loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
             partnerModel.utilityFunction = game.getUtilityFunction(loc);
-            utilityOffer = partnerModel.utilityFunction[offerPartnerChips] + Settings.SCORE_NEGOTIATION_STEP;
+            utilityOffer = partnerModel.utilityFunction[flippedOfferReceived] + Settings.SCORE_NEGOTIATION_STEP;
             if (utilityOffer - Settings.EPSILON > partnerModel.utilityFunction[partnerModel.chips]) {
                 // Given loc, offerReceived gives the partner a higher score than the initial situation
-                partnerAlternative = partnerModel.chooseOffer(0); // 0 since worst possible offer
-                // Agent's guess for partner's best option given location l
-                maxExpVal = partnerModel.getValue(partnerAlternative);
-                curExpVal = partnerModel.getValue(offerPartnerChips);
+                modeledPartnerAlternative = partnerModel.chooseOffer(Settings.ID_NO_OFFER); // 0 since worst possible offer
+
+                if (modeledPartnerAlternative == Settings.ID_WITHDRAW_NEGOTIATION) {
+                    maxExpVal = partnerModel.utilityFunction[partnerModel.chips];
+                } else {
+                    // Agent's guess for partner's best option given location l
+                    maxExpVal = partnerModel.getValue(modeledPartnerAlternative);
+                }
+                curExpVal = partnerModel.getValue(flippedOfferReceived);
 
                 // Agent's guess for partner's value of offerReceived
                 if (maxExpVal - Settings.EPSILON > utilityOffer) {

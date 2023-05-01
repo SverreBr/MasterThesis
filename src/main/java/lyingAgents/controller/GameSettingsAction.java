@@ -47,8 +47,7 @@ public class GameSettingsAction extends AbstractAction {
         bsd.setVisible(true);
 
         if (bsd.isGameHasChanged()) {
-            GameSetting gameSetting = new GameSetting();
-            gameSetting.getSettingsFromDialog(bsd);
+            GameSetting gameSetting = new GameSetting(bsd);
             game.newGameSettings(gameSetting);
         }
         bsd.dispose();

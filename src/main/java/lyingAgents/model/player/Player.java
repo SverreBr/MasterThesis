@@ -18,6 +18,7 @@ public abstract class Player {
      */
     protected int chips;
 
+
     /**
      * Score for the player given a chip index
      */
@@ -170,7 +171,7 @@ public abstract class Player {
      * @param chipsOther      The offer to the other player
      * @param utilityFunction The utility function for this player
      */
-    public void initNewRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
+    public void initNegotiationRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
         this.messages = new ArrayList<>();
         this.messageCnt = 0;
         this.saveCount = 0;
@@ -227,7 +228,9 @@ public abstract class Player {
      * @return the counter-offer from the perspective of this player.
      * That is, if accepted, this player gets the returned value.
      */
-    abstract public List<Integer> selectOffer(int offerReceived);
+    abstract public List<OfferType> selectBestOffers(int offerReceived);
+
+    abstract public int chooseOffer(int offerReceived);
 
     /**
      * Method called to receive a message by another player.
@@ -253,7 +256,6 @@ public abstract class Player {
                 beliefsOfferTypeSaved[saveCount] = beliefsOfferType.clone();
             }
         }
-
         saveCount++;
     }
 

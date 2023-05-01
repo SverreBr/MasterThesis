@@ -30,11 +30,6 @@ public class Game {
     private int[] flipArray;
 
     /**
-     * An array which contains the chips of the initiator and the responder.
-     */
-    private final int[] chipSets = new int[2];
-
-    /**
      * A 2-dimensional array which contains two goal positions for the initiator and the responder
      */
     private final int[] goalPositions = new int[2];
@@ -117,22 +112,22 @@ public class Game {
     public void reset(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
         this.board.resetBoard();
         this.initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-        if (simulationOn)
-            notifyListenersNewGame();
+        if (simulationOn) notifyListenersNewGame();
     }
 
     /**
      * Initializes a fully new game, where the agents are also fully reset
      */
     private void initNewGame(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
-        generateNewNegotiationSetting();
-        int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
-        int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
+        GameSetting gameSetting = generateNewNegotiationSetting();
+        int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
+        int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
+
 
         this.initiator = new PlayerLying(Settings.INITIATOR_NAME, this, initToM, initLR,
-                chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]], initCanLie, initCanSendMessages);
+                chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]], initCanLie, initCanSendMessages);
         this.responder = new PlayerLying(Settings.RESPONDER_NAME, this, respToM, respLR,
-                chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]], respCanLie, respCanSendMessages);
+                chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]], respCanLie, respCanSendMessages);
     }
 
     /**
@@ -140,12 +135,12 @@ public class Game {
      */
     public void newRound() {
         this.board.resetBoard();
-        generateNewNegotiationSetting();
+        GameSetting gameSetting = generateNewNegotiationSetting();
+        int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
+        int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
 
-        int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
-        int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
-        this.initiator.initNewRound(chipSets[initIdx], chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
-        this.responder.initNewRound(chipSets[respIdx], chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
+        this.initiator.initNegotiationRound(chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]]);
+        this.responder.initNegotiationRound(chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]]);
         if (simulationOn)
             notifyListenersNewGame();
     }
@@ -153,35 +148,32 @@ public class Game {
     /**
      * Generates a new negotiation setting.
      */
-    private void generateNewNegotiationSetting() {
+    private GameSetting generateNewNegotiationSetting() {
         setBasicNewGameSettings();
 
-        // Distribute tokens to players
-        int[] chipsInit = generateNewChips();  // will be stored in chipSets[0] as index
-        int[] chipsResp = generateNewChips();  // will be stored in chipSets[1] as index
-        calculateSetting(chipsInit, chipsResp);
-        assignGoalPositions();
+        generateGoalPositions();
+        int[][] newChips = generateNewChips();
+        GameSetting gameSetting = new GameSetting(board.getBoard(), newChips, goalPositions);
+        calculateSetting(gameSetting);
+
+        return gameSetting;
     }
 
     /**
      * Calculates various things for a new negotiation settings. Utility functions for goal positions are
      * calculated.
-     *
-     * @param chipsInit The chips for the initiator
-     * @param chipsResp The chips for the responder
      */
-    private void calculateSetting(int[] chipsInit, int[] chipsResp) {
+    private void calculateSetting(GameSetting gameSetting) {
         if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         int numIndexCodes, pos;
+        int[][] chipsSets = gameSetting.getChipSets();
         this.binMaxChips = Chips.makeNewChipBin();
 
         numIndexCodes = 1;
         for (int i = 0; i < Settings.CHIP_DIVERSITY; i++) {
-            this.binMaxChips[i] = chipsInit[i] + chipsResp[i];
+            this.binMaxChips[i] = chipsSets[0][i] + chipsSets[1][i];
             numIndexCodes *= (this.binMaxChips[i] + 1);
         }
-        chipSets[0] = Chips.getIndex(chipsInit, this.binMaxChips);
-        chipSets[1] = Chips.getIndex(chipsResp, this.binMaxChips);
 
         Point goalPosition;
         utilityFunctions = new int[this.goalPositionsDict.size()][numIndexCodes];
@@ -222,15 +214,19 @@ public class Game {
     /**
      * Generate and distribute tokens for the agents
      */
-    private int[] generateNewChips() {
-        int[] chips = Chips.makeNewChipBin();
+    private int[][] generateNewChips() {
+        int[][] newChips = new int[2][];
         int newChip;
 
-        for (int i = 0; i < Settings.CHIPS_PER_PLAYER; i++) {
-            newChip = (int) (Math.random() * Settings.CHIP_DIVERSITY);
-            chips[newChip] += 1;
+        for (int agent = 0; agent < 2; agent++) {
+            newChips[agent] = Chips.makeNewChipBin();
+            for (int numChip = 0; numChip < Settings.CHIPS_PER_PLAYER; numChip++) {
+                newChip = (int) (Math.random() * Settings.CHIP_DIVERSITY);
+                newChips[agent][newChip] += 1;
+            }
         }
-        return chips;
+
+        return newChips;
     }
 
     /**
@@ -241,16 +237,13 @@ public class Game {
     public void newGameSettings(GameSetting gameSetting) {
         setBasicNewGameSettings();
         board.makeBoard(gameSetting.getBoard());
+        calculateSetting(gameSetting);
+        int chipsInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
+        int chipsResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
 
-        int initIdx = getPlayerIdx(Settings.INITIATOR_NAME);
-        int respIdx = getPlayerIdx(Settings.RESPONDER_NAME);
-
-        calculateSetting(gameSetting.getChipSets()[initIdx], gameSetting.getChipSets()[respIdx]);
-        System.arraycopy(gameSetting.getGoalPositions(), 0, this.goalPositions, 0, this.goalPositions.length);
-        this.initiator.initNewRound(this.chipSets[initIdx], this.chipSets[respIdx], utilityFunctions[goalPositions[initIdx]]);
-        this.responder.initNewRound(this.chipSets[respIdx], this.chipSets[initIdx], utilityFunctions[goalPositions[respIdx]]);
-        if (simulationOn)
-            notifyListenersNewGame();
+        this.initiator.initNegotiationRound(chipsInitiator, chipsResponder, utilityFunctions[gameSetting.getGoalPositions()[0]]);
+        this.responder.initNegotiationRound(chipsResponder, chipsInitiator, utilityFunctions[gameSetting.getGoalPositions()[1]]);
+        if (simulationOn) notifyListenersNewGame();
     }
 
     /**
@@ -258,7 +251,7 @@ public class Game {
      */
     private void setBasicNewGameSettings() {
         setBooleanGameFinished(false);
-        this.lastOfferMade = -1;
+        this.lastOfferMade = Settings.ID_NO_OFFER;
         this.totalNrOffersMade = 0;
         this.turn = Settings.INITIATOR_NAME;
         this.reachedMaxNumOffers = false;
@@ -273,8 +266,7 @@ public class Game {
      * the agent ends negotiation, accepted an offer or made a new offer.
      */
     public void step() {
-        int tmpNewOffer, flippedOffer;
-        boolean negotiationEnds = false;
+        int tmpNewOffer;
 
         if (isGameFinished) return;
 
@@ -284,26 +276,23 @@ public class Game {
                 isMessageSend = false;
             }
             tmpNewOffer = this.initiator.makeOffer(lastOfferMade);
-            if (tmpNewOffer == this.initiator.getChips()) negotiationEnds = true;
         } else {
             if (isMessageSend) {
                 this.responder.receiveMessage(messageSend);
                 isMessageSend = false;
             }
             tmpNewOffer = this.responder.makeOffer(lastOfferMade);
-            if (tmpNewOffer == this.responder.getChips()) negotiationEnds = true;
         }
 
-        flippedOffer = flipOffer(tmpNewOffer);
-        if (negotiationEnds) { // Negotiation terminated
+        if (tmpNewOffer == Settings.ID_WITHDRAW_NEGOTIATION) { // Negotiation terminated
             negotiationTerminates();
             if (DEBUG) printFinalStatements();
-        } else if (tmpNewOffer == lastOfferMade) { // Offer is accepted
-            offerAccepted(flippedOffer);
+        } else if (tmpNewOffer == Settings.ID_ACCEPT_OFFER) { // Offer is accepted
+            offerAccepted();
             if (DEBUG) printFinalStatements();
         } else { // Negotiation continues with new offer
             totalNrOffersMade++;
-            lastOfferMade = flippedOffer;
+            lastOfferMade = flipOffer(tmpNewOffer);
             addOfferMessage(tmpNewOffer);
             switchTurn();
         }
@@ -314,7 +303,7 @@ public class Game {
     private void printFinalStatements() {
         List<OfferOutcome> peList = getStrictParetoOutcomes();
 
-        System.out.println("\nPossible better outcomes:");
+        System.out.println("\nPossible better outcomes than initial situation:");
         for (OfferOutcome offerOutcome : peList) {
             System.out.println("\t " + Arrays.toString(Chips.getBins(offerOutcome.getOfferForInit(), getBinMaxChips())) +
                     " - " + Arrays.toString(Chips.getBins(flipOffer(offerOutcome.getOfferForInit()), getBinMaxChips())) +
@@ -388,7 +377,7 @@ public class Game {
     /**
      * assigns a goal position to each agent
      */
-    private void assignGoalPositions() {
+    private void generateGoalPositions() {
         for (int i = 0; i < goalPositions.length; i++) {
             goalPositions[i] = (int) (Math.random() * goalPositionsDict.size());
         }
@@ -419,23 +408,19 @@ public class Game {
 
     /**
      * Called when an offer is accepted
-     *
-     * @param flippedOffer The offer that has been accepted and is given to the other player
      */
-    public void offerAccepted(int flippedOffer) {
+    public void offerAccepted() {
         setBooleanGameFinished(true);
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             // Initiator accepted offer
             initiator.processOfferAccepted(lastOfferMade);
-            responder.processOfferAccepted(flippedOffer);
-            setNewChips(lastOfferMade, flippedOffer);
+            responder.processOfferAccepted(flipOffer(lastOfferMade));
             this.initiator.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         } else {
             // Responder accepted offer
+            initiator.processOfferAccepted(flipOffer(lastOfferMade));
             responder.processOfferAccepted(lastOfferMade);
-            initiator.processOfferAccepted(flippedOffer);
-            setNewChips(flippedOffer, lastOfferMade);
             this.responder.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         }
     }
@@ -612,17 +597,6 @@ public class Game {
     }
 
     /**
-     * Sets new chips to both the initiator and the responder
-     *
-     * @param initChips The chips to be assigned to the initiator
-     * @param respChips The chips to be assigned to the responder
-     */
-    public void setNewChips(int initChips, int respChips) {
-        this.chipSets[getPlayerIdx(Settings.INITIATOR_NAME)] = initChips;
-        this.chipSets[getPlayerIdx(Settings.RESPONDER_NAME)] = respChips;
-    }
-
-    /**
      * Gets the total chips in the game as a bin
      *
      * @return The bin that contains all chips in the game
@@ -638,8 +612,7 @@ public class Game {
      * @return The goal position as a point
      */
     public Point getGoalPositionPointPlayer(String player) {
-        int playerIdx = getPlayerIdx(player);
-        return goalPositionsDict.get(goalPositions[playerIdx]);
+        return goalPositionsDict.get(goalPositions[getPlayerIdx(player)]);
     }
 
     /**
@@ -649,8 +622,7 @@ public class Game {
      * @return The goal positions as an integer
      */
     public int getGoalPositionPlayer(String player) {
-        int playerIdx = getPlayerIdx(player);
-        return goalPositions[playerIdx];
+        return goalPositions[getPlayerIdx(player)];
     }
 
     /**
@@ -700,9 +672,7 @@ public class Game {
      * @return Game setting of this game model
      */
     public GameSetting getGameSetting() {
-        GameSetting gameSetting = new GameSetting();
-        gameSetting.getSettingsFromGame(this);
-        return gameSetting;
+        return new GameSetting(this);
     }
 
     public boolean isReachedMaxNumOffers() {

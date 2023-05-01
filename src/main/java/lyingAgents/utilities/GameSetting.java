@@ -32,6 +32,20 @@ public class GameSetting implements Serializable {
      */
     private int[] goalPositions;
 
+    public GameSetting(GameSettingsDialog bsd) {
+        getSettingsFromDialog(bsd);
+    }
+
+    public GameSetting(Game game) {
+        getSettingsFromGame(game);
+    }
+
+    public GameSetting(int[][] board, int[][] chipSets, int[] goalPositions) {
+        this.board = board;
+        this.chipSets = chipSets;
+        this.goalPositions = goalPositions;
+    }
+
     /**
      * Extract a game setting from information from a dialog as provided by the user
      *

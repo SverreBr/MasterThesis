@@ -163,7 +163,7 @@ public class Settings {
     /**
      * maximum number of characters a file name may have
      */
-    public static final int MAX_FILE_NAME = 20;
+    public static final int MAX_FILE_NAME = 30;
 
     /**
      * minimum number of characters a file name may have
@@ -175,5 +175,14 @@ public class Settings {
      */
     public static final double PROB_MASS_OTHER_LOCS = 0.01;
 
-    public static final double PROB_SENDING_MESSAGES = 0.25;
+    public static final double PROB_TOM0_SEND_MESSAGE = 0.25;
+    public static final int ID_NO_OFFER = -1;
+    public static final int ID_ACCEPT_OFFER = -2;
+    public static final int ID_WITHDRAW_NEGOTIATION = -3;
+    public static final int ID_NO_LOCATION = -1;
+
+    public static final String ID_INIT_CHIPS = "initChips";
+    public static final String ID_RESP_CHIPS = "respChips";
+    public static final String ID_INIT_GOAL = "initGoal";
+    public static final String ID_RESP_GOAL = "respGoal";
 }
