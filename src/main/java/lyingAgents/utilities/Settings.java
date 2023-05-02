@@ -180,9 +180,4 @@ public class Settings {
     public static final int ID_ACCEPT_OFFER = -2;
     public static final int ID_WITHDRAW_NEGOTIATION = -3;
     public static final int ID_NO_LOCATION = -1;
-
-    public static final String ID_INIT_CHIPS = "initChips";
-    public static final String ID_RESP_CHIPS = "respChips";
-    public static final String ID_INIT_GOAL = "initGoal";
-    public static final String ID_RESP_GOAL = "respGoal";
 }

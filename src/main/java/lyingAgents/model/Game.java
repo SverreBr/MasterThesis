@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Game {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     /**
      * bin with all the chips in the game
@@ -141,8 +141,7 @@ public class Game {
 
         this.initiator.initNegotiationRound(chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]]);
         this.responder.initNegotiationRound(chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]]);
-        if (simulationOn)
-            notifyListenersNewGame();
+        if (simulationOn) notifyListenersNewGame();
     }
 
     /**
@@ -237,12 +236,16 @@ public class Game {
     public void newGameSettings(GameSetting gameSetting) {
         setBasicNewGameSettings();
         board.makeBoard(gameSetting.getBoard());
+        goalPositions[0] = gameSetting.getGoalPositions()[0];
+        goalPositions[1] = gameSetting.getGoalPositions()[1];
+
         calculateSetting(gameSetting);
+
         int chipsInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
         int chipsResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
 
-        this.initiator.initNegotiationRound(chipsInitiator, chipsResponder, utilityFunctions[gameSetting.getGoalPositions()[0]]);
-        this.responder.initNegotiationRound(chipsResponder, chipsInitiator, utilityFunctions[gameSetting.getGoalPositions()[1]]);
+        this.initiator.initNegotiationRound(chipsInitiator, chipsResponder, utilityFunctions[goalPositions[0]]);
+        this.responder.initNegotiationRound(chipsResponder, chipsInitiator, utilityFunctions[goalPositions[1]]);
         if (simulationOn) notifyListenersNewGame();
     }
 
@@ -414,13 +417,13 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             // Initiator accepted offer
-            initiator.processOfferAccepted(lastOfferMade);
-            responder.processOfferAccepted(flipOffer(lastOfferMade));
+            initiator.processOfferAccepted(lastOfferMade, false);
+            responder.processOfferAccepted(flipOffer(lastOfferMade), true);
             this.initiator.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         } else {
             // Responder accepted offer
-            initiator.processOfferAccepted(flipOffer(lastOfferMade));
-            responder.processOfferAccepted(lastOfferMade);
+            initiator.processOfferAccepted(flipOffer(lastOfferMade), true);
+            responder.processOfferAccepted(lastOfferMade, false);
             this.responder.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         }
     }

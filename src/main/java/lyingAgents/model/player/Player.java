@@ -284,11 +284,11 @@ public abstract class Player {
      * Decreases the belief of an offer of similar types to be accepted.
      * The belief is multiplied by (1 - learningSpeed).
      *
-     * @param newOwnChips The offer to the agent self.
+     * @param offerToSelf The offer to the agent self.
      */
-    private void decreaseOfferTypeBelief(int newOwnChips) {
+    private void decreaseOfferTypeBelief(int offerToSelf) {
         int pos, neg;
-        int[] diff = Chips.getDifference(chips, newOwnChips, game.getBinMaxChips());
+        int[] diff = Chips.getDifference(chips, offerToSelf, game.getBinMaxChips());
         pos = Chips.getPositiveAmount(diff);
         neg = Chips.getNegativeAmount(diff);
         if (BELIEF_TYPE_IS_ABSOLUTE) {
@@ -301,12 +301,12 @@ public abstract class Player {
     /**
      * Increases the belief of offers of a similar type to be more likely to be accepted too.
      *
-     * @param newOwnChips     The offer to this agent self.
+     * @param offerToSelf     The offer to this agent self.
      * @param revokeRejection True if one wants to undo a previous update, false otherwise
      */
-    private void increaseOfferTypeBelief(int newOwnChips, boolean revokeRejection) {
+    private void increaseOfferTypeBelief(int offerToSelf, boolean revokeRejection) {
         int pos, neg;
-        int[] diff = Chips.getDifference(chips, newOwnChips, game.getBinMaxChips());
+        int[] diff = Chips.getDifference(chips, offerToSelf, game.getBinMaxChips());
         pos = Chips.getPositiveAmount(diff);
         neg = Chips.getNegativeAmount(diff);
         if (BELIEF_TYPE_IS_ABSOLUTE) {
@@ -320,11 +320,11 @@ public abstract class Player {
     /**
      * Decreases the belief of a specific offer being accepted.
      *
-     * @param newOwnChips The new set of chips that has been offered.
+     * @param offerToSelf The new set of chips that has been offered.
      */
-    private void decreaseColorBeliefRejected(int newOwnChips) {
+    private void decreaseColorBeliefRejected(int offerToSelf) {
         int i, j;
-        int[] newOwnBins = Chips.getBins(newOwnChips, game.getBinMaxChips());
+        int[] newOwnBins = Chips.getBins(offerToSelf, game.getBinMaxChips());
         int[] curOffer;
         for (i = 0; i < beliefOffer.length; i++) {
             // curOffer represents chips that agent wants himself
@@ -332,7 +332,7 @@ public abstract class Player {
             for (j = 0; j < Settings.CHIP_DIVERSITY; j++) {
                 if (curOffer[j] >= newOwnBins[j]) {
                     // curOffer demands at least as much chips of color j
-                    // as the offer newOwnChips of the trading partner.
+                    // as the offer offerToSelf of the trading partner.
                     // It's likely to be rejected as well
                     beliefOffer[i] *= (1 - learningSpeed);
                 }
@@ -342,13 +342,13 @@ public abstract class Player {
 
     /**
      * Decreases the belief of an offer being accepted that assigns more of a particular color to this agent.
-     * This is called when an offer has been made which assigns newOwnChips to this agent.
+     * This is called when an offer has been made which assigns offerToSelf to this agent.
      *
-     * @param newOwnChips The offer assigned to this agent
+     * @param offerToSelf The offer assigned to this agent
      */
-    private void decreaseColorBeliefReceived(int newOwnChips) {
+    private void decreaseColorBeliefReceived(int offerToSelf) {
         int i, j;
-        int[] newOwnBins = Chips.getBins(newOwnChips, game.getBinMaxChips());
+        int[] newOwnBins = Chips.getBins(offerToSelf, game.getBinMaxChips());
         int[] curOffer;
         for (i = 0; i < beliefOffer.length; i++) {
             // curOffer represents offer to agent wants himself
@@ -356,7 +356,7 @@ public abstract class Player {
             for (j = 0; j < Settings.CHIP_DIVERSITY; j++) {
                 if (curOffer[j] > newOwnBins[j]) {
                     // curOffer demands more chips of color j than the
-                    // offer newOwnChips of the trading partner.
+                    // offer offerToSelf of the trading partner.
                     // It's less likely to be accepted.
                     beliefOffer[i] *= (1 - learningSpeed);
                 }
@@ -377,20 +377,20 @@ public abstract class Player {
      * Revokes the previously assumed rejection of the offer. This is now undone by increasing the
      * offerTypeBelief again.
      *
-     * @param offerMade The offer made by this player.
+     * @param offerToSelf The offer made by this player.
      */
-    public void processOfferAccepted(int offerMade) {
-        increaseOfferTypeBelief(offerMade, true);
+    public void processOfferAccepted(int offerToSelf, boolean offerAcceptedByPartner) {
+        if (offerAcceptedByPartner) increaseOfferTypeBelief(offerToSelf, true);
     }
 
     /**
      * This method is called when an offer is received. It updates the beliefs of offers as if the offer were accepted.
      *
-     * @param offerReceived the offer received
+     * @param offerToSelf the offer received
      */
-    protected void receiveOffer(int offerReceived) {
-        increaseOfferTypeBelief(offerReceived, false);
-        decreaseColorBeliefReceived(offerReceived);
+    protected void receiveOffer(int offerToSelf) {
+        increaseOfferTypeBelief(offerToSelf, false);
+        decreaseColorBeliefReceived(offerToSelf);
     }
 
     /**
@@ -526,5 +526,9 @@ public abstract class Player {
 
     public int getInitialChips() {
         return initialChips;
+    }
+
+    protected void printExpectedResponse(OfferType offerType) {
+        System.out.println("-> " + getName() + " expects offer to be accepted with probability: " + Settings.PRINT_DF.format(beliefOffer[offerType.getOffer()]));
     }
 }

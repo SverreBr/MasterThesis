@@ -4,7 +4,6 @@ import lyingAgents.model.Game;
 import lyingAgents.utilities.MiscFunc;
 
 import java.awt.*;
-import java.util.Objects;
 import javax.swing.*;
 
 /**
@@ -111,11 +110,6 @@ public class ForwardAction implements ForwardListener {
                 int progress = (int) evt.getNewValue();
                 pbProgress.setValue(progress);
                 pane.repaint();
-            } else if (name.equals("state")) {
-                SwingWorker.StateValue state = (SwingWorker.StateValue) evt.getNewValue();
-                if (Objects.requireNonNull(state) == SwingWorker.StateValue.DONE) {
-                    System.out.println("Done");
-                }
             }
         });
     }

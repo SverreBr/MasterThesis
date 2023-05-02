@@ -1,6 +1,7 @@
 package lyingAgents.model.player;
 
 import lyingAgents.model.Game;
+import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.Messages;
 import lyingAgents.utilities.Settings;
 
@@ -272,27 +273,27 @@ public class PlayerToM extends Player {
     /**
      * Deals with updating beliefs since the partner made an offer
      *
-     * @param offerReceived the offer received.
+     * @param offerToSelf the offer received.
      */
     @Override
-    protected void receiveOffer(int offerReceived) {
+    protected void receiveOffer(int offerToSelf) {
         int inverseOffer;
         if (this.orderToM == 0) {
-            super.receiveOffer(offerReceived);
+            super.receiveOffer(offerToSelf);
         } else {
-            updateLocationBeliefs(offerReceived);
+            updateLocationBeliefs(offerToSelf);
 
             if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with what is offered...
                 restoreLocationBeliefsDueToUnbelievedMessage();
                 if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
-                    System.out.println(getName() + " does not believe trading partner ###########################");
-                    addMessage("(Agent doesn't believe trading partner.)", false);
+                    System.out.println("--- " + getName() + " DOES NOT BELIEVE TRADING PARTNER ---");
+                    addMessage("(Agent doesn't believe partner.)", false);
                 }
             }
-            selfModel.receiveOffer(offerReceived);
+            selfModel.receiveOffer(offerToSelf);
 
             // Update partner lyingAgents.model for the fact that they had send the offer that was just received
-            inverseOffer = this.game.flipOffer(offerReceived);
+            inverseOffer = this.game.flipOffer(offerToSelf);
             partnerModel.sendOffer(inverseOffer);
         }
     }
@@ -415,9 +416,9 @@ public class PlayerToM extends Player {
     }
 
     @Override
-    public void processOfferAccepted(int offerMade) {
-        if (orderToM == 0) super.processOfferAccepted(offerMade);
-        setNewChips(offerMade);
+    public void processOfferAccepted(int offerToSelf, boolean offerAcceptedByPartner) {
+        if (orderToM == 0) super.processOfferAccepted(offerToSelf, offerAcceptedByPartner);
+        setNewChips(offerToSelf);
     }
 
     ///////////////////////////////
@@ -648,4 +649,44 @@ public class PlayerToM extends Player {
     public boolean getHasSentMessage() {
         return hasSentMessage;
     }
+
+    protected void printExpectedResponse(OfferType offerType) {
+        int mostLikelyGP, cnt = 0;
+        if (((offerType.getOffer() == Settings.ID_ACCEPT_OFFER) || (offerType.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION))) return;
+
+        if (orderToM > 0) {
+            mostLikelyGP = getMostLikelyGP();
+            partnerModel.saveBeliefs();
+            partnerModel.utilityFunction = game.getUtilityFunction(mostLikelyGP);
+            partnerModel.receiveOffer(game.flipOffer(offerType.getOffer()));
+            List<OfferType> expectedResponses = partnerModel.selectBestOffers(game.flipOffer(offerType.getOffer()));
+            System.out.println("-> When " + getName() + " assumes trading partner has goal position " + mostLikelyGP + ":");
+            for (OfferType expectedResponse : expectedResponses) {
+                if (expectedResponse.getOffer() == Settings.ID_ACCEPT_OFFER) {
+                    System.out.println(cnt + ". " + getName() + " expects trading partner to ACCEPT offer.");
+                } else if (expectedResponse.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION) {
+                    System.out.println(cnt + ". " + getName() + " expects trading partner to WITHDRAW from negotiation.");
+                } else {
+                    System.out.println(cnt + ". " + getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse.getOffer()), game.getBinMaxChips())));
+                }
+                cnt++;
+            }
+            partnerModel.restoreBeliefs();
+            selfModel.printExpectedResponse(offerType);
+        } else {
+            super.printExpectedResponse(offerType);
+        }
+    }
+
+    private int getMostLikelyGP() {
+        String tradingPartner = getName().contains(Settings.INITIATOR_NAME) ? Settings.RESPONDER_NAME : Settings.INITIATOR_NAME;
+        int mostLikelyGP = game.getGoalPositionPlayer(tradingPartner);
+        for (int i = 0; i < locationBeliefs.length; i++) {
+            if (locationBeliefs[i] - Settings.EPSILON > locationBeliefs[mostLikelyGP]) {
+                mostLikelyGP = i;
+            }
+        }
+        return mostLikelyGP;
+    }
+
 }

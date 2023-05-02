@@ -90,49 +90,34 @@ public class PlayerLying extends PlayerToM {
     public int makeOffer(int offerReceived) {
         int curOffer;
 
+        if (Game.DEBUG) System.out.println("\n-----");
+
         if (offerReceived == Settings.ID_NO_OFFER) {
             curOffer = chooseOffer(Settings.ID_NO_OFFER);
         } else {
             receiveOffer(offerReceived);
             curOffer = chooseOffer(offerReceived);
         }
-        if ((curOffer != Settings.ID_ACCEPT_OFFER) && (curOffer != Settings.ID_WITHDRAW_NEGOTIATION))
-            sendOffer(curOffer);
+        if ((curOffer != Settings.ID_ACCEPT_OFFER) && (curOffer != Settings.ID_WITHDRAW_NEGOTIATION)) sendOffer(curOffer);
         return curOffer;
     }
 
     public int chooseOffer(int offerReceived) {
         List<OfferType> offerList = selectBestOffers(offerReceived);
         OfferType offerType = offerList.get((int) (Math.random() * offerList.size()));
-
-        if (Game.DEBUG) {
-            System.out.println("-> Chosen is offer: " + offerType.getOffer() + " with value " + Settings.PRINT_DF.format(offerType.getValue()));
-        }
+        int newOffer = offerType.getOffer();
 
         int locMessage = offerType.getLoc();
-        if ((getOrderToM() == 0) && (Math.random() < Settings.PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
+        if ((getOrderToM() == 0) && (newOffer != Settings.ID_ACCEPT_OFFER) && (newOffer != Settings.ID_WITHDRAW_NEGOTIATION)
+                && (Math.random() < Settings.PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
         if (locMessage != Settings.ID_NO_LOCATION) sendMessage(Messages.createLocationMessage(locMessage));
 
-        if (Game.DEBUG &&
-                ((offerType.getOffer() != Settings.ID_ACCEPT_OFFER) && (offerType.getOffer() != Settings.ID_WITHDRAW_NEGOTIATION)) &&
-                (getOrderToM() > 0)) {
-            partnerModel.saveBeliefs();
-            partnerModel.receiveOffer(game.flipOffer(offerType.getOffer()));
-            List<OfferType> expectedResponses = partnerModel.selectBestOffers(game.flipOffer(offerType.getOffer()));
-            for (OfferType expectedResponse : expectedResponses) {
-                if (expectedResponse.getOffer() == Settings.ID_ACCEPT_OFFER) {
-                    System.out.println(getName() + " expects trading partner to ACCEPT offer.");
-                } else if (expectedResponse.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION) {
-                    System.out.printf(getName() + " expects trading partner to WITHDRAW from negotiation.");
-                } else {
-                    System.out.println(getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse.getOffer()), game.getBinMaxChips())));
-                }
-            }
-            partnerModel.restoreBeliefs();
-            System.out.println("\n");
+        if (Game.DEBUG) {
+            System.out.println("\n-> Chosen is offer: " + newOffer + " with value " + Settings.PRINT_DF.format(offerType.getValue()) + "\n");
+            printExpectedResponse(offerType);
         }
 
-        return offerType.getOffer();
+        return newOffer;
     }
 
     /**
@@ -165,14 +150,14 @@ public class PlayerLying extends PlayerToM {
         }
 
         if (Game.DEBUG) {
-            System.out.println("\n-> Offers that are optimal for " + getName() + " including messages:");
+            System.out.println("-> Offers that are optimal for " + getName() + " including messages:");
             for (OfferType smt : bestOffers) {
                 System.out.println("\t- value=" + Settings.PRINT_DF.format(smt.getValue()) + "; offer to self=" + smt.getOffer() + "; " +
                         Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
                         ", loc=" + smt.getLoc());
             }
 
-            System.out.println("\n-> Offers that are optimal for " + getName() + " without messages:");
+            System.out.println("-> Offers that are optimal for " + getName() + " without messages:");
             for (OfferType smt : bestOffersWithoutMessage) {
                 System.out.println("\t- value=" + Settings.PRINT_DF.format(smt.getValue()) + "; offer to self=" + smt.getOffer() + "; " +
                         Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +

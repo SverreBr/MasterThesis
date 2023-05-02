@@ -6,7 +6,6 @@ import lyingAgents.utilities.MiscFunc;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.util.Objects;
 
 public class PlayAction implements PlayListener {
 
@@ -86,11 +85,6 @@ public class PlayAction implements PlayListener {
             if (name.equals("progress")) {
                 updatePane(pw.getProgress());
                 pane.repaint();
-            } else if (name.equals("state")) {
-                SwingWorker.StateValue state = (SwingWorker.StateValue) evt.getNewValue();
-                if (Objects.requireNonNull(state) == SwingWorker.StateValue.DONE) {
-                    System.out.println("Done");
-                }
             }
         });
     }
