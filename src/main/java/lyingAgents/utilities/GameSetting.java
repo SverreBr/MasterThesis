@@ -3,7 +3,7 @@ package lyingAgents.utilities;
 import lyingAgents.model.Game;
 import lyingAgents.view.changeSettings.GameSettingsDialog;
 
-import java.io.Serial;
+//import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -15,7 +15,7 @@ public class GameSetting implements Serializable {
     /**
      * Serializable version
      */
-    @Serial
+//    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
