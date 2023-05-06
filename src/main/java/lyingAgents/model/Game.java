@@ -94,7 +94,6 @@ public class Game {
      */
     private String messageSend;
 
-    private boolean reachedMaxNumOffers;
 
     /**
      * Constructor
@@ -257,7 +256,6 @@ public class Game {
         this.lastOfferMade = Settings.ID_NO_OFFER;
         this.totalNrOffersMade = 0;
         this.turn = Settings.INITIATOR_NAME;
-        this.reachedMaxNumOffers = false;
     }
 
     //////////////////////////////
@@ -346,10 +344,7 @@ public class Game {
             step();
             i++;
         }
-        if (i >= Settings.MAX_NUMBER_OFFERS) {
-            System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " STEPS PERFORMED. ---");
-            reachedMaxNumOffers = true;
-        }
+        if (i >= Settings.MAX_NUMBER_OFFERS) System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " STEPS PERFORMED. ---");
     }
 
     /**
@@ -679,6 +674,6 @@ public class Game {
     }
 
     public boolean isReachedMaxNumOffers() {
-        return reachedMaxNumOffers;
+        return (totalNrOffersMade >= Settings.MAX_NUMBER_OFFERS);
     }
 }

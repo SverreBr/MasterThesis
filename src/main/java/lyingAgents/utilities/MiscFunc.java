@@ -1,9 +1,13 @@
 package lyingAgents.utilities;
 
+import lyingAgents.model.Game;
+import lyingAgents.model.player.PlayerLying;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -135,7 +139,35 @@ public class MiscFunc {
                 }
             }
         }
-
         return goalPositions;
+    }
+
+    public static boolean calcIfOutcomeIsStrictPE(List<OfferOutcome> peList, Game game) {
+        if (peList.size() == 0) return true;
+
+        int respUtil = game.getResponder().getUtilityValue();
+        int initUtil = game.getInitiator().getUtilityValue();
+
+        for (OfferOutcome outcome : peList) {
+            if ((outcome.getValueInit() > initUtil) && (outcome.getValueResp() > respUtil)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean calcIfOutcomeIsBestSW(List<OfferOutcome> peList, Game game) {
+        if (peList.size() == 0) return true;
+        int highestSW = peList.get(0).getSocialWelfare();
+        for (OfferOutcome outcome : peList) {
+            highestSW = Math.max(highestSW, outcome.getSocialWelfare());
+        }
+        int sw = game.getResponder().getUtilityValue() + game.getInitiator().getUtilityValue();
+        return (highestSW == sw);
+    }
+
+    public static boolean isNewOfferAccepted(Game game) {
+        PlayerLying initiator = game.getInitiator();
+        return (initiator.getInitialChips() != initiator.getChips());
     }
 }

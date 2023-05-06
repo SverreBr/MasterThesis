@@ -2,6 +2,7 @@ package results.createResults;
 
 import lyingAgents.model.Game;
 import lyingAgents.model.player.PlayerLying;
+import lyingAgents.utilities.MiscFunc;
 import lyingAgents.utilities.OfferOutcome;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public class ResultElement {
     private final double initLR;
     private final double respLR;
 
+    private final boolean initCanSendMessages;
+    private final boolean respCanSendMessages;
+
     private final boolean initCanLie;
     private final boolean respCanLie;
 
@@ -25,10 +29,10 @@ public class ResultElement {
     private final int respInitialPoints;
 
     private final int nrOffers;
-    private boolean isPE;
-    private boolean isBestSW;
-    private boolean isNegotiationSuccess;
-    private final boolean thereIsBetterOutcome;
+    private final boolean isStrictPE;
+    private final boolean isBestSW;
+    private final boolean isNewOfferAccepted;
+    private final boolean thereIsBetterOutcomeThanInitialSituForBothAgents;
     private final boolean reachedMaxNumOffers;
     private final double timePassed;
 
@@ -39,11 +43,13 @@ public class ResultElement {
         initToM = init.getOrderToM();
         initLR = init.getLearningSpeed();
         initCanLie = init.isCanMakeFalseStatements();
+        initCanSendMessages = init.isCanSendMessages();
         initFinalPoints = init.getFinalPoints();
         initInitialPoints = init.getInitialPoints();
 
         respToM = resp.getOrderToM();
         respLR = resp.getLearningSpeed();
+        respCanSendMessages = resp.isCanSendMessages();
         respCanLie = resp.isCanMakeFalseStatements();
         respFinalPoints = resp.getFinalPoints();
         respInitialPoints = resp.getInitialPoints();
@@ -51,47 +57,13 @@ public class ResultElement {
         nrOffers = game.getTotalNrOffersMade();
 
         List<OfferOutcome> peList = game.getStrictParetoOutcomes();
-        thereIsBetterOutcome = !peList.isEmpty();
-        calcIfNegotiationIsSuccess(peList.size(), game);
-        calcIfOutcomeIsPE(peList, game);
-        calcIfOutcomeIsBestSW(peList, game);
+        thereIsBetterOutcomeThanInitialSituForBothAgents = !peList.isEmpty();
+        isNewOfferAccepted = MiscFunc.isNewOfferAccepted(game);
+        isStrictPE = MiscFunc.calcIfOutcomeIsStrictPE(peList, game);
+        isBestSW = MiscFunc.calcIfOutcomeIsBestSW(peList, game);
         reachedMaxNumOffers = game.isReachedMaxNumOffers();
 
         this.timePassed = timePassed;
-    }
-
-    private void calcIfOutcomeIsPE(List<OfferOutcome> peList, Game game) {
-        isPE = true;
-        if (peList.size() == 0) return;
-
-        int respUtil = game.getResponder().getUtilityValue();
-        int initUtil = game.getInitiator().getUtilityValue();
-
-        for (OfferOutcome outcome : peList) {
-            if ((outcome.getValueInit() > initUtil) && (outcome.getValueResp() > respUtil)) {
-                isPE = false;
-                break;
-            }
-        }
-    }
-
-    private void calcIfOutcomeIsBestSW(List<OfferOutcome> peList, Game game) {
-        isBestSW = true;
-        if (peList.size() == 0) return;
-        int highestSW = peList.get(0).getSocialWelfare();
-        for (OfferOutcome outcome : peList) {
-            highestSW = Math.max(highestSW, outcome.getSocialWelfare());
-        }
-        int sw = game.getResponder().getUtilityValue() + game.getInitiator().getUtilityValue();
-        isBestSW = (highestSW == sw);
-    }
-
-    private void calcIfNegotiationIsSuccess(int numBetterOutcomes, Game game) {
-        isNegotiationSuccess = true;
-        if (numBetterOutcomes == 0) return;
-        int initInitialChips = game.getInitiator().getInitialChips();
-        int initFinalChips = game.getInitiator().getChips();
-        isNegotiationSuccess = (initInitialChips != initFinalChips);
     }
 
     public int getInitGain() {
@@ -102,7 +74,6 @@ public class ResultElement {
         return respFinalPoints - respInitialPoints;
     }
 
-    // GETTERS
     public int getInitToM() {
         return initToM;
     }
@@ -147,8 +118,8 @@ public class ResultElement {
         return respCanLie;
     }
 
-    public boolean isPE() {
-        return isPE;
+    public boolean isStrictPE() {
+        return isStrictPE;
     }
 
     public double getTimePassed() {
@@ -159,15 +130,23 @@ public class ResultElement {
         return isBestSW;
     }
 
-    public boolean isNegotiationSuccess() {
-        return isNegotiationSuccess;
+    public boolean isNewOfferAccepted() {
+        return isNewOfferAccepted;
     }
 
-    public boolean isThereIsBetterOutcome() {
-        return thereIsBetterOutcome;
+    public boolean isThereIsBetterOutcomeThanInitialSituForBothAgents() {
+        return thereIsBetterOutcomeThanInitialSituForBothAgents;
     }
 
     public boolean isReachedMaxNumOffers() {
         return reachedMaxNumOffers;
+    }
+
+    public boolean isInitCanSendMessages() {
+        return initCanSendMessages;
+    }
+
+    public boolean isRespCanSendMessages() {
+        return respCanSendMessages;
     }
 }

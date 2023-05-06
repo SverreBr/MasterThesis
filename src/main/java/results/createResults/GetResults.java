@@ -33,8 +33,6 @@ public class GetResults {
 
     public void makeResults() {
         int cnt = 0;
-        boolean initCanSendMessages = true;
-        boolean respCanSendMessages = true;
 
         while (cnt++ < ResultSettings.NUM_REP) {
             System.out.println("--- Repetition " + cnt + " ---");
@@ -42,18 +40,24 @@ public class GetResults {
                 for (int respTom : ResultSettings.respTomList) {
                     for (double initLR : ResultSettings.initLRList) {
                         for (double respLR : ResultSettings.respLRList) {
-                            for (boolean initCanLie : ResultSettings.initCanLieList) {
-                                for (boolean respCanLie : ResultSettings.respCanLieList) {
-                                    if ((initCanLie && (initTom < 2)) || (respCanLie && (respTom < 2))) { // agents without 2nd order tom cannot lie
-                                        System.out.println("\t  Skipping [" + initTom + ", " + respTom + ", " + initLR + ", " + respLR + ", " + initCanLie + ", " + respCanLie + "] Done;");
-                                    } else {
-                                        generateNewGame(initTom, respTom, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-                                        try {
-                                            writeExcel();
-                                        } catch (IOException exception) {
-                                            System.out.println("writing to excel did not succeed.");
+                            for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
+                                for (boolean respCanSendMessages : ResultSettings.respCanSendMessagesList) {
+                                    for (boolean initCanLie : ResultSettings.initCanLieList) {
+                                        if ((!initCanSendMessages && initCanLie)) continue;
+                                        for (boolean respCanLie : ResultSettings.respCanLieList) {
+                                            if (!respCanSendMessages && respCanLie) continue;
+                                            generateNewGame(initTom, respTom, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+                                            try {
+                                                writeExcel();
+                                            } catch (IOException exception) {
+                                                System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
+                                            }
+                                            System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
+                                                    ", i_lr=" + initLR + ", r_lr=" + respLR +
+                                                    ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
+                                                    ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
+
                                         }
-                                        System.out.println("\t[" + initTom + ", " + respTom + ", " + initLR + ", " + respLR + ", " + initCanLie + ", " + respCanLie + "] Done;");
                                     }
                                 }
                             }
@@ -115,15 +119,16 @@ public class GetResults {
     }
 
     private void addHeaders() {
-        String[] cell_headers = new String[] {
+        String[] cell_headers = new String[]{
                 ResultSettings.initTom, ResultSettings.respTom,
                 ResultSettings.initLR, ResultSettings.respLR,
+                ResultSettings.initCanSendMessages, ResultSettings.respCanSendMessages,
                 ResultSettings.initCanLie, ResultSettings.respCanLie,
                 ResultSettings.initInitPoints, ResultSettings.respInitPoints,
                 ResultSettings.initFinalPoints, ResultSettings.respFinalPoints,
                 ResultSettings.initGain, ResultSettings.respGain,
-                ResultSettings.nrOffers, ResultSettings.outcomeIsPE, ResultSettings.isBestSW,
-                ResultSettings.isNegotiationSuccess, ResultSettings.thereIsABetterOutcome,
+                ResultSettings.nrOffers, ResultSettings.outcomeIsStrictPE, ResultSettings.isBestSWFromStrictPE,
+                ResultSettings.isNewOfferAccepted, ResultSettings.thereIsABetterOutcomeThanInitialSitu,
                 ResultSettings.reachedMaxNumOffers, ResultSettings.timePassed};
         dataString.add(cell_headers);
     }
@@ -132,12 +137,15 @@ public class GetResults {
         String[] dataLine;
 
         for (ResultElement resultElement : data) {
-            dataLine = new String[] {
+            dataLine = new String[]{
                     String.valueOf(resultElement.getInitToM()),
                     String.valueOf(resultElement.getRespToM()),
 
                     String.valueOf(resultElement.getInitLR()),
                     String.valueOf(resultElement.getRespLR()),
+
+                    String.valueOf(resultElement.isInitCanSendMessages()),
+                    String.valueOf(resultElement.isRespCanSendMessages()),
 
                     String.valueOf(resultElement.isInitCanLie()),
                     String.valueOf(resultElement.isRespCanLie()),
@@ -152,10 +160,10 @@ public class GetResults {
                     String.valueOf(resultElement.getRespGain()),
 
                     String.valueOf(resultElement.getNrOffers()),
-                    String.valueOf(resultElement.isPE()),
+                    String.valueOf(resultElement.isStrictPE()),
                     String.valueOf(resultElement.isBestSW()),
-                    String.valueOf(resultElement.isNegotiationSuccess()),
-                    String.valueOf(resultElement.isThereIsBetterOutcome()),
+                    String.valueOf(resultElement.isNewOfferAccepted()),
+                    String.valueOf(resultElement.isThereIsBetterOutcomeThanInitialSituForBothAgents()),
                     String.valueOf(resultElement.isReachedMaxNumOffers()),
                     String.valueOf(resultElement.getTimePassed())
             };

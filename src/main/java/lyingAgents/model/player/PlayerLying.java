@@ -107,10 +107,13 @@ public class PlayerLying extends PlayerToM {
         OfferType offerType = offerList.get((int) (Math.random() * offerList.size()));
         int newOffer = offerType.getOffer();
 
-        int locMessage = offerType.getLoc();
-        if ((getOrderToM() == 0) && (newOffer != Settings.ID_ACCEPT_OFFER) && (newOffer != Settings.ID_WITHDRAW_NEGOTIATION)
-                && (Math.random() < Settings.PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
-        if (locMessage != Settings.ID_NO_LOCATION) sendMessage(Messages.createLocationMessage(locMessage));
+        if (canSendMessages) {
+            int locMessage = offerType.getLoc();
+            if ((getOrderToM() == 0) && (newOffer != Settings.ID_ACCEPT_OFFER) && (newOffer != Settings.ID_WITHDRAW_NEGOTIATION)
+                    && (Math.random() < Settings.PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
+            if (locMessage != Settings.ID_NO_LOCATION) sendMessage(Messages.createLocationMessage(locMessage));
+        }
+
 
         if (Game.DEBUG) {
             System.out.println("\n-> Chosen is offer: " + newOffer + " with value " + Settings.PRINT_DF.format(offerType.getValue()) + "\n");
