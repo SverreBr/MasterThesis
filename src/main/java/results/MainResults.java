@@ -54,7 +54,7 @@ public class MainResults {
         try {
             getResults.writeExcel();
         } catch (IOException exception) {
-            System.out.println("Did not work.");
+            System.out.println("Writing to Excel did not work.");
         }
     }
 
