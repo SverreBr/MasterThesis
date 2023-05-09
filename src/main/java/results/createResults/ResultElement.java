@@ -4,6 +4,7 @@ import lyingAgents.model.Game;
 import lyingAgents.model.player.PlayerLying;
 import lyingAgents.utilities.MiscFunc;
 import lyingAgents.utilities.OfferOutcome;
+import lyingAgents.utilities.Settings;
 
 import java.util.List;
 
@@ -28,6 +29,9 @@ public class ResultElement {
     private final int initInitialPoints;
     private final int respInitialPoints;
 
+    private final boolean initCanInitiallyReachGP;
+    private final boolean respCanInitiallyReachGP;
+
     private final int nrOffers;
     private final boolean isStrictPE;
     private final boolean isBestSW;
@@ -46,6 +50,7 @@ public class ResultElement {
         initCanSendMessages = init.isCanSendMessages();
         initFinalPoints = init.getFinalPoints();
         initInitialPoints = init.getInitialPoints();
+        initCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION, init.getChipsBin(), game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME));
 
         respToM = resp.getOrderToM();
         respLR = resp.getLearningSpeed();
@@ -53,6 +58,7 @@ public class ResultElement {
         respCanLie = resp.isCanMakeFalseStatements();
         respFinalPoints = resp.getFinalPoints();
         respInitialPoints = resp.getInitialPoints();
+        respCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION, resp.getChipsBin(), game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME));
 
         nrOffers = game.getTotalNrOffersMade();
 
@@ -148,5 +154,13 @@ public class ResultElement {
 
     public boolean isRespCanSendMessages() {
         return respCanSendMessages;
+    }
+
+    public boolean isInitCanInitiallyReachGP() {
+        return initCanInitiallyReachGP;
+    }
+
+    public boolean isRespCanInitiallyReachGP() {
+        return respCanInitiallyReachGP;
     }
 }

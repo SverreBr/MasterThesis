@@ -127,6 +127,7 @@ public class GetResults {
                 ResultSettings.initInitPoints, ResultSettings.respInitPoints,
                 ResultSettings.initFinalPoints, ResultSettings.respFinalPoints,
                 ResultSettings.initGain, ResultSettings.respGain,
+                ResultSettings.initCanInitiallyReachGP, ResultSettings.respCanInitiallyReachGP,
                 ResultSettings.nrOffers, ResultSettings.outcomeIsStrictPE, ResultSettings.isBestSWFromStrictPE,
                 ResultSettings.isNewOfferAccepted, ResultSettings.thereIsABetterOutcomeThanInitialSitu,
                 ResultSettings.reachedMaxNumOffers, ResultSettings.timePassed};
@@ -158,6 +159,9 @@ public class GetResults {
 
                     String.valueOf(resultElement.getInitGain()),
                     String.valueOf(resultElement.getRespGain()),
+
+                    String.valueOf(resultElement.isInitCanInitiallyReachGP()),
+                    String.valueOf(resultElement.isRespCanInitiallyReachGP()),
 
                     String.valueOf(resultElement.getNrOffers()),
                     String.valueOf(resultElement.isStrictPE()),

@@ -12,6 +12,7 @@ public class ResultSettings {
     public static final String initInitPoints = "init_initPoints";
     public static final String initFinalPoints = "init_finalPoints";
     public static final String initGain = "init_gain";
+    public static final String initCanInitiallyReachGP = "init_canInitiallyReachGP";
     public static final String respTom = "resp_tom";
     public static final String respLR = "resp_lr";
     public static final String respCanSendMessages = "resp_canSendMessages";
@@ -19,6 +20,7 @@ public class ResultSettings {
     public static final String respInitPoints = "resp_initPoints";
     public static final String respFinalPoints = "resp_finalPoints";
     public static final String respGain = "resp_gain";
+    public static final String respCanInitiallyReachGP = "init_canInitiallyReachGP";
     public static final String nrOffers = "nr_offers";
     public static final String outcomeIsStrictPE = "outcome_is_StrictPE";
     public static final String isBestSWFromStrictPE = "outcome_is_highestSW";
@@ -32,9 +34,9 @@ public class ResultSettings {
     public static final List<Double> respLRList = List.of(0.5);
     public static final List<Boolean> initCanLieList = Arrays.asList(true, false);
     public static final List<Boolean> respCanLieList = Arrays.asList(true, false);
-    public static final List<Boolean> initCanSendMessagesList = List.of(true);
-    public static final List<Boolean> respCanSendMessagesList = List.of(true);
-    public static final int NUM_REP = 2;
+    public static final List<Boolean> initCanSendMessagesList = Arrays.asList(true, false);
+    public static final List<Boolean> respCanSendMessagesList = Arrays.asList(true, false);
+    public static final int NUM_REP = 1;
     public static final int WARMUP_ROUNDS = 100;
     public static final int KEEP_RESULTS_NR_ROUNDS = 50;
 }

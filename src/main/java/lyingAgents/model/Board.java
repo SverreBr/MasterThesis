@@ -161,6 +161,33 @@ public class Board {
         return highestScore;
     }
 
+    public boolean canReachGP(Point currLoc, int[] chips, Point goalLoc) {
+        if (currLoc.equals(goalLoc)) {
+            return true;
+        } else if (Chips.getNrChips(chips) == 0) {
+            return false;
+        }
+
+        int tileColor;
+        Point newLoc;
+        int[] newTokens;
+        boolean canReachGP = false;
+        List<Point> possibleMoves = Settings.getPossibleMoves();
+        for (Point move : possibleMoves) {
+            newLoc = new Point(currLoc.x + move.x, currLoc.y + move.y);
+            if ((0 <= newLoc.x) && (newLoc.x < boardWidth) && (0 <= newLoc.y) && (newLoc.y < boardHeight)) {
+                tileColor = this.getTileColorNumber(newLoc);
+                if (chips[tileColor] > 0) {
+                    // Move is allowed
+                    newTokens = chips.clone();
+                    newTokens[tileColor] -= 1;
+                    canReachGP = canReachGP | canReachGP(newLoc, newTokens, goalLoc);
+                }
+            }
+        }
+        return canReachGP;
+    }
+
     /**
      * Getter for the board
      *
