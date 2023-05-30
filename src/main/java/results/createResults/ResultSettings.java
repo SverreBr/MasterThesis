@@ -13,6 +13,7 @@ public class ResultSettings {
     public static final String initFinalPoints = "init_finalPoints";
     public static final String initGain = "init_gain";
     public static final String initCanInitiallyReachGP = "init_canInitiallyReachGP";
+    public static final String initZeroToMProb = "init_zeroToMProb";
     public static final String respTom = "resp_tom";
     public static final String respLR = "resp_lr";
     public static final String respCanSendMessages = "resp_canSendMessages";
@@ -20,7 +21,8 @@ public class ResultSettings {
     public static final String respInitPoints = "resp_initPoints";
     public static final String respFinalPoints = "resp_finalPoints";
     public static final String respGain = "resp_gain";
-    public static final String respCanInitiallyReachGP = "init_canInitiallyReachGP";
+    public static final String respCanInitiallyReachGP = "resp_canInitiallyReachGP";
+    public static final String respZeroToMProb = "resp_zeroToMProb";
     public static final String nrOffers = "nr_offers";
     public static final String outcomeIsStrictPE = "outcome_is_StrictPE";
     public static final String isBestSWFromStrictPE = "outcome_is_highestSW";
@@ -30,13 +32,12 @@ public class ResultSettings {
     public static final String reachedMaxNumOffers = "reached_max_num_offers";
     public static final List<Integer> initTomList = Arrays.asList(0, 1, 2);
     public static final List<Integer> respTomList = Arrays.asList(0, 1, 2);
-    public static final List<Double> initLRList = List.of(0.5);
-    public static final List<Double> respLRList = List.of(0.5);
+    public static final List<Double> tom0probList = Arrays.asList(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0);
     public static final List<Boolean> initCanLieList = Arrays.asList(true, false);
     public static final List<Boolean> respCanLieList = Arrays.asList(true, false);
-    public static final List<Boolean> initCanSendMessagesList = Arrays.asList(true, false);
-    public static final List<Boolean> respCanSendMessagesList = Arrays.asList(true, false);
-    public static final int NUM_REP = 1;
+    public static final List<Boolean> initCanSendMessagesList = Arrays.asList(true);
+    public static final List<Boolean> respCanSendMessagesList = Arrays.asList(true);
+    public static final int NUM_REP = 4;
     public static final int WARMUP_ROUNDS = 100;
-    public static final int KEEP_RESULTS_NR_ROUNDS = 50;
+    public static final int KEEP_RESULTS_NR_ROUNDS = 1;
 }

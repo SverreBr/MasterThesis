@@ -23,6 +23,8 @@ public class PlayerLying extends PlayerToM {
 
     private final boolean canSendMessages;
 
+    private double PROB_TOM0_SEND_MESSAGE = 0.25;
+
     /**
      * List of best offers
      */
@@ -67,12 +69,9 @@ public class PlayerLying extends PlayerToM {
         int[] goalPositionsArray = new int[game.getNumberOfGoalPositions()];
         int goalPosition = this.game.getGoalPositionPlayer(this.getName());
 
-        if (canMakeFalseStatements) {
-            Arrays.fill(zeroOrderProbSendingMessages, Settings.PROB_MASS_OTHER_LOCS);
-            zeroOrderProbSendingMessages[goalPosition] = 1.0 - Settings.PROB_MASS_OTHER_LOCS * (zeroOrderProbSendingMessages.length - 1);
-        } else {
-            zeroOrderProbSendingMessages[goalPosition] = 1.0;
-        }
+        Arrays.fill(zeroOrderProbSendingMessages, Settings.PROB_MASS_OTHER_LOCS);
+        zeroOrderProbSendingMessages[goalPosition] = 1.0 - Settings.PROB_MASS_OTHER_LOCS * (zeroOrderProbSendingMessages.length - 1);
+
 
         for (int i = 0; i < goalPositionsArray.length; i++) {
             goalPositionsArray[i] = i;
@@ -110,7 +109,7 @@ public class PlayerLying extends PlayerToM {
         if (canSendMessages) {
             int locMessage = offerType.getLoc();
             if ((getOrderToM() == 0) && (newOffer != Settings.ID_ACCEPT_OFFER) && (newOffer != Settings.ID_WITHDRAW_NEGOTIATION)
-                    && (Math.random() < Settings.PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
+                    && (Math.random() < PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
             if (locMessage != Settings.ID_NO_LOCATION) sendMessage(Messages.createLocationMessage(locMessage));
         }
 
@@ -265,5 +264,13 @@ public class PlayerLying extends PlayerToM {
 
     public boolean isCanSendMessages() {
         return canSendMessages;
+    }
+
+    public void setPROB_TOM0_SEND_MESSAGE(double prob) {
+        PROB_TOM0_SEND_MESSAGE = prob;
+    }
+
+    public double getPROB_TOM0_SEND_MESSAGE() {
+        return PROB_TOM0_SEND_MESSAGE;
     }
 }

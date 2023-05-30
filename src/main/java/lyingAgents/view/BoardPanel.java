@@ -2,6 +2,7 @@ package lyingAgents.view;
 
 import lyingAgents.model.GameListener;
 import lyingAgents.model.Game;
+import lyingAgents.model.player.PlayerLying;
 import lyingAgents.utilities.Settings;
 
 import javax.swing.*;
@@ -44,6 +45,7 @@ public class BoardPanel extends JComponent implements GameListener {
         paintGoalLocation(g2);
         g2.setFont(new Font("SansSerif", Font.BOLD, 16));
         paintGoalNumbers(g2);
+        paintValues(g2);
 
         g2.dispose();
     }
@@ -138,6 +140,36 @@ public class BoardPanel extends JComponent implements GameListener {
         }
     }
 
+    private void paintValues(Graphics2D g2) {
+        if ((game.getLastOfferMade() == Settings.ID_NO_OFFER) ||
+                (game.getLastOfferMade() == Settings.ID_ACCEPT_OFFER) ||
+                (game.getLastOfferMade() == Settings.ID_WITHDRAW_NEGOTIATION)) return;
+
+        Dimension siteSize = getTileSize();
+        FontMetrics metrics = g2.getFontMetrics(g2.getFont());
+        int x, y = metrics.getAscent();
+
+        Map<Integer, Point> goalPositionsDict = game.getGoalPositionsDict();
+        for (Map.Entry<Integer, Point> entry : goalPositionsDict.entrySet()) {
+            Point position = entry.getValue();
+            int value = getChangeValue(entry.getKey());
+            x = siteSize.width - metrics.stringWidth(String.valueOf(value)) - metrics.stringWidth("0");
+
+            g2.setColor(Color.BLACK);
+            g2.drawString(String.valueOf(value),
+                    x + siteSize.width * position.x,
+                    y + siteSize.height * position.y);
+        }
+    }
+
+    private int getChangeValue(int goalPos) {
+        PlayerLying player = game.getTurn().equals(Settings.INITIATOR_NAME) ? game.getResponder() : game.getInitiator();
+        int[] utilityFunc = game.getUtilityFunction(goalPos);
+        int offerMade = game.flipOffer(game.getLastOfferMade());
+        int chips = player.getChips();
+        return utilityFunc[offerMade] - utilityFunc[chips];
+    }
+
     /**
      * Draws a symbol on a tile with position "position"
      *
@@ -165,5 +197,6 @@ public class BoardPanel extends JComponent implements GameListener {
 
     @Override
     public void gameChanged() {
+        this.repaint(); // TODO: change this.
     }
 }

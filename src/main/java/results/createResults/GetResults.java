@@ -31,44 +31,6 @@ public class GetResults {
         }
     }
 
-    public void makeResults() {
-        int cnt = 0;
-
-        while (cnt++ < ResultSettings.NUM_REP) {
-            System.out.println("--- Repetition " + cnt + " ---");
-            for (int initTom : ResultSettings.initTomList) {
-                for (int respTom : ResultSettings.respTomList) {
-                    for (double initLR : ResultSettings.initLRList) {
-                        for (double respLR : ResultSettings.respLRList) {
-                            for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
-                                for (boolean respCanSendMessages : ResultSettings.respCanSendMessagesList) {
-                                    for (boolean initCanLie : ResultSettings.initCanLieList) {
-                                        if ((!initCanSendMessages && initCanLie)) continue;
-                                        for (boolean respCanLie : ResultSettings.respCanLieList) {
-                                            if (!respCanSendMessages && respCanLie) continue;
-                                            generateNewGame(initTom, respTom, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-                                            try {
-                                                writeExcel();
-                                            } catch (IOException exception) {
-                                                System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
-                                            }
-                                            System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
-                                                    ", i_lr=" + initLR + ", r_lr=" + respLR +
-                                                    ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
-                                                    ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            System.out.println("################### Finished iteration " + cnt + " ###################\n");
-        }
-    }
-
     private String convertToCSV(String[] data) {
         return Stream.of(data)
                 .map(this::escapeSpecialCharacters)
@@ -84,26 +46,26 @@ public class GetResults {
         return escapedData;
     }
 
-    private void generateNewGame(int initTom, int respTom, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
-        long startTime = System.currentTimeMillis();
-        Game game = new Game(initTom, respTom, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-        for (int i = 0; i < ResultSettings.WARMUP_ROUNDS; i++) {
+    public void generateNewResults(Game game) {
+        int i;
+        ResultElement resultElement;
+        long endTime, startTime;
+
+        startTime = System.currentTimeMillis();
+        for (i = 0; i < ResultSettings.WARMUP_ROUNDS; i++) {
             game.playTillEnd();
             game.newRound();
         }
 
-        game.newRound();
-        game.playTillEnd();
-        long endTime = System.currentTimeMillis();
-        ResultElement resultElement = new ResultElement(game, (endTime - startTime) / 1000.0);
-        data.add(resultElement);
-
-        for (int i = 1; i < ResultSettings.KEEP_RESULTS_NR_ROUNDS; i++) {
+        i = 0;
+        do {
             game.newRound();
             game.playTillEnd();
-            resultElement = new ResultElement(game, -1);
+            endTime = System.currentTimeMillis();
+            resultElement = new ResultElement(game, (endTime - startTime) / 1000.0);
             data.add(resultElement);
-        }
+            i++;
+        } while (i < ResultSettings.KEEP_RESULTS_NR_ROUNDS);
     }
 
     public void writeExcel() throws IOException {
@@ -128,6 +90,7 @@ public class GetResults {
                 ResultSettings.initFinalPoints, ResultSettings.respFinalPoints,
                 ResultSettings.initGain, ResultSettings.respGain,
                 ResultSettings.initCanInitiallyReachGP, ResultSettings.respCanInitiallyReachGP,
+                ResultSettings.initZeroToMProb, ResultSettings.respZeroToMProb,
                 ResultSettings.nrOffers, ResultSettings.outcomeIsStrictPE, ResultSettings.isBestSWFromStrictPE,
                 ResultSettings.isNewOfferAccepted, ResultSettings.thereIsABetterOutcomeThanInitialSitu,
                 ResultSettings.reachedMaxNumOffers, ResultSettings.timePassed};
@@ -162,6 +125,9 @@ public class GetResults {
 
                     String.valueOf(resultElement.isInitCanInitiallyReachGP()),
                     String.valueOf(resultElement.isRespCanInitiallyReachGP()),
+
+                    String.valueOf(resultElement.getInitZeroToMProb()),
+                    String.valueOf(resultElement.getRespZeroToMProb()),
 
                     String.valueOf(resultElement.getNrOffers()),
                     String.valueOf(resultElement.isStrictPE()),

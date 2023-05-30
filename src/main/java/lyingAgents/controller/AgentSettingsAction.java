@@ -56,7 +56,7 @@ public class AgentSettingsAction extends AbstractAction {
         respCanSendMessages = sd.isResponderCanSendMessagesValue();
 
         GameSetting gameSetting = game.getGameSetting();
-        game.reset(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+        game.initFullyNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
         game.newGameSettings(gameSetting);
     }
 

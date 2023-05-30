@@ -102,45 +102,52 @@ public class Game {
         this.listeners = new HashSet<>();
         this.board = new Board();
         this.goalPositionsDict = MiscFunc.makeGoalPositionDictionary();
-        initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-    }
-
-    /**
-     * resets the board to a new initialization
-     */
-    public void reset(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
-        this.board.resetBoard();
-        this.initNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-        if (simulationOn) notifyListenersNewGame();
+        initFullyNewGame(initToM, respToM, initLR, respLR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
     }
 
     /**
      * Initializes a fully new game, where the agents are also fully reset
      */
-    private void initNewGame(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
-        GameSetting gameSetting = generateNewNegotiationSetting();
-        int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
-        int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
+    public void initFullyNewGame(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
+        do {
+            this.board.resetBoard();
+            GameSetting gameSetting = generateNewNegotiationSetting();
+            int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
+            int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
 
-
-        this.initiator = new PlayerLying(Settings.INITIATOR_NAME, this, initToM, initLR,
-                chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]], initCanLie, initCanSendMessages);
-        this.responder = new PlayerLying(Settings.RESPONDER_NAME, this, respToM, respLR,
-                chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]], respCanLie, respCanSendMessages);
+            this.initiator = new PlayerLying(Settings.INITIATOR_NAME, this, initToM, initLR,
+                    chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]], initCanLie, initCanSendMessages);
+            this.responder = new PlayerLying(Settings.RESPONDER_NAME, this, respToM, respLR,
+                    chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]], respCanLie, respCanSendMessages);
+        } while (canAnyAgentReachTheirGP());
+        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
+        if (simulationOn) notifyListenersNewGame();
     }
 
     /**
      * Initializes a new round of play, where agents keep learnt behaviour across games.
      */
     public void newRound() {
-        this.board.resetBoard();
-        GameSetting gameSetting = generateNewNegotiationSetting();
-        int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
-        int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
+        do {
+            this.board.resetBoard();
+            GameSetting gameSetting = generateNewNegotiationSetting();
+            int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
+            int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
 
-        this.initiator.initNegotiationRound(chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]]);
-        this.responder.initNegotiationRound(chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]]);
+            this.initiator.initNegotiationRound(chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]]);
+            this.responder.initNegotiationRound(chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]]);
+        } while (canAnyAgentReachTheirGP());
+
+        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         if (simulationOn) notifyListenersNewGame();
+    }
+
+    private boolean canAnyAgentReachTheirGP() {
+        boolean initCanReach = board.canReachGP(Settings.STARTING_POSITION, Chips.getBins(initiator.getInitialChips(), binMaxChips),
+                getGoalPositionPointPlayer(Settings.INITIATOR_NAME));
+        boolean respCanReach = board.canReachGP(Settings.STARTING_POSITION, Chips.getBins(responder.getInitialChips(), binMaxChips),
+                getGoalPositionPointPlayer(Settings.RESPONDER_NAME));
+        return (initCanReach || respCanReach);
     }
 
     /**
@@ -162,7 +169,7 @@ public class Game {
      * calculated.
      */
     private void calculateSetting(GameSetting gameSetting) {
-        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
+
         int numIndexCodes, pos;
         int[][] chipsSets = gameSetting.getChipSets();
         this.binMaxChips = Chips.makeNewChipBin();
@@ -339,12 +346,11 @@ public class Game {
      * Plays the negotiation until MAX_NUMBER_OFFERS of steps have been performed or the game ended
      */
     public void playTillEnd() {
-        int i = 0;
-        while (i < Settings.MAX_NUMBER_OFFERS && !isGameFinished) {
+        while (totalNrOffersMade < Settings.MAX_NUMBER_OFFERS && !isGameFinished) {
             step();
-            i++;
         }
-        if (i >= Settings.MAX_NUMBER_OFFERS) System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " STEPS PERFORMED. ---");
+        if (totalNrOffersMade >= Settings.MAX_NUMBER_OFFERS)
+            System.out.println("--- " + Settings.MAX_NUMBER_OFFERS + " STEPS PERFORMED. ---");
     }
 
     /**
@@ -421,6 +427,8 @@ public class Game {
             responder.processOfferAccepted(lastOfferMade, false);
             this.responder.addMessage(Settings.ACCEPT_OFFER_MESSAGE, false);
         }
+
+        lastOfferMade = Settings.ID_ACCEPT_OFFER;
     }
 
     /**
@@ -428,11 +436,13 @@ public class Game {
      */
     public void negotiationTerminates() {
         setBooleanGameFinished(true);
+
         if (turn.equals(Settings.INITIATOR_NAME)) {
             this.initiator.addMessage(Settings.TERMINATE_NEGOTIATION_MESSAGE, false);
         } else {
             this.responder.addMessage(Settings.TERMINATE_NEGOTIATION_MESSAGE, false);
         }
+        lastOfferMade = Settings.ID_WITHDRAW_NEGOTIATION;
     }
 
     /**
@@ -476,7 +486,7 @@ public class Game {
         }
 
         return strictParetoOutcomes;
-    }
+    }  // TODO: combine these two functions
 
     public List<OfferOutcome> getParetoOutcomes() {
         OfferOutcome newOffer;
@@ -675,5 +685,13 @@ public class Game {
 
     public boolean isReachedMaxNumOffers() {
         return (totalNrOffersMade >= Settings.MAX_NUMBER_OFFERS);
+    }
+
+    public int getLastOfferMade() {
+        return lastOfferMade;
+    }
+
+    public String getTurn() {
+        return turn;
     }
 }

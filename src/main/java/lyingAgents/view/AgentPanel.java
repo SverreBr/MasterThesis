@@ -246,7 +246,11 @@ public class AgentPanel extends JComponent implements GameListener {
     private void updateInfo() {
         int idx = 0;
         style[idx] = "bold";
-        content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanMakeFalseStatements() + ")";
+        if (agent.getOrderToM() != 0) {
+            content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanMakeFalseStatements() + ")";
+        } else {
+            content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ")";
+        }
         content[idx++] = "initial chips: " + Arrays.toString(this.initialChips);
         content[idx++] = "";
         content[idx++] = "";
@@ -268,7 +272,7 @@ public class AgentPanel extends JComponent implements GameListener {
             style[idx] = "regular";
             content[idx++] = "total nr. offers: " + game.getTotalNrOffersMade();
             style[idx] = "italic";
-            content[idx++] = "final (total) points: " + agent.getUtilityValue() + " (" + agent.getFinalPoints() + ")";
+            content[idx++] = "final points: " + agent.getUtilityValue();
         }
 
         while (idx < content.length) {

@@ -2,6 +2,7 @@ package results.createResults;
 
 import lyingAgents.model.Game;
 import lyingAgents.model.player.PlayerLying;
+import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.MiscFunc;
 import lyingAgents.utilities.OfferOutcome;
 import lyingAgents.utilities.Settings;
@@ -32,6 +33,9 @@ public class ResultElement {
     private final boolean initCanInitiallyReachGP;
     private final boolean respCanInitiallyReachGP;
 
+    private final double initZeroToMProb;
+    private final double respZeroToMProb;
+
     private final int nrOffers;
     private final boolean isStrictPE;
     private final boolean isBestSW;
@@ -48,20 +52,23 @@ public class ResultElement {
         initLR = init.getLearningSpeed();
         initCanLie = init.isCanMakeFalseStatements();
         initCanSendMessages = init.isCanSendMessages();
-        initFinalPoints = init.getFinalPoints();
+        initFinalPoints = init.getUtilityValue();
         initInitialPoints = init.getInitialPoints();
-        initCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION, init.getChipsBin(), game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME));
+        initCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION,
+                Chips.getBins(init.getInitialChips(), game.getBinMaxChips()), game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME));
+        initZeroToMProb = init.getPROB_TOM0_SEND_MESSAGE();
 
         respToM = resp.getOrderToM();
         respLR = resp.getLearningSpeed();
         respCanSendMessages = resp.isCanSendMessages();
         respCanLie = resp.isCanMakeFalseStatements();
-        respFinalPoints = resp.getFinalPoints();
+        respFinalPoints = resp.getUtilityValue();
         respInitialPoints = resp.getInitialPoints();
-        respCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION, resp.getChipsBin(), game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME));
+        respCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION,
+                Chips.getBins(resp.getInitialChips(), game.getBinMaxChips()), game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME));
+        respZeroToMProb = resp.getPROB_TOM0_SEND_MESSAGE();
 
         nrOffers = game.getTotalNrOffersMade();
-
         List<OfferOutcome> peList = game.getStrictParetoOutcomes();
         thereIsBetterOutcomeThanInitialSituForBothAgents = !peList.isEmpty();
         isNewOfferAccepted = MiscFunc.isNewOfferAccepted(game);
@@ -162,5 +169,13 @@ public class ResultElement {
 
     public boolean isRespCanInitiallyReachGP() {
         return respCanInitiallyReachGP;
+    }
+
+    public double getInitZeroToMProb() {
+        return initZeroToMProb;
+    }
+
+    public double getRespZeroToMProb() {
+        return respZeroToMProb;
     }
 }

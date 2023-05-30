@@ -11,7 +11,7 @@ public class Main {
      * initializes game and creates main panel
      */
     public static void main(String[] args) {
-        Game game = new Game(0, 0, 0.5, 0.5, true, true, true, true);
+        Game game = new Game(2, 1, 0.5, 0.5, false, false, false, false);
         MainFrame main = new MainFrame(game);
         main.setLocationRelativeTo(null);
         main.setVisible(true);

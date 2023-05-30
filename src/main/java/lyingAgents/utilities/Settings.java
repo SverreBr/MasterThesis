@@ -173,11 +173,11 @@ public class Settings {
     /**
      * Probability mass the other locations get for sending messages.
      */
-    public static final double PROB_MASS_OTHER_LOCS = 0.01;
-
-    public static final double PROB_TOM0_SEND_MESSAGE = 0.25;
+    public static final double PROB_MASS_OTHER_LOCS = 0.02;
     public static final int ID_NO_OFFER = -1;
     public static final int ID_ACCEPT_OFFER = -2;
     public static final int ID_WITHDRAW_NEGOTIATION = -3;
     public static final int ID_NO_LOCATION = -1;
+    public static final int INIT_NUM_POS_ENCOUNTERS = 5;
+    public static final double STANDARD_LR = 0.5;
 }

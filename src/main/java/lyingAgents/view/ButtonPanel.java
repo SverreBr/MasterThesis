@@ -195,7 +195,7 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         PlayerLying init = game.getInitiator();
         PlayerLying resp = game.getResponder();
         GameSetting gameSetting = game.getGameSetting();
-        game.reset(init.getOrderToM(),
+        game.initFullyNewGame(init.getOrderToM(),
                 resp.getOrderToM(),
                 init.getLearningSpeed(),
                 resp.getLearningSpeed(),

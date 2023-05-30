@@ -282,8 +282,7 @@ public class PlayerToM extends Player {
             super.receiveOffer(offerToSelf);
         } else {
             updateLocationBeliefs(offerToSelf);
-
-            if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with what is offered...
+            if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with beliefs...
                 restoreLocationBeliefsDueToUnbelievedMessage();
                 if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
                     System.out.println("--- " + getName() + " DOES NOT BELIEVE TRADING PARTNER ---");
@@ -542,29 +541,28 @@ public class PlayerToM extends Player {
     /////////////////
 
     /**
-     * Method called when the agent receives a message with a location. Agent checks if it is going to believe the agent.
+     * Method called when the agent receives a message with a receivedLoc. Agent checks if it is going to believe the agent.
      * It does not believe the agent when
      *
-     * @param location The location that the trading partner announced
+     * @param receivedLoc The receivedLoc that the trading partner announced
      */
-    private void receiveLocationMessage(int location) {
-        if (this.orderToM > 0) { // Models goal location of trading partner
+    private void receiveLocationMessage(int receivedLoc) {
+        if (this.orderToM > 0) { // Models goal receivedLoc of trading partner
             if (!this.receivedMessage) { // First message received
-                double savedLocationBelief = locationBeliefs[location];
                 storeLocationBeliefsDueToBelievedMessage();
-                for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
-                    locationBeliefs[loc] = 0.0;
-                }
-                if (savedLocationBelief - Settings.EPSILON > 0.0) locationBeliefs[location] = 1.0;
-            } else {  // already received a message
-                if (locationBeliefs[location] - Settings.EPSILON <= 0.0) {
+                if (locationBeliefs[receivedLoc] - Settings.EPSILON > 0.0) { // agent believes partner
                     for (int loc = 0; loc < game.getNumberOfGoalPositions(); loc++) {
                         locationBeliefs[loc] = 0.0;
                     }
-                } // else, agent can still believe trading partner, or already disbelieved the trading partner.
+                    locationBeliefs[receivedLoc] = 1.0;
+                }
+            } else {  // already received a message
+                if (locationBeliefs[receivedLoc] - Settings.EPSILON <= 0.0) { // agent does not believe partner
+                    restoreLocationBeliefsDueToUnbelievedMessage();
+                }
             }
         } else {
-            decreaseColorBeliefMessage(location);
+            decreaseColorBeliefMessage(receivedLoc);
         }
         this.receivedMessage = true;
     }

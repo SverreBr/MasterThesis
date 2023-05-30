@@ -145,8 +145,8 @@ public abstract class Player {
             // Initialize beliefs to 5 positive encounters to make sure the agent's experience doesn't crash immediately to disbelief
             for (i = 0; i < nrPossibleChips; i++) {
                 for (j = 0; j < nrPossibleChips; j++) {
-                    countBeliefsOfferType[i][j] = 1;
-                    countTotalOfferType[i][j] = 1;
+                    countBeliefsOfferType[i][j] = Settings.INIT_NUM_POS_ENCOUNTERS;
+                    countTotalOfferType[i][j] = Settings.INIT_NUM_POS_ENCOUNTERS;
                 }
             }
         } else {
@@ -438,15 +438,6 @@ public abstract class Player {
      */
     public int getUtilityValue() {
         return utilityFunction[chips];
-    }
-
-    /**
-     * returns the final score of this agent given its current offer and the number of offers that has been made
-     *
-     * @return the final score of this agent after negotiation
-     */
-    public int getFinalPoints() {
-        return utilityFunction[chips] + game.getTotalNrOffersMade() * Settings.SCORE_NEGOTIATION_STEP;
     }
 
 
