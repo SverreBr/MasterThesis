@@ -59,11 +59,14 @@ public class GetResults {
 
         i = 0;
         do {
-            game.newRound();
+            do {
+                game.newRound();
+            } while (game.canAnyAgentReachTheirGP());
             game.playTillEnd();
             endTime = System.currentTimeMillis();
             resultElement = new ResultElement(game, (endTime - startTime) / 1000.0);
             data.add(resultElement);
+            startTime = System.currentTimeMillis();
             i++;
         } while (i < ResultSettings.KEEP_RESULTS_NR_ROUNDS);
     }
@@ -91,6 +94,8 @@ public class GetResults {
                 ResultSettings.initGain, ResultSettings.respGain,
                 ResultSettings.initCanInitiallyReachGP, ResultSettings.respCanInitiallyReachGP,
                 ResultSettings.initZeroToMProb, ResultSettings.respZeroToMProb,
+                ResultSettings.initHighestValueParetoOutcome, ResultSettings.respHighestValueParetoOutcome,
+                ResultSettings.initHighestValueStrictParetoOutcome, ResultSettings.respHighestValueStrictParetoOutcome,
                 ResultSettings.nrOffers, ResultSettings.outcomeIsStrictPE, ResultSettings.isBestSWFromStrictPE,
                 ResultSettings.isNewOfferAccepted, ResultSettings.thereIsABetterOutcomeThanInitialSitu,
                 ResultSettings.reachedMaxNumOffers, ResultSettings.timePassed};
@@ -128,6 +133,12 @@ public class GetResults {
 
                     String.valueOf(resultElement.getInitZeroToMProb()),
                     String.valueOf(resultElement.getRespZeroToMProb()),
+
+                    String.valueOf(resultElement.getInitHighestValueParetoOutcome()),
+                    String.valueOf(resultElement.getRespHighestValueParetoOutcome()),
+
+                    String.valueOf(resultElement.getInitHighestValueStrictParetoOutcome()),
+                    String.valueOf(resultElement.getRespHighestValueStrictParetoOutcome()),
 
                     String.valueOf(resultElement.getNrOffers()),
                     String.valueOf(resultElement.isStrictPE()),

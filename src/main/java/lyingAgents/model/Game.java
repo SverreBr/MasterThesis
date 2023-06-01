@@ -109,18 +109,15 @@ public class Game {
      * Initializes a fully new game, where the agents are also fully reset
      */
     public void initFullyNewGame(int initToM, int respToM, double initLR, double respLR, boolean initCanLie, boolean respCanLie, boolean initCanSendMessages, boolean respCanSendMessages) {
-        do {
-            this.board.resetBoard();
-            GameSetting gameSetting = generateNewNegotiationSetting();
-            int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
-            int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
+        this.board.resetBoard();
+        GameSetting gameSetting = generateNewNegotiationSetting();
+        int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
+        int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
 
-            this.initiator = new PlayerLying(Settings.INITIATOR_NAME, this, initToM, initLR,
-                    chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]], initCanLie, initCanSendMessages);
-            this.responder = new PlayerLying(Settings.RESPONDER_NAME, this, respToM, respLR,
-                    chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]], respCanLie, respCanSendMessages);
-        } while (canAnyAgentReachTheirGP());
-        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
+        this.initiator = new PlayerLying(Settings.INITIATOR_NAME, this, initToM, initLR,
+                chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]], initCanLie, initCanSendMessages);
+        this.responder = new PlayerLying(Settings.RESPONDER_NAME, this, respToM, respLR,
+                chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]], respCanLie, respCanSendMessages);
         if (simulationOn) notifyListenersNewGame();
     }
 
@@ -128,21 +125,18 @@ public class Game {
      * Initializes a new round of play, where agents keep learnt behaviour across games.
      */
     public void newRound() {
-        do {
-            this.board.resetBoard();
-            GameSetting gameSetting = generateNewNegotiationSetting();
-            int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
-            int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
+        this.board.resetBoard();
+        GameSetting gameSetting = generateNewNegotiationSetting();
+        int chipSetInitiator = Chips.getIndex(gameSetting.getChipSets()[0], binMaxChips);
+        int chipSetResponder = Chips.getIndex(gameSetting.getChipSets()[1], binMaxChips);
 
-            this.initiator.initNegotiationRound(chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]]);
-            this.responder.initNegotiationRound(chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]]);
-        } while (canAnyAgentReachTheirGP());
+        this.initiator.initNegotiationRound(chipSetInitiator, chipSetResponder, utilityFunctions[goalPositions[0]]);
+        this.responder.initNegotiationRound(chipSetResponder, chipSetInitiator, utilityFunctions[goalPositions[1]]);
 
-        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         if (simulationOn) notifyListenersNewGame();
     }
 
-    private boolean canAnyAgentReachTheirGP() {
+    public boolean canAnyAgentReachTheirGP() {
         boolean initCanReach = board.canReachGP(Settings.STARTING_POSITION, Chips.getBins(initiator.getInitialChips(), binMaxChips),
                 getGoalPositionPointPlayer(Settings.INITIATOR_NAME));
         boolean respCanReach = board.canReachGP(Settings.STARTING_POSITION, Chips.getBins(responder.getInitialChips(), binMaxChips),
@@ -252,6 +246,7 @@ public class Game {
 
         this.initiator.initNegotiationRound(chipsInitiator, chipsResponder, utilityFunctions[goalPositions[0]]);
         this.responder.initNegotiationRound(chipsResponder, chipsInitiator, utilityFunctions[goalPositions[1]]);
+        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         if (simulationOn) notifyListenersNewGame();
     }
 

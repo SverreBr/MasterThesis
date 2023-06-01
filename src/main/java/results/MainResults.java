@@ -136,38 +136,34 @@ public class MainResults {
             for (int initTom : ResultSettings.initTomList) {
                 for (int respTom : ResultSettings.respTomList) {
                     if ((initTom != 0) && (respTom != 0)) continue;
-                    for (double initZeroToMProb : ResultSettings.tom0probList) {
-                        for (double respZeroToMProb : ResultSettings.tom0probList) {
-                            for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
-                                for (boolean respCanSendMessages : ResultSettings.respCanSendMessagesList) {
-                                    for (boolean initCanLie : ResultSettings.initCanLieList) {
-                                        if ((!initCanSendMessages && initCanLie)) continue;
-                                        if ((initTom == 0) && !initCanLie) continue;
-                                        for (boolean respCanLie : ResultSettings.respCanLieList) {
-                                            if (!respCanSendMessages && respCanLie) continue;
-                                            if ((respTom == 0) && !respCanLie) continue;
+                    for (double zeroToMProb : ResultSettings.tom0probList) {
+                        for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
+                            for (boolean respCanSendMessages : ResultSettings.respCanSendMessagesList) {
+                                for (boolean initCanLie : ResultSettings.initCanLieList) {
+                                    if ((!initCanSendMessages && initCanLie)) continue;
+                                    if ((initTom == 0) && !initCanLie) continue;
+                                    for (boolean respCanLie : ResultSettings.respCanLieList) {
+                                        if (!respCanSendMessages && respCanLie) continue;
+                                        if ((respTom == 0) && !respCanLie) continue;
 
-                                            Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-                                            game.getInitiator().setPROB_TOM0_SEND_MESSAGE(initZeroToMProb);
-                                            game.getResponder().setPROB_TOM0_SEND_MESSAGE(respZeroToMProb);
+                                        Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+                                        game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                                        game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
 
-                                            getResults.generateNewResults(game);
-                                            try {
-                                                getResults.writeExcel();
-                                            } catch (IOException exception) {
-                                                System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
-                                            }
-                                            System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
-                                                    ", i_prob=" + initZeroToMProb + ", r_prob=" + respZeroToMProb +
-                                                    ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
-                                                    ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
-                                        }
+                                        getResults.generateNewResults(game);
+                                        System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
+                                                ", prob=" + zeroToMProb +
+                                                ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
+                                                ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
                                     }
                                 }
                             }
-                            if (respTom != 0) break;
                         }
-                        if (initTom != 0) break;
+                    }
+                    try {
+                        getResults.writeExcel();
+                    } catch (IOException exception) {
+                        System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
                     }
                 }
             }

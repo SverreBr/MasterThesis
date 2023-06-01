@@ -170,4 +170,27 @@ public class MiscFunc {
         PlayerLying initiator = game.getInitiator();
         return (initiator.getInitialChips() != initiator.getChips());
     }
+
+    public static HashMap<String, Integer> getHighestValue(List<OfferOutcome> peList) {
+        int valueInit, valueResp;
+        HashMap<String, Integer> map = new HashMap<>();
+
+        map.put(Settings.INITIATOR_NAME, -1);
+        map.put(Settings.RESPONDER_NAME, -1);
+        if (peList.size() == 0) return map;
+
+        for (OfferOutcome outcome : peList) {
+            valueInit = outcome.getValueInit();
+            valueResp = outcome.getValueResp();
+            if (map.get(Settings.INITIATOR_NAME) < valueInit) {
+                map.remove(Settings.INITIATOR_NAME);
+                map.put(Settings.INITIATOR_NAME, valueInit);
+            }
+            if (map.get(Settings.RESPONDER_NAME) < valueResp) {
+                map.remove(Settings.RESPONDER_NAME);
+                map.put(Settings.RESPONDER_NAME, valueResp);
+            }
+        }
+        return map;
+    }
 }

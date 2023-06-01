@@ -7,6 +7,7 @@ import lyingAgents.utilities.MiscFunc;
 import lyingAgents.utilities.OfferOutcome;
 import lyingAgents.utilities.Settings;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class ResultElement {
@@ -36,6 +37,12 @@ public class ResultElement {
     private final double initZeroToMProb;
     private final double respZeroToMProb;
 
+    private final int initHighestValueStrictParetoOutcome;
+    private final int respHighestValueStrictParetoOutcome;
+
+    private final int initHighestValueParetoOutcome;
+    private final int respHighestValueParetoOutcome;
+
     private final int nrOffers;
     private final boolean isStrictPE;
     private final boolean isBestSW;
@@ -58,6 +65,7 @@ public class ResultElement {
                 Chips.getBins(init.getInitialChips(), game.getBinMaxChips()), game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME));
         initZeroToMProb = init.getPROB_TOM0_SEND_MESSAGE();
 
+
         respToM = resp.getOrderToM();
         respLR = resp.getLearningSpeed();
         respCanSendMessages = resp.isCanSendMessages();
@@ -69,12 +77,21 @@ public class ResultElement {
         respZeroToMProb = resp.getPROB_TOM0_SEND_MESSAGE();
 
         nrOffers = game.getTotalNrOffersMade();
-        List<OfferOutcome> peList = game.getStrictParetoOutcomes();
-        thereIsBetterOutcomeThanInitialSituForBothAgents = !peList.isEmpty();
+        List<OfferOutcome> strictPEList = game.getStrictParetoOutcomes();
+        thereIsBetterOutcomeThanInitialSituForBothAgents = !strictPEList.isEmpty();
         isNewOfferAccepted = MiscFunc.isNewOfferAccepted(game);
-        isStrictPE = MiscFunc.calcIfOutcomeIsStrictPE(peList, game);
-        isBestSW = MiscFunc.calcIfOutcomeIsBestSW(peList, game);
+        isStrictPE = MiscFunc.calcIfOutcomeIsStrictPE(strictPEList, game);
+        isBestSW = MiscFunc.calcIfOutcomeIsBestSW(strictPEList, game);
         reachedMaxNumOffers = game.isReachedMaxNumOffers();
+
+        HashMap<String, Integer> map = MiscFunc.getHighestValue(strictPEList);
+        initHighestValueStrictParetoOutcome = map.get(Settings.INITIATOR_NAME);
+        respHighestValueStrictParetoOutcome = map.get(Settings.RESPONDER_NAME);
+
+        List<OfferOutcome> PEList = game.getParetoOutcomes();
+        map = MiscFunc.getHighestValue(PEList);
+        initHighestValueParetoOutcome = map.get(Settings.INITIATOR_NAME);
+        respHighestValueParetoOutcome = map.get(Settings.RESPONDER_NAME);
 
         this.timePassed = timePassed;
     }
@@ -177,5 +194,21 @@ public class ResultElement {
 
     public double getRespZeroToMProb() {
         return respZeroToMProb;
+    }
+
+    public int getInitHighestValueStrictParetoOutcome() {
+        return initHighestValueStrictParetoOutcome;
+    }
+
+    public int getRespHighestValueStrictParetoOutcome() {
+        return respHighestValueStrictParetoOutcome;
+    }
+
+    public int getInitHighestValueParetoOutcome() {
+        return initHighestValueParetoOutcome;
+    }
+
+    public int getRespHighestValueParetoOutcome() {
+        return respHighestValueParetoOutcome;
     }
 }
