@@ -87,7 +87,7 @@ public class MainResults {
 
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {
-            System.out.println("--- Repetition " + cnt + " ---");
+            System.out.println("--- Start Repetition " + cnt + " ---");
             for (int initTom : ResultSettings.initTomList) {
                 for (int respTom : ResultSettings.respTomList) {
                     for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
@@ -101,11 +101,7 @@ public class MainResults {
 
                                     Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
                                     getResults.generateNewResults(game);
-                                    try {
-                                        getResults.writeExcel();
-                                    } catch (IOException exception) {
-                                        System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
-                                    }
+
                                     System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
                                             ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
                                             ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
@@ -116,6 +112,11 @@ public class MainResults {
                         }
                     }
                 }
+            }
+            try {
+                getResults.writeExcel();
+            } catch (IOException exception) {
+                System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
             }
             System.out.println("################### Finished iteration " + cnt + " ###################\n");
         }
@@ -132,7 +133,7 @@ public class MainResults {
 
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {
-            System.out.println("--- Repetition " + cnt + " ---");
+            System.out.println("--- Start Repetition " + cnt + " ---");
             for (int initTom : ResultSettings.initTomList) {
                 for (int respTom : ResultSettings.respTomList) {
                     if ((initTom != 0) && (respTom != 0)) continue;
@@ -160,21 +161,14 @@ public class MainResults {
                             }
                         }
                     }
-                    try {
-                        getResults.writeExcel();
-                    } catch (IOException exception) {
-                        System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
-                    }
                 }
+            }
+            try {
+                getResults.writeExcel();
+            } catch (IOException exception) {
+                System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
             }
             System.out.println("################### Finished iteration " + cnt + " ###################\n");
         }
-
-        try {
-            getResults.writeExcel();
-        } catch (IOException exception) {
-            System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
-        }
     }
-
 }

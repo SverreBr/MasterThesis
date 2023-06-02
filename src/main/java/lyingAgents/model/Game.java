@@ -246,7 +246,7 @@ public class Game {
 
         this.initiator.initNegotiationRound(chipsInitiator, chipsResponder, utilityFunctions[goalPositions[0]]);
         this.responder.initNegotiationRound(chipsResponder, chipsInitiator, utilityFunctions[goalPositions[1]]);
-        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
+//        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         if (simulationOn) notifyListenersNewGame();
     }
 
@@ -289,10 +289,10 @@ public class Game {
 
         if (tmpNewOffer == Settings.ID_WITHDRAW_NEGOTIATION) { // Negotiation terminated
             negotiationTerminates();
-            if (DEBUG) printFinalStatements();
+//            if (DEBUG) printFinalStatements();
         } else if (tmpNewOffer == Settings.ID_ACCEPT_OFFER) { // Offer is accepted
             offerAccepted();
-            if (DEBUG) printFinalStatements();
+//            if (DEBUG) printFinalStatements();
         } else { // Negotiation continues with new offer
             totalNrOffersMade++;
             lastOfferMade = flipOffer(tmpNewOffer);
