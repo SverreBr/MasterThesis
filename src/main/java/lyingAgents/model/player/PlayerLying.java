@@ -148,13 +148,16 @@ public class PlayerLying extends PlayerToM {
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
         bestOffers = new ArrayList<>();
 
-        if ((getOrderToM() > 0) && canMakeFalseStatements) {
-            for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
-                addOffers(loc);
+        if (getOrderToM() > 0) {
+            if (canMakeFalseStatements) {
+                for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
+                    addOffers(loc);
+                }
+            } else {
+                addOffers(game.getGoalPositionPlayer(this.getName()));
             }
-        } else if (canMakeFalseStatements) {
-            addOffers(game.getGoalPositionPlayer(this.getName()));
         }
+
 
 //        if (Game.DEBUG) {
 //            System.out.println("-> Offers that are optimal for " + getName() + " including messages:");
