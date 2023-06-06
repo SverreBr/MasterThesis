@@ -37,6 +37,12 @@ public class ResultElement {
     private final double initZeroToMProb;
     private final double respZeroToMProb;
 
+    private final int initNumberOfTimesLied;
+    private final int respNumberOfTimesLied;
+
+    private final int initNumberOfMessagesSent;
+    private final int respNumberOfMessagesSent;
+
     private final int initHighestValueStrictParetoOutcome;
     private final int respHighestValueStrictParetoOutcome;
 
@@ -64,6 +70,8 @@ public class ResultElement {
         initCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION,
                 Chips.getBins(init.getInitialChips(), game.getBinMaxChips()), game.getGoalPositionPointPlayer(Settings.INITIATOR_NAME));
         initZeroToMProb = init.getPROB_TOM0_SEND_MESSAGE();
+        initNumberOfTimesLied = init.getNumberOfTimesLied();
+        initNumberOfMessagesSent = init.getNumberOfMessagesSent();
 
 
         respToM = resp.getOrderToM();
@@ -75,6 +83,8 @@ public class ResultElement {
         respCanInitiallyReachGP = game.getBoard().canReachGP(Settings.STARTING_POSITION,
                 Chips.getBins(resp.getInitialChips(), game.getBinMaxChips()), game.getGoalPositionPointPlayer(Settings.RESPONDER_NAME));
         respZeroToMProb = resp.getPROB_TOM0_SEND_MESSAGE();
+        respNumberOfTimesLied = resp.getNumberOfTimesLied();
+        respNumberOfMessagesSent = resp.getNumberOfMessagesSent();
 
         nrOffers = game.getTotalNrOffersMade();
         List<OfferOutcome> strictPEList = game.getStrictParetoOutcomes();
@@ -210,5 +220,21 @@ public class ResultElement {
 
     public int getRespHighestValueParetoOutcome() {
         return respHighestValueParetoOutcome;
+    }
+
+    public int getInitNumberOfTimesLied() {
+        return initNumberOfTimesLied;
+    }
+
+    public int getRespNumberOfTimesLied() {
+        return respNumberOfTimesLied;
+    }
+
+    public int getInitNumberOfMessagesSent() {
+        return initNumberOfMessagesSent;
+    }
+
+    public int getRespNumberOfMessagesSent() {
+        return respNumberOfMessagesSent;
     }
 }

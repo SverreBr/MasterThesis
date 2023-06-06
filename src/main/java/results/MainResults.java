@@ -18,7 +18,7 @@ public class MainResults {
 
     private static String csvFileName = "results.csv";
     private static String experimentName = "main";
-    private static final List<String> experiment_options = Arrays.asList("main", "determine_prob");
+    private static final List<String> experiment_options = Arrays.asList("main", "determine_prob", "determine_prob_compare");
 
     private static final String FILE_ID = "-file_id";
     private static final String EXPERIMENT_ID = "-experiment";
@@ -77,6 +77,8 @@ public class MainResults {
             performMainExperiment();
         } else if (experimentName.equals("determine_prob")) {
             performDetermineProbExperiment();
+        } else if (experimentName.equals("determine_prob_compare")) {
+            performDetermineProbCompareExperiment();
         } else {
             System.out.println("No results obtained as experiment name not implemented");
         }
@@ -107,8 +109,6 @@ public class MainResults {
                                             ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
                                 }
                             }
-
-
                         }
                     }
                 }
@@ -120,16 +120,12 @@ public class MainResults {
             }
             System.out.println("################### Finished iteration " + cnt + " ###################\n");
         }
-
-        try {
-            getResults.writeExcel();
-        } catch (IOException exception) {
-            System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
-        }
     }
 
     private static void performDetermineProbExperiment() {
         GetResults getResults = new GetResults(csvFileName);
+        boolean initCanSendMessages = true;
+        boolean respCanSendMessages = true;
 
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {
@@ -138,27 +134,60 @@ public class MainResults {
                 for (int respTom : ResultSettings.respTomList) {
                     if ((initTom != 0) && (respTom != 0)) continue;
                     for (double zeroToMProb : ResultSettings.tom0probList) {
-                        for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
-                            for (boolean respCanSendMessages : ResultSettings.respCanSendMessagesList) {
-                                for (boolean initCanLie : ResultSettings.initCanLieList) {
-                                    if ((!initCanSendMessages && initCanLie)) continue;
-                                    if ((initTom == 0) && !initCanLie) continue;
-                                    for (boolean respCanLie : ResultSettings.respCanLieList) {
-                                        if (!respCanSendMessages && respCanLie) continue;
-                                        if ((respTom == 0) && !respCanLie) continue;
+                        for (boolean initCanLie : ResultSettings.initCanLieList) {
+                            if ((initTom == 0) && !initCanLie) continue;
+                            for (boolean respCanLie : ResultSettings.respCanLieList) {
+                                if ((respTom == 0) && !respCanLie) continue;
 
-                                        Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-                                        game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
-                                        game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                                Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+                                game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                                game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
 
-                                        getResults.generateNewResults(game);
-                                        System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
-                                                ", prob=" + zeroToMProb +
-                                                ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
-                                                ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
-                                    }
-                                }
+                                getResults.generateNewResults(game);
+                                System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
+                                        ", prob=" + zeroToMProb +
+                                        ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
+                                        ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
                             }
+                        }
+                    }
+                }
+            }
+            try {
+                getResults.writeExcel();
+            } catch (IOException exception) {
+                System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
+            }
+            System.out.println("################### Finished iteration " + cnt + " ###################\n");
+        }
+    }
+
+    private static void performDetermineProbCompareExperiment() {
+        GetResults getResults = new GetResults(csvFileName);
+        boolean initCanSendMessages = true;
+        boolean respCanSendMessages = true;
+        double zeroToMProb = 0.0;
+
+        int cnt = 0;
+        while (cnt++ < ResultSettings.NUM_REP) {
+            System.out.println("--- Start Repetition " + cnt + " ---");
+            for (int initTom : ResultSettings.initTomList) {
+                for (int respTom : ResultSettings.respTomList) {
+                    if ((initTom == 0) && (respTom == 0)) continue;
+                    for (boolean initCanLie : ResultSettings.initCanLieList) {
+                        if ((initTom == 0) && !initCanLie) continue;
+                        for (boolean respCanLie : ResultSettings.respCanLieList) {
+                            if ((respTom == 0) && !respCanLie) continue;
+
+                            Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+                            game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                            game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+
+                            getResults.generateNewResults(game);
+                            System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
+                                    ", prob=" + zeroToMProb +
+                                    ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
+                                    ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
                         }
                     }
                 }

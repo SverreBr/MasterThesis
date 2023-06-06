@@ -1,7 +1,6 @@
 package lyingAgents.model.player;
 
 import lyingAgents.model.Game;
-import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.Messages;
 import lyingAgents.utilities.RandomNumGen;
 import lyingAgents.utilities.Settings;
@@ -34,6 +33,8 @@ public class PlayerLying extends PlayerToM {
      * Value for calculating the best offer to make.
      */
     private double tmpSelectOfferValue;
+    private int numberOfTimesLied;
+    private int numberOfMessagesSent;
 
     private RandomNumGen rng;
 
@@ -62,6 +63,8 @@ public class PlayerLying extends PlayerToM {
     public void initNegotiationRound(int chipsSelf, int chipsOther, int[] utilityFunction) {
         super.initNegotiationRound(chipsSelf, chipsOther, utilityFunction);
         if (canSendMessages && (getOrderToM() == 0)) makeRng();
+        this.numberOfMessagesSent = 0;
+        this.numberOfTimesLied = 0;
     }
 
     private void makeRng() {
@@ -71,7 +74,6 @@ public class PlayerLying extends PlayerToM {
 
         Arrays.fill(zeroOrderProbSendingMessages, Settings.PROB_MASS_OTHER_LOCS);
         zeroOrderProbSendingMessages[goalPosition] = 1.0 - Settings.PROB_MASS_OTHER_LOCS * (zeroOrderProbSendingMessages.length - 1);
-
 
         for (int i = 0; i < goalPositionsArray.length; i++) {
             goalPositionsArray[i] = i;
@@ -90,6 +92,7 @@ public class PlayerLying extends PlayerToM {
         int curOffer;
 
 //        if (Game.DEBUG) System.out.println("\n-----");
+        if (!canSendMessages) return super.makeOffer(offerReceived);
 
         if (offerReceived == Settings.ID_NO_OFFER) {
             curOffer = chooseOffer(Settings.ID_NO_OFFER);
@@ -97,7 +100,8 @@ public class PlayerLying extends PlayerToM {
             receiveOffer(offerReceived);
             curOffer = chooseOffer(offerReceived);
         }
-        if ((curOffer != Settings.ID_ACCEPT_OFFER) && (curOffer != Settings.ID_WITHDRAW_NEGOTIATION)) sendOffer(curOffer);
+        if ((curOffer != Settings.ID_ACCEPT_OFFER) && (curOffer != Settings.ID_WITHDRAW_NEGOTIATION))
+            sendOffer(curOffer);
         return curOffer;
     }
 
@@ -106,12 +110,11 @@ public class PlayerLying extends PlayerToM {
         OfferType offerType = offerList.get((int) (Math.random() * offerList.size()));
         int newOffer = offerType.getOffer();
 
-        if (canSendMessages) {
-            int locMessage = offerType.getLoc();
-            if ((getOrderToM() == 0) && (newOffer != Settings.ID_ACCEPT_OFFER) && (newOffer != Settings.ID_WITHDRAW_NEGOTIATION)
-                    && (Math.random() < PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
-            if (locMessage != Settings.ID_NO_LOCATION) sendMessage(Messages.createLocationMessage(locMessage));
-        }
+
+        int locMessage = offerType.getLoc();
+        if ((getOrderToM() == 0) && (newOffer != Settings.ID_ACCEPT_OFFER) && (newOffer != Settings.ID_WITHDRAW_NEGOTIATION)
+                && (Math.random() < PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
+        if (locMessage != Settings.ID_NO_LOCATION) sendGLMessage(locMessage);
 
 
 //        if (Game.DEBUG) {
@@ -134,7 +137,6 @@ public class PlayerLying extends PlayerToM {
         double noMessageOfferValue;
 
 //        if (!Game.DEBUG && !canSendMessages) return super.selectBestOffers(offerReceived);
-        if (!canSendMessages) return super.selectBestOffers(offerReceived);
 
         bestOffers = new ArrayList<>();
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
@@ -146,11 +148,12 @@ public class PlayerLying extends PlayerToM {
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
         bestOffers = new ArrayList<>();
 
-//        if (canSendMessages && (getOrderToM() > 0)) {
-        if (getOrderToM() > 0) {
+        if ((getOrderToM() > 0) && canMakeFalseStatements) {
             for (int loc = 0; loc < this.game.getNumberOfGoalPositions(); loc++) {
                 addOffers(loc);
             }
+        } else if (canMakeFalseStatements) {
+            addOffers(game.getGoalPositionPlayer(this.getName()));
         }
 
 //        if (Game.DEBUG) {
@@ -199,12 +202,11 @@ public class PlayerLying extends PlayerToM {
         double curValue;
         boolean savedHasSentMessage = this.hasSentMessage;
 
-        if ((!canMakeFalseStatements) && (loc != game.getGoalPositionPlayer(this.getName()))) return;
-        assert (getOrderToM() > 0) : "Theory of mind zero agent cannot reason about sending messages...";
+//        assert (getOrderToM() > 0) : "Theory of mind zero agent cannot reason about sending messages...";
 
         for (int i = 0; i < utilityFunction.length; i++) {  // loop over offers
             partnerModel.saveBeliefs();
-            partnerModel.receiveMessage(Messages.createLocationMessage(loc));
+            partnerModel.receiveGLMessage(loc);
             curValue = getValue(i);
             partnerModel.restoreBeliefs();
             this.setHasSentMessage(savedHasSentMessage);
@@ -248,12 +250,14 @@ public class PlayerLying extends PlayerToM {
     /**
      * Method called when a message has been sent.
      *
-     * @param message The message to be sent
+     * @param loc The goal location in the goal location message to be sent
      */
-    public void sendMessage(String message) {
-        super.sendMessage(message);
-        addMessage(message, false);
-        this.game.sendMessage(message);
+    public void sendGLMessage(int loc) {
+        super.sendGLMessage(loc);
+        addMessage(Messages.createLocationMessage(loc), false);
+        this.game.sendMessage(loc);
+        if (loc != game.getGoalPositionPlayer(this.getName())) numberOfTimesLied++; // TODO: maybe redefine this?
+        this.numberOfMessagesSent++;
     }
 
     /**
@@ -275,5 +279,13 @@ public class PlayerLying extends PlayerToM {
 
     public double getPROB_TOM0_SEND_MESSAGE() {
         return PROB_TOM0_SEND_MESSAGE;
+    }
+
+    public int getNumberOfTimesLied() {
+        return numberOfTimesLied;
+    }
+
+    public int getNumberOfMessagesSent() {
+        return numberOfMessagesSent;
     }
 }

@@ -233,13 +233,6 @@ public abstract class Player {
     abstract public int chooseOffer(int offerReceived);
 
     /**
-     * Method called to receive a message by another player.
-     *
-     * @param message The message to be handled by the player.
-     */
-    abstract public void receiveMessage(String message);
-
-    /**
      * Stores the current beliefs for later retrieval.
      * Used for prediction using a "fictitious play"-like structure
      */

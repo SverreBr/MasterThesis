@@ -2,7 +2,6 @@ package lyingAgents.model.player;
 
 import lyingAgents.model.Game;
 import lyingAgents.utilities.Chips;
-import lyingAgents.utilities.Messages;
 import lyingAgents.utilities.Settings;
 
 import java.util.ArrayList;
@@ -546,7 +545,7 @@ public class PlayerToM extends Player {
      *
      * @param receivedLoc The receivedLoc that the trading partner announced
      */
-    private void receiveLocationMessage(int receivedLoc) {
+    public void receiveGLMessage(int receivedLoc) {
         if (this.orderToM > 0) { // Models goal receivedLoc of trading partner
             if (!this.receivedMessage) { // First message received
                 storeLocationBeliefsDueToBelievedMessage();
@@ -561,42 +560,25 @@ public class PlayerToM extends Player {
                     restoreLocationBeliefsDueToUnbelievedMessage();
                 }
             }
+            selfModel.receiveGLMessage(receivedLoc);
+            partnerModel.sendGLMessage(receivedLoc);
         } else {
             decreaseColorBeliefMessage(receivedLoc);
         }
         this.receivedMessage = true;
     }
 
-
-    /**
-     * Method that is called when the agent receives a message.
-     *
-     * @param message The message to be handled by the player.
-     */
-    public void receiveMessage(String message) {
-        int loc;
-        String messageType = Messages.getMessageType(message);
-        if (messageType.equals(Messages.LOCATION_MESSAGE)) {
-            loc = Messages.getLocationFromMessage(message);
-            receiveLocationMessage(loc);
-        }
-        if (orderToM > 0) { // Agent has selfModel and partnerModel
-            selfModel.receiveMessage(message);
-            partnerModel.sendMessage(message);
-        }
-    }
-
     /**
      * Method called when agent sends a message.
      *
-     * @param message The message to send to the other agent
+     * @param loc The location in the goal location message to send to the other agent
      */
-    public void sendMessage(String message) {
+    public void sendGLMessage(int loc) {
         this.hasSentMessage = true;
 
         if (orderToM > 0) {
-            partnerModel.receiveMessage(message);
-            selfModel.sendMessage(message);
+            partnerModel.receiveGLMessage(loc);
+            selfModel.sendGLMessage(loc);
         }
     }
 

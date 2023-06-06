@@ -14,6 +14,8 @@ public class ResultSettings {
     public static final String initGain = "init_gain";
     public static final String initCanInitiallyReachGP = "init_canInitiallyReachGP";
     public static final String initZeroToMProb = "init_zeroToMProb";
+    public static final String initNumberOfTimesLied = "init_numberOfTimesLied";
+    public static final String initNumberOfMessagesSent = "init_numberOfMessagesSent";
     public static final String initHighestValueStrictParetoOutcome = "init_highestValueStrictParetoOutcome";
     public static final String initHighestValueParetoOutcome = "init_highestValueParetoOutcome";
     public static final String respTom = "resp_tom";
@@ -27,6 +29,8 @@ public class ResultSettings {
     public static final String respZeroToMProb = "resp_zeroToMProb";
     public static final String respHighestValueStrictParetoOutcome = "resp_highestValueStrictParetoOutcome";
     public static final String respHighestValueParetoOutcome = "resp_highestValueParetoOutcome";
+    public static final String respNumberOfTimesLied = "resp_numberOfTimesLied";
+    public static final String respNumberOfMessagesSent = "resp_numberOfMessagesSent";
     public static final String nrOffers = "nr_offers";
     public static final String outcomeIsStrictPE = "outcome_is_StrictPE";
     public static final String isBestSWFromStrictPE = "outcome_is_highestSW";

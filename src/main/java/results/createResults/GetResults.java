@@ -94,6 +94,8 @@ public class GetResults {
                 ResultSettings.initGain, ResultSettings.respGain,
                 ResultSettings.initCanInitiallyReachGP, ResultSettings.respCanInitiallyReachGP,
                 ResultSettings.initZeroToMProb, ResultSettings.respZeroToMProb,
+                ResultSettings.initNumberOfMessagesSent, ResultSettings.respNumberOfMessagesSent,
+                ResultSettings.initNumberOfTimesLied, ResultSettings.respNumberOfTimesLied,
                 ResultSettings.initHighestValueParetoOutcome, ResultSettings.respHighestValueParetoOutcome,
                 ResultSettings.initHighestValueStrictParetoOutcome, ResultSettings.respHighestValueStrictParetoOutcome,
                 ResultSettings.nrOffers, ResultSettings.outcomeIsStrictPE, ResultSettings.isBestSWFromStrictPE,
@@ -133,6 +135,12 @@ public class GetResults {
 
                     String.valueOf(resultElement.getInitZeroToMProb()),
                     String.valueOf(resultElement.getRespZeroToMProb()),
+
+                    String.valueOf(resultElement.getInitNumberOfMessagesSent()),
+                    String.valueOf(resultElement.getRespNumberOfMessagesSent()),
+
+                    String.valueOf(resultElement.getInitNumberOfTimesLied()),
+                    String.valueOf(resultElement.getRespNumberOfTimesLied()),
 
                     String.valueOf(resultElement.getInitHighestValueParetoOutcome()),
                     String.valueOf(resultElement.getRespHighestValueParetoOutcome()),

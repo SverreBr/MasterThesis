@@ -92,7 +92,7 @@ public class Game {
     /**
      * The message sent by one of the agents
      */
-    private String messageSend;
+    private int GLMessageSent;
 
 
     /**
@@ -148,6 +148,7 @@ public class Game {
      * Generates a new negotiation setting.
      */
     private GameSetting generateNewNegotiationSetting() {
+        //        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         setBasicNewGameSettings();
 
         generateGoalPositions();
@@ -246,7 +247,6 @@ public class Game {
 
         this.initiator.initNegotiationRound(chipsInitiator, chipsResponder, utilityFunctions[goalPositions[0]]);
         this.responder.initNegotiationRound(chipsResponder, chipsInitiator, utilityFunctions[goalPositions[1]]);
-//        if (DEBUG) System.out.println("\n-------------------- NEW ROUND --------------------");
         if (simulationOn) notifyListenersNewGame();
     }
 
@@ -275,17 +275,18 @@ public class Game {
 
         if (turn.equals(Settings.INITIATOR_NAME)) {
             if (isMessageSend) {
-                this.initiator.receiveMessage(messageSend);
+                this.initiator.receiveGLMessage(GLMessageSent);
                 isMessageSend = false;
             }
             tmpNewOffer = this.initiator.makeOffer(lastOfferMade);
         } else {
             if (isMessageSend) {
-                this.responder.receiveMessage(messageSend);
+                this.responder.receiveGLMessage(GLMessageSent);
                 isMessageSend = false;
             }
             tmpNewOffer = this.responder.makeOffer(lastOfferMade);
         }
+
 
         if (tmpNewOffer == Settings.ID_WITHDRAW_NEGOTIATION) { // Negotiation terminated
             negotiationTerminates();
@@ -351,11 +352,11 @@ public class Game {
     /**
      * Method called when an agent sends a message to another agent
      *
-     * @param message The message that is sent
+     * @param loc The goal location message that is sent
      */
-    public void sendMessage(String message) {
+    public void sendMessage(int loc) {
         isMessageSend = true;
-        this.messageSend = message;
+        this.GLMessageSent = loc;
     }
 
     //////////////////////////////
