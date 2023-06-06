@@ -46,6 +46,6 @@ public class ResultSettings {
     public static final List<Boolean> initCanSendMessagesList = Arrays.asList(true);
     public static final List<Boolean> respCanSendMessagesList = Arrays.asList(true);
     public static final int NUM_REP = 1;
-    public static final int WARMUP_ROUNDS = 10;
-    public static final int KEEP_RESULTS_NR_ROUNDS = 10;
+    public static final int WARMUP_ROUNDS = 100;
+    public static final int KEEP_RESULTS_NR_ROUNDS = 1;
 }
