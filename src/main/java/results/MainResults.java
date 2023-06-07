@@ -86,6 +86,7 @@ public class MainResults {
 
     private static void performMainExperiment() {
         GetResults getResults = new GetResults(csvFileName);
+        double zeroToMProb = 0.2;
 
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {
@@ -102,6 +103,8 @@ public class MainResults {
                                     if ((respTom == 0) && !respCanLie) continue;
 
                                     Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+                                    game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                                    game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
                                     getResults.generateNewResults(game);
 
                                     System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
