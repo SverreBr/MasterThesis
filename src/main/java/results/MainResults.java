@@ -86,7 +86,7 @@ public class MainResults {
 
     private static void performMainExperiment() {
         GetResults getResults = new GetResults(csvFileName);
-        double zeroToMProb = 0.2;
+        double zeroToMProb = 0.25;
 
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {

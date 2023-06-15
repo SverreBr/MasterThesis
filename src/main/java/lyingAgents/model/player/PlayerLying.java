@@ -88,11 +88,11 @@ public class PlayerLying extends PlayerToM {
      *                      That is, if accepted, the agent gets offer
      * @return The best offer to make, that is, when accepted, this player gets the curOffer.
      */
+    @Override
     public int makeOffer(int offerReceived) {
         int curOffer;
 
 //        if (Game.DEBUG) System.out.println("\n-----");
-        if (!canSendMessages) return super.makeOffer(offerReceived);
 
         if (offerReceived == Settings.ID_NO_OFFER) {
             curOffer = chooseOffer(Settings.ID_NO_OFFER);
@@ -105,17 +105,18 @@ public class PlayerLying extends PlayerToM {
         return curOffer;
     }
 
+    @Override
     public int chooseOffer(int offerReceived) {
+        if (!canSendMessages) return super.chooseOffer(offerReceived);
+
         List<OfferType> offerList = selectBestOffers(offerReceived);
         OfferType offerType = offerList.get((int) (Math.random() * offerList.size()));
         int newOffer = offerType.getOffer();
-
 
         int locMessage = offerType.getLoc();
         if ((getOrderToM() == 0) && (newOffer != Settings.ID_ACCEPT_OFFER) && (newOffer != Settings.ID_WITHDRAW_NEGOTIATION)
                 && (Math.random() < PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
         if (locMessage != Settings.ID_NO_LOCATION) sendGLMessage(locMessage);
-
 
 //        if (Game.DEBUG) {
 //            System.out.println("\n-> Chosen is offer: " + newOffer + " with value " + Settings.PRINT_DF.format(offerType.getValue()) + "\n");
@@ -136,7 +137,7 @@ public class PlayerLying extends PlayerToM {
     public List<OfferType> selectBestOffers(int offerReceived) {
         double noMessageOfferValue;
 
-//        if (!Game.DEBUG && !canSendMessages) return super.selectBestOffers(offerReceived);
+        if (!canSendMessages) return super.selectBestOffers(offerReceived);
 
         bestOffers = new ArrayList<>();
         tmpSelectOfferValue = -Double.MAX_VALUE + Settings.EPSILON;
@@ -157,7 +158,6 @@ public class PlayerLying extends PlayerToM {
                 addOffers(game.getGoalPositionPlayer(this.getName()));
             }
         }
-
 
 //        if (Game.DEBUG) {
 //            System.out.println("-> Offers that are optimal for " + getName() + " including messages:");

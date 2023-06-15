@@ -271,6 +271,22 @@ public class Game {
     public void step() {
         int tmpNewOffer;
 
+//        double[] locationBeliefs = initiator.getLocationBeliefs(initiator.getOrderToM());
+//        System.out.printf("initiator = [" + Settings.PRINT_DF.format(locationBeliefs[0]));
+//        for (int i = 1; i < locationBeliefs.length; i++) {
+//            System.out.printf(", " + Settings.PRINT_DF.format(locationBeliefs[i]));
+//        }
+//        System.out.print("]");
+//        System.out.println();
+//
+//        locationBeliefs = responder.getLocationBeliefs(responder.getOrderToM());
+//        System.out.printf("responder = [" + Settings.PRINT_DF.format(locationBeliefs[0]));
+//        for (int i = 1; i < locationBeliefs.length; i++) {
+//            System.out.printf(", " + Settings.PRINT_DF.format(locationBeliefs[i]));
+//        }
+//        System.out.print("]");
+//        System.out.println();
+
         if (isGameFinished) return;
 
         if (turn.equals(Settings.INITIATOR_NAME)) {

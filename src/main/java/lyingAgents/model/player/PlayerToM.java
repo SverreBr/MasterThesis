@@ -138,6 +138,7 @@ public class PlayerToM extends Player {
      * @return the counter-offer to Player p from the perspective of this agent.
      * That is, if accepted, this player gets the returned value.
      */
+    @Override
     public int makeOffer(int offerReceived) {
         int curOffer;
 
@@ -151,6 +152,7 @@ public class PlayerToM extends Player {
         return curOffer;
     }
 
+    @Override
     public int chooseOffer(int offerReceived) {
         List<OfferType> offerList = selectBestOffers(offerReceived);
         OfferType offerType = offerList.get((int) (Math.random() * offerList.size()));
@@ -390,6 +392,7 @@ public class PlayerToM extends Player {
     /**
      * Saves beliefs for (nested) hypothetical beliefs
      */
+    @Override
     public void saveBeliefs() {
         super.saveBeliefs();
         if (orderToM > 0) {
@@ -403,6 +406,7 @@ public class PlayerToM extends Player {
     /**
      * Restore previous pushed back beliefs
      */
+    @Override
     public void restoreBeliefs() {
         super.restoreBeliefs();
         if (orderToM > 0) {
@@ -534,6 +538,46 @@ public class PlayerToM extends Player {
         return selfModel.getPartnerModelLocationBeliefsWithoutMessage(orderToMSelf);
     }
 
+    @Override
+    protected void printExpectedResponse(OfferType offerType) {
+        int mostLikelyGP, cnt = 0;
+        if (((offerType.getOffer() == Settings.ID_ACCEPT_OFFER) || (offerType.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION))) return;
+
+        if (orderToM > 0) {
+            mostLikelyGP = getMostLikelyGP();
+            partnerModel.saveBeliefs();
+            partnerModel.utilityFunction = game.getUtilityFunction(mostLikelyGP);
+            partnerModel.receiveOffer(game.flipOffer(offerType.getOffer()));
+            List<OfferType> expectedResponses = partnerModel.selectBestOffers(game.flipOffer(offerType.getOffer()));
+            System.out.println("-> When " + getName() + " assumes trading partner has goal position " + mostLikelyGP + ":");
+            for (OfferType expectedResponse : expectedResponses) {
+                if (expectedResponse.getOffer() == Settings.ID_ACCEPT_OFFER) {
+                    System.out.println(cnt + ". " + getName() + " expects trading partner to ACCEPT offer.");
+                } else if (expectedResponse.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION) {
+                    System.out.println(cnt + ". " + getName() + " expects trading partner to WITHDRAW from negotiation.");
+                } else {
+                    System.out.println(cnt + ". " + getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse.getOffer()), game.getBinMaxChips())));
+                }
+                cnt++;
+            }
+            partnerModel.restoreBeliefs();
+            selfModel.printExpectedResponse(offerType);
+        } else {
+            super.printExpectedResponse(offerType);
+        }
+    }
+
+    private int getMostLikelyGP() {
+        String tradingPartner = getName().contains(Settings.INITIATOR_NAME) ? Settings.RESPONDER_NAME : Settings.INITIATOR_NAME;
+        int mostLikelyGP = game.getGoalPositionPlayer(tradingPartner);
+        for (int i = 0; i < locationBeliefs.length; i++) {
+            if (locationBeliefs[i] - Settings.EPSILON > locationBeliefs[mostLikelyGP]) {
+                mostLikelyGP = i;
+            }
+        }
+        return mostLikelyGP;
+    }
+
 
     /////////////////
     ////  LYING  ////
@@ -629,44 +673,4 @@ public class PlayerToM extends Player {
     public boolean getHasSentMessage() {
         return hasSentMessage;
     }
-
-    protected void printExpectedResponse(OfferType offerType) {
-        int mostLikelyGP, cnt = 0;
-        if (((offerType.getOffer() == Settings.ID_ACCEPT_OFFER) || (offerType.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION))) return;
-
-        if (orderToM > 0) {
-            mostLikelyGP = getMostLikelyGP();
-            partnerModel.saveBeliefs();
-            partnerModel.utilityFunction = game.getUtilityFunction(mostLikelyGP);
-            partnerModel.receiveOffer(game.flipOffer(offerType.getOffer()));
-            List<OfferType> expectedResponses = partnerModel.selectBestOffers(game.flipOffer(offerType.getOffer()));
-            System.out.println("-> When " + getName() + " assumes trading partner has goal position " + mostLikelyGP + ":");
-            for (OfferType expectedResponse : expectedResponses) {
-                if (expectedResponse.getOffer() == Settings.ID_ACCEPT_OFFER) {
-                    System.out.println(cnt + ". " + getName() + " expects trading partner to ACCEPT offer.");
-                } else if (expectedResponse.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION) {
-                    System.out.println(cnt + ". " + getName() + " expects trading partner to WITHDRAW from negotiation.");
-                } else {
-                    System.out.println(cnt + ". " + getName() + " expects response for itself: " + Arrays.toString(Chips.getBins(game.flipOffer(expectedResponse.getOffer()), game.getBinMaxChips())));
-                }
-                cnt++;
-            }
-            partnerModel.restoreBeliefs();
-            selfModel.printExpectedResponse(offerType);
-        } else {
-            super.printExpectedResponse(offerType);
-        }
-    }
-
-    private int getMostLikelyGP() {
-        String tradingPartner = getName().contains(Settings.INITIATOR_NAME) ? Settings.RESPONDER_NAME : Settings.INITIATOR_NAME;
-        int mostLikelyGP = game.getGoalPositionPlayer(tradingPartner);
-        for (int i = 0; i < locationBeliefs.length; i++) {
-            if (locationBeliefs[i] - Settings.EPSILON > locationBeliefs[mostLikelyGP]) {
-                mostLikelyGP = i;
-            }
-        }
-        return mostLikelyGP;
-    }
-
 }
