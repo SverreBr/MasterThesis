@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Game {
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     /**
      * bin with all the chips in the game
@@ -254,6 +254,7 @@ public class Game {
      * Sets some basic values to the game model
      */
     private void setBasicNewGameSettings() {
+        System.out.println("\n\t---");
         setBooleanGameFinished(false);
         this.lastOfferMade = Settings.ID_NO_OFFER;
         this.totalNrOffersMade = 0;
@@ -270,10 +271,12 @@ public class Game {
      */
     public void step() {
         int tmpNewOffer;
-
+//        double minProb = 1.0;
+//
 //        double[] locationBeliefs = initiator.getLocationBeliefs(initiator.getOrderToM());
 //        System.out.printf("initiator = [" + Settings.PRINT_DF.format(locationBeliefs[0]));
 //        for (int i = 1; i < locationBeliefs.length; i++) {
+//            if (locationBeliefs[i] - Settings.EPSILON > 0) minProb = Math.min(locationBeliefs[i], minProb);
 //            System.out.printf(", " + Settings.PRINT_DF.format(locationBeliefs[i]));
 //        }
 //        System.out.print("]");
@@ -282,10 +285,12 @@ public class Game {
 //        locationBeliefs = responder.getLocationBeliefs(responder.getOrderToM());
 //        System.out.printf("responder = [" + Settings.PRINT_DF.format(locationBeliefs[0]));
 //        for (int i = 1; i < locationBeliefs.length; i++) {
+//            if (locationBeliefs[i] - Settings.EPSILON > 0) minProb = Math.min(locationBeliefs[i], minProb);
 //            System.out.printf(", " + Settings.PRINT_DF.format(locationBeliefs[i]));
 //        }
 //        System.out.print("]");
 //        System.out.println();
+//        System.out.println("Min value = " + Settings.PRINT_DF.format(minProb));
 
         if (isGameFinished) return;
 

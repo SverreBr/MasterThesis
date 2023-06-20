@@ -156,6 +156,21 @@ public class MiscFunc {
         return true;
     }
 
+    public static boolean calcIfOutcomeIsPE(List<OfferOutcome> peList, Game game) {
+        if (peList.size() == 0) return true;
+
+        int respUtil = game.getResponder().getUtilityValue();
+        int initUtil = game.getInitiator().getUtilityValue();
+
+        for (OfferOutcome outcome : peList) {
+            if (((outcome.getValueInit() >= initUtil) && (outcome.getValueResp() > respUtil)) ||
+                    ((outcome.getValueInit() > initUtil) && (outcome.getValueResp() >= respUtil))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean calcIfOutcomeIsBestSW(List<OfferOutcome> peList, Game game) {
         if (peList.size() == 0) return true;
         int highestSW = peList.get(0).getSocialWelfare();
@@ -172,16 +187,18 @@ public class MiscFunc {
     }
 
     public static HashMap<String, Integer> getHighestValue(List<OfferOutcome> peList) {
-        int valueInit, valueResp;
+        int valueInit, valueResp, sw;
         HashMap<String, Integer> map = new HashMap<>();
 
         map.put(Settings.INITIATOR_NAME, -1);
         map.put(Settings.RESPONDER_NAME, -1);
+        map.put("sw", -1);
         if (peList.size() == 0) return map;
 
         for (OfferOutcome outcome : peList) {
             valueInit = outcome.getValueInit();
             valueResp = outcome.getValueResp();
+            sw = outcome.getSocialWelfare();
             if (map.get(Settings.INITIATOR_NAME) < valueInit) {
                 map.remove(Settings.INITIATOR_NAME);
                 map.put(Settings.INITIATOR_NAME, valueInit);
@@ -189,6 +206,10 @@ public class MiscFunc {
             if (map.get(Settings.RESPONDER_NAME) < valueResp) {
                 map.remove(Settings.RESPONDER_NAME);
                 map.put(Settings.RESPONDER_NAME, valueResp);
+            }
+            if (map.get("sw") < sw) {
+                map.remove("sw");
+                map.put("sw", sw);
             }
         }
         return map;

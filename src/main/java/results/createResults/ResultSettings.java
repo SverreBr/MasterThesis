@@ -31,8 +31,11 @@ public class ResultSettings {
     public static final String respHighestValueParetoOutcome = "resp_highestValueParetoOutcome";
     public static final String respNumberOfTimesLied = "resp_numberOfTimesLied";
     public static final String respNumberOfMessagesSent = "resp_numberOfMessagesSent";
+    public static final String highestSWPE = "highest_SW_PE";
+    public static final String highestSWStrictPE = "highest_SW_strict_PE";
     public static final String nrOffers = "nr_offers";
     public static final String outcomeIsStrictPE = "outcome_is_StrictPE";
+    public static final String outcomeIsPE = "outcome_is_PE";
     public static final String isBestSWFromStrictPE = "outcome_is_highestSW";
     public static final String isNewOfferAccepted = "outcome_is_new_distribution";
     public static final String timePassed = "passed_time";

@@ -49,8 +49,12 @@ public class ResultElement {
     private final int initHighestValueParetoOutcome;
     private final int respHighestValueParetoOutcome;
 
+    private final int highestSWPE;
+    private final int highestSWStrictPE;
+
     private final int nrOffers;
     private final boolean isStrictPE;
+    private final boolean isPE;
     private final boolean isBestSW;
     private final boolean isNewOfferAccepted;
     private final boolean thereIsBetterOutcomeThanInitialSituForBothAgents;
@@ -87,21 +91,25 @@ public class ResultElement {
         respNumberOfMessagesSent = resp.getNumberOfMessagesSent();
 
         nrOffers = game.getTotalNrOffersMade();
+        isNewOfferAccepted = MiscFunc.isNewOfferAccepted(game);
+        reachedMaxNumOffers = game.isReachedMaxNumOffers();
+
         List<OfferOutcome> strictPEList = game.getStrictParetoOutcomes();
         thereIsBetterOutcomeThanInitialSituForBothAgents = !strictPEList.isEmpty();
-        isNewOfferAccepted = MiscFunc.isNewOfferAccepted(game);
         isStrictPE = MiscFunc.calcIfOutcomeIsStrictPE(strictPEList, game);
-        isBestSW = MiscFunc.calcIfOutcomeIsBestSW(strictPEList, game);
-        reachedMaxNumOffers = game.isReachedMaxNumOffers();
+        isBestSW = MiscFunc.calcIfOutcomeIsBestSW(strictPEList, game);  // TODO: revisit
 
         HashMap<String, Integer> map = MiscFunc.getHighestValue(strictPEList);
         initHighestValueStrictParetoOutcome = map.get(Settings.INITIATOR_NAME);
         respHighestValueStrictParetoOutcome = map.get(Settings.RESPONDER_NAME);
+        highestSWStrictPE = map.get("sw");
 
         List<OfferOutcome> PEList = game.getParetoOutcomes();
+        isPE = MiscFunc.calcIfOutcomeIsPE(PEList, game);
         map = MiscFunc.getHighestValue(PEList);
         initHighestValueParetoOutcome = map.get(Settings.INITIATOR_NAME);
         respHighestValueParetoOutcome = map.get(Settings.RESPONDER_NAME);
+        highestSWPE = map.get("sw");
 
         this.timePassed = timePassed;
     }
@@ -237,4 +245,17 @@ public class ResultElement {
     public int getRespNumberOfMessagesSent() {
         return respNumberOfMessagesSent;
     }
+
+    public int getHighestSWPE() {
+        return highestSWPE;
+    }
+
+    public int getHighestSWStrictPE() {
+        return highestSWStrictPE;
+    }
+
+    public boolean isPE() {
+        return isPE;
+    }
 }
+

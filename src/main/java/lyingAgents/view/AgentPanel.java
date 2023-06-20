@@ -247,9 +247,9 @@ public class AgentPanel extends JComponent implements GameListener {
         int idx = 0;
         style[idx] = "bold";
         if (agent.getOrderToM() != 0) {
-            content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanMakeFalseStatements() + ")";
+            content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ")"; //, lr=" + df.format(agent.getLearningSpeed()) + ", lie=" + agent.isCanMakeFalseStatements() + ")";
         } else {
-            content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ", lr=" + df.format(agent.getLearningSpeed()) + ")";
+            content[idx++] = agent.getName() + " (ToM=" + agent.getOrderToM() + ")"; //, lr=" + df.format(agent.getLearningSpeed()) + ")";
         }
         content[idx++] = "initial chips: " + Arrays.toString(this.initialChips);
         content[idx++] = "";

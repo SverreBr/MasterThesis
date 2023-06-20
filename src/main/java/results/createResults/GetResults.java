@@ -98,7 +98,10 @@ public class GetResults {
                 ResultSettings.initNumberOfTimesLied, ResultSettings.respNumberOfTimesLied,
                 ResultSettings.initHighestValueParetoOutcome, ResultSettings.respHighestValueParetoOutcome,
                 ResultSettings.initHighestValueStrictParetoOutcome, ResultSettings.respHighestValueStrictParetoOutcome,
-                ResultSettings.nrOffers, ResultSettings.outcomeIsStrictPE, ResultSettings.isBestSWFromStrictPE,
+                ResultSettings.highestSWStrictPE, ResultSettings.highestSWPE,
+                ResultSettings.nrOffers,
+                ResultSettings.outcomeIsStrictPE, ResultSettings.outcomeIsPE,
+                ResultSettings.isBestSWFromStrictPE,
                 ResultSettings.isNewOfferAccepted, ResultSettings.thereIsABetterOutcomeThanInitialSitu,
                 ResultSettings.reachedMaxNumOffers, ResultSettings.timePassed};
         dataString.add(cell_headers);
@@ -148,8 +151,12 @@ public class GetResults {
                     String.valueOf(resultElement.getInitHighestValueStrictParetoOutcome()),
                     String.valueOf(resultElement.getRespHighestValueStrictParetoOutcome()),
 
+                    String.valueOf(resultElement.getHighestSWStrictPE()),
+                    String.valueOf(resultElement.getHighestSWPE()),
+
                     String.valueOf(resultElement.getNrOffers()),
                     String.valueOf(resultElement.isStrictPE()),
+                    String.valueOf(resultElement.isPE()),
                     String.valueOf(resultElement.isBestSW()),
                     String.valueOf(resultElement.isNewOfferAccepted()),
                     String.valueOf(resultElement.isThereIsBetterOutcomeThanInitialSituForBothAgents()),
