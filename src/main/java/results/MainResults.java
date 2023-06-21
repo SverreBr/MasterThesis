@@ -96,10 +96,10 @@ public class MainResults {
                     for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
                         for (boolean respCanSendMessages : ResultSettings.respCanSendMessagesList) {
                             for (boolean initCanLie : ResultSettings.initCanLieList) {
-                                if ((!initCanSendMessages && initCanLie)) continue;
+                                if ((!initCanSendMessages && !initCanLie)) continue;
                                 if ((initTom == 0) && !initCanLie) continue;
                                 for (boolean respCanLie : ResultSettings.respCanLieList) {
-                                    if (!respCanSendMessages && respCanLie) continue;
+                                    if (!respCanSendMessages && !respCanLie) continue;
                                     if ((respTom == 0) && !respCanLie) continue;
 
                                     Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
