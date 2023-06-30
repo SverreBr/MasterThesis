@@ -49,6 +49,9 @@ public class ResultElement {
     private final int initHighestValueParetoOutcome;
     private final int respHighestValueParetoOutcome;
 
+    private final int initNrFinalChips;
+    private final int respNrFinalChips;
+
     private final int highestSWPE;
     private final int highestSWStrictPE;
 
@@ -76,6 +79,7 @@ public class ResultElement {
         initZeroToMProb = init.getPROB_TOM0_SEND_MESSAGE();
         initNumberOfTimesLied = init.getNumberOfTimesLied();
         initNumberOfMessagesSent = init.getNumberOfMessagesSent();
+        initNrFinalChips = Chips.getNrChips(init.getChipsBin());
 
 
         respToM = resp.getOrderToM();
@@ -89,6 +93,7 @@ public class ResultElement {
         respZeroToMProb = resp.getPROB_TOM0_SEND_MESSAGE();
         respNumberOfTimesLied = resp.getNumberOfTimesLied();
         respNumberOfMessagesSent = resp.getNumberOfMessagesSent();
+        respNrFinalChips = Chips.getNrChips(resp.getChipsBin());
 
         nrOffers = game.getTotalNrOffersMade();
         isNewOfferAccepted = MiscFunc.isNewOfferAccepted(game);
@@ -256,6 +261,14 @@ public class ResultElement {
 
     public boolean isPE() {
         return isPE;
+    }
+
+    public int getInitNrFinalChips() {
+        return initNrFinalChips;
+    }
+
+    public int getRespNrFinalChips() {
+        return respNrFinalChips;
     }
 }
 

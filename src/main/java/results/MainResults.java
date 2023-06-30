@@ -85,33 +85,35 @@ public class MainResults {
     }
 
     private static void performMainExperiment() {
-        GetResults getResults = new GetResults(csvFileName);
-        double zeroToMProb = 0.25;
+        GetResults getResults = new GetResults(csvFileName, experimentName);
+
+        // Settings
+        List<Integer> initTomList = Arrays.asList(0, 1, 2);
+        List<Integer> respTomList = Arrays.asList(0, 1, 2);
+        List<Boolean> initCanLieList = Arrays.asList(true, false);
+        List<Boolean> respCanLieList = Arrays.asList(true, false);
+        boolean initCanSendMessages = true;
+        boolean respCanSendMessages = true;
+        double zeroToMProb = 0.2;
 
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {
             System.out.println("--- Start Repetition " + cnt + " ---");
-            for (int initTom : ResultSettings.initTomList) {
-                for (int respTom : ResultSettings.respTomList) {
-                    for (boolean initCanSendMessages : ResultSettings.initCanSendMessagesList) {
-                        for (boolean respCanSendMessages : ResultSettings.respCanSendMessagesList) {
-                            for (boolean initCanLie : ResultSettings.initCanLieList) {
-                                if ((!initCanSendMessages && !initCanLie)) continue;
-                                if ((initTom == 0) && !initCanLie) continue;
-                                for (boolean respCanLie : ResultSettings.respCanLieList) {
-                                    if (!respCanSendMessages && !respCanLie) continue;
-                                    if ((respTom == 0) && !respCanLie) continue;
+            for (int initTom : initTomList) {
+                for (int respTom : respTomList) {
+                    for (boolean initCanLie : initCanLieList) {
+                        if ((initTom == 0) && !initCanLie) continue;
+                        for (boolean respCanLie : respCanLieList) {
+                            if ((respTom == 0) && !respCanLie) continue;
 
-                                    Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
-                                    game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
-                                    game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
-                                    getResults.generateNewResults(game);
+                            Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+                            game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                            game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                            getResults.generateNewResults(game);
 
-                                    System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
-                                            ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
-                                            ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
-                                }
-                            }
+                            System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
+                                    ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
+                                    ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
                         }
                     }
                 }
@@ -126,20 +128,27 @@ public class MainResults {
     }
 
     private static void performDetermineProbExperiment() {
-        GetResults getResults = new GetResults(csvFileName);
+        GetResults getResults = new GetResults(csvFileName, experimentName);
+
+        // Settings
+        List<Double> tom0probList = Arrays.asList(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0);
+        List<Integer> initTomList = Arrays.asList(0, 1, 2);
+        List<Integer> respTomList = Arrays.asList(0, 1, 2);
+        List<Boolean> initCanLieList = Arrays.asList(true, false);
+        List<Boolean> respCanLieList = Arrays.asList(true, false);
         boolean initCanSendMessages = true;
         boolean respCanSendMessages = true;
 
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {
             System.out.println("--- Start Repetition " + cnt + " ---");
-            for (int initTom : ResultSettings.initTomList) {
-                for (int respTom : ResultSettings.respTomList) {
+            for (int initTom : initTomList) {
+                for (int respTom : respTomList) {
                     if ((initTom != 0) && (respTom != 0)) continue;
-                    for (double zeroToMProb : ResultSettings.tom0probList) {
-                        for (boolean initCanLie : ResultSettings.initCanLieList) {
+                    for (double zeroToMProb : tom0probList) {
+                        for (boolean initCanLie : initCanLieList) {
                             if ((initTom == 0) && !initCanLie) continue;
-                            for (boolean respCanLie : ResultSettings.respCanLieList) {
+                            for (boolean respCanLie : respCanLieList) {
                                 if ((respTom == 0) && !respCanLie) continue;
 
                                 Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
@@ -166,7 +175,13 @@ public class MainResults {
     }
 
     private static void performDetermineProbCompareExperiment() {
-        GetResults getResults = new GetResults(csvFileName);
+        GetResults getResults = new GetResults(csvFileName, experimentName);
+
+        // Settings
+        List<Integer> initTomList = Arrays.asList(0, 1, 2);
+        List<Integer> respTomList = Arrays.asList(0, 1, 2);
+        List<Boolean> initCanLieList = Arrays.asList(true, false);
+        List<Boolean> respCanLieList = Arrays.asList(true, false);
         boolean initCanSendMessages = true;
         boolean respCanSendMessages = true;
         double zeroToMProb = 0.0;
@@ -174,12 +189,12 @@ public class MainResults {
         int cnt = 0;
         while (cnt++ < ResultSettings.NUM_REP) {
             System.out.println("--- Start Repetition " + cnt + " ---");
-            for (int initTom : ResultSettings.initTomList) {
-                for (int respTom : ResultSettings.respTomList) {
+            for (int initTom : initTomList) {
+                for (int respTom : respTomList) {
                     if ((initTom == 0) && (respTom == 0)) continue;
-                    for (boolean initCanLie : ResultSettings.initCanLieList) {
+                    for (boolean initCanLie : initCanLieList) {
                         if ((initTom == 0) && !initCanLie) continue;
-                        for (boolean respCanLie : ResultSettings.respCanLieList) {
+                        for (boolean respCanLie : respCanLieList) {
                             if ((respTom == 0) && !respCanLie) continue;
 
                             Game game = new Game(initTom, respTom, Settings.STANDARD_LR, Settings.STANDARD_LR, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);

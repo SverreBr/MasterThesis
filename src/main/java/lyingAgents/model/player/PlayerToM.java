@@ -285,10 +285,10 @@ public class PlayerToM extends Player {
             updateLocationBeliefs(offerToSelf);
             if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with beliefs...
                 restoreLocationBeliefsDueToUnbelievedMessage();
-                if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
-                    System.out.println("--- " + getName() + " DOES NOT BELIEVE TRADING PARTNER ---");
-                    addMessage("(Agent doesn't believe partner.)", false);
-                }
+//                if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
+//                    System.out.println("--- " + getName() + " DOES NOT BELIEVE TRADING PARTNER ---");
+//                    addMessage("(Agent doesn't believe partner.)", false);
+//                }
             }
             selfModel.receiveOffer(offerToSelf);
 

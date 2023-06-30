@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GetResults {
-    String SAVE_DIRECTORY = "tmp_results";
+    String saveDirectory;
 
     private final List<ResultElement> data = new ArrayList<>();
 
@@ -18,13 +18,14 @@ public class GetResults {
 
     private final String csvFileName;
 
-    public GetResults(String csvFileName) {
+    public GetResults(String csvFileName, String experimentName) {
         this.csvFileName = csvFileName;
+        this.saveDirectory = "tmp_results" + File.separator + experimentName;
         makeFolder();
     }
 
     private void makeFolder() {
-        File saveDirectory = new File(SAVE_DIRECTORY);
+        File saveDirectory = new File(this.saveDirectory);
         if (!saveDirectory.exists()) {
             boolean wasSuccessful = saveDirectory.mkdir();
             if (!wasSuccessful) System.out.println("Directory not made...");
@@ -75,7 +76,7 @@ public class GetResults {
         this.dataString = new ArrayList<>();
         addHeaders();
         createDataString();
-        File csvOutputFile = new File(SAVE_DIRECTORY + File.separator + csvFileName);
+        File csvOutputFile = new File(saveDirectory + File.separator + csvFileName);
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             dataString.stream()
                     .map(this::convertToCSV)
@@ -98,6 +99,7 @@ public class GetResults {
                 ResultSettings.initNumberOfTimesLied, ResultSettings.respNumberOfTimesLied,
                 ResultSettings.initHighestValueParetoOutcome, ResultSettings.respHighestValueParetoOutcome,
                 ResultSettings.initHighestValueStrictParetoOutcome, ResultSettings.respHighestValueStrictParetoOutcome,
+                ResultSettings.initNrFinalChips, ResultSettings.respNrOfFinalChips,
                 ResultSettings.highestSWStrictPE, ResultSettings.highestSWPE,
                 ResultSettings.nrOffers,
                 ResultSettings.outcomeIsStrictPE, ResultSettings.outcomeIsPE,
@@ -150,6 +152,9 @@ public class GetResults {
 
                     String.valueOf(resultElement.getInitHighestValueStrictParetoOutcome()),
                     String.valueOf(resultElement.getRespHighestValueStrictParetoOutcome()),
+
+                    String.valueOf(resultElement.getInitNrFinalChips()),
+                    String.valueOf(resultElement.getRespNrFinalChips()),
 
                     String.valueOf(resultElement.getHighestSWStrictPE()),
                     String.valueOf(resultElement.getHighestSWPE()),

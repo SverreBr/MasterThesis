@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Game {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     /**
      * bin with all the chips in the game
@@ -254,7 +254,7 @@ public class Game {
      * Sets some basic values to the game model
      */
     private void setBasicNewGameSettings() {
-        System.out.println("\n\t---");
+//        System.out.println("\n\t---");
         setBooleanGameFinished(false);
         this.lastOfferMade = Settings.ID_NO_OFFER;
         this.totalNrOffersMade = 0;

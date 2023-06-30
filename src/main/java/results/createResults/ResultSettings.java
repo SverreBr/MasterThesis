@@ -1,10 +1,6 @@
 package results.createResults;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class ResultSettings {
-
     public static final String initTom = "init_tom";
     public static final String initLR = "init_lr";
     public static final String initCanSendMessages = "init_canSendMessages";
@@ -18,6 +14,7 @@ public class ResultSettings {
     public static final String initNumberOfMessagesSent = "init_numberOfMessagesSent";
     public static final String initHighestValueStrictParetoOutcome = "init_highestValueStrictParetoOutcome";
     public static final String initHighestValueParetoOutcome = "init_highestValueParetoOutcome";
+    public static final String initNrFinalChips = "init_nrOfFinalChips";
     public static final String respTom = "resp_tom";
     public static final String respLR = "resp_lr";
     public static final String respCanSendMessages = "resp_canSendMessages";
@@ -31,6 +28,7 @@ public class ResultSettings {
     public static final String respHighestValueParetoOutcome = "resp_highestValueParetoOutcome";
     public static final String respNumberOfTimesLied = "resp_numberOfTimesLied";
     public static final String respNumberOfMessagesSent = "resp_numberOfMessagesSent";
+    public static final String respNrOfFinalChips = "resp_nrOfFinalChips";
     public static final String highestSWPE = "highest_SW_PE";
     public static final String highestSWStrictPE = "highest_SW_strict_PE";
     public static final String nrOffers = "nr_offers";
@@ -41,14 +39,7 @@ public class ResultSettings {
     public static final String timePassed = "passed_time";
     public static final String thereIsABetterOutcomeThanInitialSitu = "there_is_better_outcome_than_initial_situ";
     public static final String reachedMaxNumOffers = "reached_max_num_offers";
-    public static final List<Integer> initTomList = Arrays.asList(0, 1, 2);
-    public static final List<Integer> respTomList = Arrays.asList(0, 1, 2);
-    public static final List<Double> tom0probList = Arrays.asList(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0);
-    public static final List<Boolean> initCanLieList = Arrays.asList(true, false);
-    public static final List<Boolean> respCanLieList = Arrays.asList(true, false);
-    public static final List<Boolean> initCanSendMessagesList = Arrays.asList(true, false);
-    public static final List<Boolean> respCanSendMessagesList = Arrays.asList(true, false);
     public static final int NUM_REP = 1;
-    public static final int WARMUP_ROUNDS = 1;
+    public static final int WARMUP_ROUNDS = 100;
     public static final int KEEP_RESULTS_NR_ROUNDS = 1;
 }
