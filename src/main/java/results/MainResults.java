@@ -18,7 +18,7 @@ public class MainResults {
 
     private static String csvFileName = "results.csv";
     private static String experimentName = "main";
-    private static final List<String> experiment_options = Arrays.asList("main", "determine_prob", "determine_prob_compare", "de_weerd");
+    private static final List<String> experiment_options = Arrays.asList("main", "determine_prob", "determine_prob_compare", "de_weerd", "lr");
 
     private static final String FILE_ID = "-file_id";
     private static final String EXPERIMENT_ID = "-experiment";
@@ -77,6 +77,8 @@ public class MainResults {
             performMainExperiment();
         } else if (experimentName.equals("de_weerd")) {
             performDeWeerdExperiment();
+        } else if (experimentName.equals("lr")) {
+            performLrExperiment();
         } else if (experimentName.equals("determine_prob")) {
             performDetermineProbExperiment();
         } else if (experimentName.equals("determine_prob_compare")) {
@@ -244,6 +246,54 @@ public class MainResults {
                     System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
                             ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
                             ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
+                }
+            }
+            try {
+                getResults.writeExcel();
+            } catch (IOException exception) {
+                System.out.println("!!! WRITING TO EXCEL DID NOT SUCCEED !!!");
+            }
+            System.out.println("################### Finished iteration " + cnt + " ###################\n");
+        }
+    }
+
+    private static void performLrExperiment() {
+        GetResults getResults = new GetResults(csvFileName, experimentName);
+
+        // Settings
+        List<Integer> initTomList = Arrays.asList(0, 1, 2);
+        List<Integer> respTomList = Arrays.asList(0, 1, 2);
+        List<Boolean> initCanLieList = Arrays.asList(true, false);
+        List<Boolean> respCanLieList = Arrays.asList(true, false);
+        List<Double> lrInitList = Arrays.asList(0.1, 0.3, 0.5);
+        List<Double> lrRespList = Arrays.asList(0.1, 0.3, 0.5);
+        boolean initCanSendMessages = true;
+        boolean respCanSendMessages = true;
+        double zeroToMProb = 0.2;
+
+        int cnt = 0;
+        while (cnt++ < ResultSettings.NUM_REP) {
+            System.out.println("--- Start Repetition " + cnt + " ---");
+            for (int initTom : initTomList) {
+                for (int respTom : respTomList) {
+                    for (boolean initCanLie : initCanLieList) {
+                        if ((initTom == 0) && !initCanLie) continue;
+                        for (boolean respCanLie : respCanLieList) {
+                            if ((respTom == 0) && !respCanLie) continue;
+                            for (double initLr : lrInitList) {
+                                for (double respLr : lrRespList) {
+                                    Game game = new Game(initTom, respTom, initLr, respLr, initCanLie, respCanLie, initCanSendMessages, respCanSendMessages);
+                                    game.getInitiator().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                                    game.getResponder().setPROB_TOM0_SEND_MESSAGE(zeroToMProb);
+                                    getResults.generateNewResults(game);
+
+                                    System.out.println("\t[i_tom=" + initTom + ", r_tom=" + respTom +
+                                            ", i_mess=" + initCanSendMessages + ", r_mess=" + respCanSendMessages +
+                                            ", i_lie=" + initCanLie + ", r_lie=" + respCanLie + "] Done;");
+                                }
+                            }
+                        }
+                    }
                 }
             }
             try {
