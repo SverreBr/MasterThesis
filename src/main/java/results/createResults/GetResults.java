@@ -47,7 +47,7 @@ public class GetResults {
         return escapedData;
     }
 
-    public void generateNewResults(Game game) {
+    public void generateNewResults(Game game, Boolean isPareto) {
         int i;
         ResultElement resultElement;
         long endTime, startTime;
@@ -60,9 +60,15 @@ public class GetResults {
 
         i = 0;
         do {
-            do {
-                game.newRound();
-            } while (game.canAnyAgentReachTheirGP());
+            if (isPareto) {
+                do {
+                    game.newRound();
+                } while ((game.canAnyAgentReachTheirGP()) || (game.getParetoOutcomes().size() == 0));
+            } else {
+                do {
+                    game.newRound();
+                } while (game.canAnyAgentReachTheirGP());
+            }
             game.playTillEnd();
             endTime = System.currentTimeMillis();
             resultElement = new ResultElement(game, (endTime - startTime) / 1000.0);
