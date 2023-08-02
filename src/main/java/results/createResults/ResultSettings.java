@@ -1,0 +1,45 @@
+package results.createResults;
+
+public class ResultSettings {
+    public static final String initTom = "init_tom";
+    public static final String initLR = "init_lr";
+    public static final String initCanSendMessages = "init_canSendMessages";
+    public static final String initCanLie = "init_canLie";
+    public static final String initInitPoints = "init_initPoints";
+    public static final String initFinalPoints = "init_finalPoints";
+    public static final String initGain = "init_gain";
+    public static final String initCanInitiallyReachGP = "init_canInitiallyReachGP";
+    public static final String initZeroToMProb = "init_zeroToMProb";
+    public static final String initNumberOfTimesLied = "init_numberOfTimesLied";
+    public static final String initNumberOfMessagesSent = "init_numberOfMessagesSent";
+    public static final String initHighestValueStrictParetoOutcome = "init_highestValueStrictParetoOutcome";
+    public static final String initHighestValueParetoOutcome = "init_highestValueParetoOutcome";
+    public static final String initNrFinalChips = "init_nrOfFinalChips";
+    public static final String respTom = "resp_tom";
+    public static final String respLR = "resp_lr";
+    public static final String respCanSendMessages = "resp_canSendMessages";
+    public static final String respCanLie = "resp_canLie";
+    public static final String respInitPoints = "resp_initPoints";
+    public static final String respFinalPoints = "resp_finalPoints";
+    public static final String respGain = "resp_gain";
+    public static final String respCanInitiallyReachGP = "resp_canInitiallyReachGP";
+    public static final String respZeroToMProb = "resp_zeroToMProb";
+    public static final String respHighestValueStrictParetoOutcome = "resp_highestValueStrictParetoOutcome";
+    public static final String respHighestValueParetoOutcome = "resp_highestValueParetoOutcome";
+    public static final String respNumberOfTimesLied = "resp_numberOfTimesLied";
+    public static final String respNumberOfMessagesSent = "resp_numberOfMessagesSent";
+    public static final String respNrOfFinalChips = "resp_nrOfFinalChips";
+    public static final String highestSWPE = "highest_SW_PE";
+    public static final String highestSWStrictPE = "highest_SW_strict_PE";
+    public static final String nrOffers = "nr_offers";
+    public static final String outcomeIsStrictPE = "outcome_is_StrictPE";
+    public static final String outcomeIsPE = "outcome_is_PE";
+    public static final String isBestSWFromStrictPE = "outcome_is_highestSW";
+    public static final String isNewOfferAccepted = "outcome_is_new_distribution";
+    public static final String timePassed = "passed_time";
+    public static final String thereIsABetterOutcomeThanInitialSitu = "there_is_better_outcome_than_initial_situ";
+    public static final String reachedMaxNumOffers = "reached_max_num_offers";
+    public static final int NUM_REP = 1;
+    public static final int WARMUP_ROUNDS = 100;
+    public static final int KEEP_RESULTS_NR_ROUNDS = 1;
+}
