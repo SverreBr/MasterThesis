@@ -2,17 +2,22 @@
 This is the repository containing the code for my master thesis: Influence of Lying in a Negotiation Setting: The Colored Trails.
 
 ## Content
-Explain the content.
+This repository consists of code for running the experiments (located in *src/main/java/results*), code for running the GUI (located in *src/main/java/lyingAgents*), and code for making the figures of the results (located in *py_src*). 
 
 ## Run
-Explain how to run the code.
+A detailed explanation of how to run the code is given in my Master's thesis:
+```
+Brok, S. (2023, August). Influence of lying in a negotiation setting: The Colored Trails [Master’s thesis]. (Available at https://fse.studenttheses.ub.rug.nl/)
+```
+
 
 ## Acknowledgement
 Some of the Java code in this project is adapted from code provided by Harmen de Weerd. 
 In particular, the classes Player.java and PlayerToM.java include adapted parts of code provided by Harmen de Weerd. 
 Harmen de Weerd used this code, for example, in the following article:
-
-* de Weerd, H., Verbrugge, R., & Verheij, B. (2017). Negotiating with other minds: The role of recursive theory of mind in negotiation with incomplete information. Autonomous Agents and Multi-Agent Systems, 31(2), 250–287.
+```
+de Weerd, H., Verbrugge, R., & Verheij, B. (2017). Negotiating with other minds: The role of recursive theory of mind in negotiation with incomplete information. Autonomous Agents and Multi-Agent Systems, 31(2), 250–287.
+```
 
 ### Main changes
 Apart from some changes in the layout of the code, I changed and added a few functionalities compared to the provided code by Harmen de Weerd. These are:
@@ -25,4 +30,20 @@ Apart from some changes in the layout of the code, I changed and added a few fun
 • The function GetValue(), i.e. the method to get the expected value of making an offer, is changed to stochastic and not deterministic for ToM_k agents, k ≥ 1. This means that the value of an offer is stochastic. This is caused by the modeled trading partner that chooses the best offer among the list of offers that gives the trading partner itself the highest value, but for the other agent the offers made by the trading partner may have different values. (The random offer choosing was not in the code of Harmen, and therefore it was not stochastic before). I made a new method that returns all possibilities to get a new value and takes the average (as every return offer is equally likely).
 
 ## Citation
-Please cite the following Thesis when using this code:
+Please use the following citation when using this code:
+```
+Brok, S. (2023, August). Influence of lying in a negotiation setting: The Colored Trails [Master’s thesis]. (Available at https://fse.studenttheses.ub.rug.nl/)
+```
+
+Or, use the following bib entry:
+```
+@misc{mythesis,
+    title        = {Influence of lying in a negotiation setting: {T}he {C}olored {T}rails},
+    author       = {Sverre Brok},
+    year         = 2023,
+    month        = {August},
+    note         = {Available at \url{https://fse.studenttheses.ub.rug.nl/}},
+    school       = {University of Groningen},
+    type         = {Master's thesis}
+}
+```
