@@ -1,5 +1,5 @@
 # Master Thesis
-This is the repository containing the code for my master thesis: Influence of Lying in a Negotiation Setting: The Colored Trails.
+This is the repository containing the code for my Master's thesis: Influence of Lying in a Negotiation Setting: The Colored Trails.
 
 ## Content
 This repository consists of code for running the experiments (located in *src/main/java/results*), code for running the GUI (located in *src/main/java/lyingAgents*), and code for making the figures of the results (located in *py_src*). 
