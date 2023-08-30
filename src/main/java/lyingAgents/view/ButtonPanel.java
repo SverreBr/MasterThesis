@@ -120,10 +120,11 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(2,2,2,2);
+        gbc.insets = new Insets(2, 2, 2, 2);
         gbc.gridwidth = 2;
         gbc.weightx = 0.5;
-        gbc.gridy = 0; gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridx = 0;
 
         add(step, gbc);
         gbc.gridy++;
@@ -131,18 +132,20 @@ public class ButtonPanel extends JPanel implements ActionListener, GameListener,
         gbc.insets = new Insets(2, 2, 12, 2);
         add(play, gbc);
         gbc.gridy++;
-        gbc.insets = new Insets(2,2,2,2);
+        gbc.insets = new Insets(2, 2, 2, 2);
 
         gbc.gridwidth = 1;
         add(newNeg, gbc);
         gbc.gridx++;
         add(newNegPlay, gbc);
-        gbc.gridy++; gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridx = 0;
 
         add(forwardPlays, gbc);
         gbc.gridx++;
         add(forward, gbc);
-        gbc.gridy++; gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridx = 0;
 
         gbc.insets = new Insets(12, 2, 0, 2);
 

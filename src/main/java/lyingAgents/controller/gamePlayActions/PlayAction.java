@@ -7,18 +7,41 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 
+/**
+ * Class for action to play a negotiation round
+ */
 public class PlayAction implements PlayListener {
 
+    /**
+     * Game class
+     */
     private final Game game;
 
+    /**
+     * Panel to show information to the user
+     */
     private final JPanel pane;
 
+    /**
+     * Frame
+     */
     private final JFrame frame;
 
+    /**
+     * Progress worker to play a game
+     */
     private ProgressWorker pw;
 
+    /**
+     * Text for the user
+     */
     private final JTextPane textPane;
 
+    /**
+     * Constructor
+     *
+     * @param game The game class
+     */
     public PlayAction(Game game) {
         this.game = game;
         pane = new JPanel();
@@ -60,6 +83,11 @@ public class PlayAction implements PlayListener {
         pane.add(cancel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Method to update the pane
+     *
+     * @param numSteps The number of steps that have been executed
+     */
     private void updatePane(int numSteps) {
         String[] content = new String[3];
         String[] style = new String[3];
@@ -89,6 +117,9 @@ public class PlayAction implements PlayListener {
         });
     }
 
+    /**
+     * Execute action
+     */
     public void execute() {
         pw.startExecution();
         pw.execute();

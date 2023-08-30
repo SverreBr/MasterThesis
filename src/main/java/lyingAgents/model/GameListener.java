@@ -18,5 +18,6 @@ public interface GameListener {
     /**
      * The field in game has changed
      */
-    default void inGameChanged() {}
+    default void inGameChanged() {
+    }
 }

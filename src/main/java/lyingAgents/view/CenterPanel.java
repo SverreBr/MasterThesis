@@ -66,8 +66,8 @@ public class CenterPanel extends JPanel implements GameListener {
         List<OfferOutcome> paretoOutcomes = game.getParetoOutcomes();
         Collections.sort(paretoOutcomes);
         Collections.reverse(paretoOutcomes);
-        String[] content = new String[(strictParetoOutcomes.size()+1) + (paretoOutcomes.size()+1) + 1];
-        String[] style = new String[strictParetoOutcomes.size()+1 + paretoOutcomes.size()+1 + 1];
+        String[] content = new String[(strictParetoOutcomes.size() + 1) + (paretoOutcomes.size() + 1) + 1];
+        String[] style = new String[strictParetoOutcomes.size() + 1 + paretoOutcomes.size() + 1 + 1];
 
         int idx = 0;
         style[idx] = "bold";

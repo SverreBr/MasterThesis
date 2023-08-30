@@ -34,6 +34,9 @@ class ProgressWorker extends SwingWorker<Object, Object> {
      */
     private boolean cancel = false;
 
+    /**
+     * Description of which action to perform (play or forward)
+     */
     private final String description;
 
     /**
@@ -49,12 +52,21 @@ class ProgressWorker extends SwingWorker<Object, Object> {
         createListenerSet();
     }
 
+    /**
+     * Constructor
+     *
+     * @param game        The game model
+     * @param description Description of which action to perform
+     */
     public ProgressWorker(Game game, String description) {
         this.game = game;
         this.description = description;
         createListenerSet();
     }
 
+    /**
+     * Method to create a listeners set
+     */
     private void createListenerSet() {
         if (description.equals(GamePlaySettings.FORWARD_ACTION)) {
             this.forwardListeners = new HashSet<>();
@@ -72,6 +84,11 @@ class ProgressWorker extends SwingWorker<Object, Object> {
         forwardListeners.add(listener);
     }
 
+    /**
+     * Adds a listener to the set of listeners
+     *
+     * @param listener The listener to be added
+     */
     public void addPlayListener(PlayListener listener) {
         playListeners.add(listener);
     }
@@ -125,7 +142,7 @@ class ProgressWorker extends SwingWorker<Object, Object> {
         while (i < Settings.MAX_NUMBER_OFFERS && !game.isGameFinished()) {
             if (this.cancel) break;
             game.step();
-            this.setProgress(i+1);
+            this.setProgress(i + 1);
             i++;
         }
     }

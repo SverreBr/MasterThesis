@@ -1,7 +1,6 @@
 package lyingAgents.model.player;
 
 import lyingAgents.model.Game;
-import lyingAgents.utilities.Chips;
 import lyingAgents.utilities.Messages;
 import lyingAgents.utilities.RandomNumGen;
 import lyingAgents.utilities.Settings;
@@ -119,11 +118,6 @@ public class PlayerLying extends PlayerToM {
                 && (Math.random() < PROB_TOM0_SEND_MESSAGE)) locMessage = rng.random();
         if (locMessage != Settings.ID_NO_LOCATION) sendGLMessage(locMessage);
 
-//        if (Game.DEBUG) {
-//            System.out.println("\n-> Chosen is offer: " + newOffer + " with value " + Settings.PRINT_DF.format(offerType.getValue()) + "\n");
-//            printExpectedResponse(offerType);
-//        }
-
         return newOffer;
     }
 
@@ -160,38 +154,10 @@ public class PlayerLying extends PlayerToM {
             }
         }
 
-//        if (Game.DEBUG) {
-//            System.out.println("-> Offers that are optimal for " + getName() + " including messages:");
-//            for (OfferType smt : bestOffers) {
-//                System.out.println("\t- value=" + Settings.PRINT_DF.format(smt.getValue()) + "; offer to self=" + smt.getOffer() + "; " +
-//                        Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
-//                        ", loc=" + smt.getLoc());
-//            }
-//
-//            System.out.println("-> Offers that are optimal for " + getName() + " without messages:");
-//            for (OfferType smt : bestOffersWithoutMessage) {
-//                System.out.println("\t- value=" + Settings.PRINT_DF.format(smt.getValue()) + "; offer to self=" + smt.getOffer() + "; " +
-//                        Arrays.toString(Chips.getBins(smt.getOffer(), game.getBinMaxChips())) +
-//                        ", loc=" + smt.getLoc());
-//            }
-//        }
-
         if (noMessageOfferValue + Settings.EPSILON >= tmpSelectOfferValue) {
             bestOffers = bestOffersWithoutMessage;
             tmpSelectOfferValue = noMessageOfferValue;
         }
-//        else if (Game.DEBUG) {
-//            boolean lyingIsBetter = true;
-//            System.out.println("--- THERE IS AN OFFER WITH MESSAGE THAT IS BETTER THAN SENDING NO MESSAGE ---");
-//
-//            // Check if lying is better than telling the truth.
-//            for (OfferType something : bestOffers) {
-//                if (something.getLoc() == game.getGoalPositionPlayer(this.getName())) {
-//                    lyingIsBetter = false;
-//                }
-//            }
-//            if (lyingIsBetter) System.out.println("--- LYING IS BETTER THAN TELLING THE TRUTH. ---");
-//        }
 
         return checkPossibleOffers(offerReceived, bestOffers, tmpSelectOfferValue);
     }

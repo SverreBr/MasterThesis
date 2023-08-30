@@ -1,6 +1,6 @@
 package lyingAgents.utilities;
 
-public class OfferOutcome implements Comparable<OfferOutcome>{
+public class OfferOutcome implements Comparable<OfferOutcome> {
     private final int offerForInit;
     private final int valueInit;
     private final int valueResp;

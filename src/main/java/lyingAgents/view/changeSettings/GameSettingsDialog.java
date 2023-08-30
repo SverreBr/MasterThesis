@@ -149,14 +149,17 @@ public class GameSettingsDialog extends JDialog {
     private void createButtonPanel() {
         btnPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
 
         JButton removeAllBtn = new JButton("Remove all values");
         removeAllBtn.addActionListener(e -> removeAllValues());
         btnPanel.add(removeAllBtn, gbc);
 
-        gbc.gridy++; gbc.gridwidth = 1;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
         JButton okBtn = new JButton("Accept");
         okBtn.addActionListener(e -> okButton());
         btnPanel.add(okBtn, gbc);

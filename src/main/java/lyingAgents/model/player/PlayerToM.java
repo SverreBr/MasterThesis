@@ -148,7 +148,8 @@ public class PlayerToM extends Player {
             receiveOffer(offerReceived);
             curOffer = chooseOffer(offerReceived);
         }
-        if ((curOffer != Settings.ID_ACCEPT_OFFER) && (curOffer != Settings.ID_WITHDRAW_NEGOTIATION)) sendOffer(curOffer);
+        if ((curOffer != Settings.ID_ACCEPT_OFFER) && (curOffer != Settings.ID_WITHDRAW_NEGOTIATION))
+            sendOffer(curOffer);
         return curOffer;
     }
 
@@ -262,7 +263,7 @@ public class PlayerToM extends Player {
             } else {
                 // Offer is not equal to partner its offer, so new offer has been made
                 someOffer = game.flipOffer(expectedResponse.getOffer());
-                curValue = Math.max(utilityFunction[someOffer], utilityFunction[this.chips]) + 2*Settings.SCORE_NEGOTIATION_STEP;
+                curValue = Math.max(utilityFunction[someOffer], utilityFunction[this.chips]) + 2 * Settings.SCORE_NEGOTIATION_STEP;
                 // minus one for current offer and one for offer from partner
             }
             totValue += chance * curValue;
@@ -285,10 +286,6 @@ public class PlayerToM extends Player {
             updateLocationBeliefs(offerToSelf);
             if (receivedMessage && !(getSumLocationBeliefs() - Settings.EPSILON > 0)) { // offer is not consistent with beliefs...
                 restoreLocationBeliefsDueToUnbelievedMessage();
-//                if (Game.DEBUG && (getName().equals(Settings.INITIATOR_NAME) || getName().equals(Settings.RESPONDER_NAME))) {
-//                    System.out.println("--- " + getName() + " DOES NOT BELIEVE TRADING PARTNER ---");
-//                    addMessage("(Agent doesn't believe partner.)", false);
-//                }
             }
             selfModel.receiveOffer(offerToSelf);
 
@@ -541,7 +538,8 @@ public class PlayerToM extends Player {
     @Override
     protected void printExpectedResponse(OfferType offerType) {
         int mostLikelyGP, cnt = 0;
-        if (((offerType.getOffer() == Settings.ID_ACCEPT_OFFER) || (offerType.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION))) return;
+        if (((offerType.getOffer() == Settings.ID_ACCEPT_OFFER) || (offerType.getOffer() == Settings.ID_WITHDRAW_NEGOTIATION)))
+            return;
 
         if (orderToM > 0) {
             mostLikelyGP = getMostLikelyGP();

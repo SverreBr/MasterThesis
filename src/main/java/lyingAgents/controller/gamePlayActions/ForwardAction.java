@@ -89,7 +89,8 @@ public class ForwardAction implements ForwardListener {
 
         pane.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = 0; gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridx = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
 
         pane.add(textPane, gbc);
