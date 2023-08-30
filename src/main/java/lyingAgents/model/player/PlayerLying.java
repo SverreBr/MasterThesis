@@ -226,7 +226,7 @@ public class PlayerLying extends PlayerToM {
         super.sendGLMessage(loc);
         addMessage(Messages.createLocationMessage(loc), false);
         this.game.sendMessage(loc);
-        if (loc != game.getGoalPositionPlayer(this.getName())) numberOfTimesLied++; // TODO: maybe redefine this?
+        if (loc != game.getGoalPositionPlayer(this.getName())) numberOfTimesLied++;
         this.numberOfMessagesSent++;
     }
 
