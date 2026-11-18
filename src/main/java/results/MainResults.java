@@ -43,8 +43,8 @@ public class MainResults {
             } else if (option.equals(EXPERIMENT_ID) && (i + 1 < args.length)) {
                 experimentName = args[i + 1];
                 if (!experiment_options.contains(experimentName)) {
-                    System.out.println("Experiment id is not implemented");
-                    System.out.println(-1);
+                    System.out.println("Experiment id '" + experimentName + "' is not implemented, options = " + experiment_options);
+                    System.exit(-1);
                 }
             } else if (option.equals("-h") || option.equals("--help")) {
                 printHelpMessage();

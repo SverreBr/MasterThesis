@@ -27,7 +27,7 @@ public class GetResults {
     private void makeFolder() {
         File saveDirectory = new File(this.saveDirectory);
         if (!saveDirectory.exists()) {
-            boolean wasSuccessful = saveDirectory.mkdir();
+            boolean wasSuccessful = saveDirectory.mkdirs();
             if (!wasSuccessful) System.out.println("Directory not made...");
         }
     }

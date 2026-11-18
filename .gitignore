@@ -35,3 +35,5 @@ bin/
 py_src/myenv/
 /src/code_hw/
 /target/
+/tmp_results/
+/saved_gameSettings/

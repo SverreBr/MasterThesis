@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Is Honesty the Best Policy in Negotiation? The Influence of Lying in Colored Trails (simulation code)"
+version: 1.0.0
+date-released: 2026-11-18
+license: MIT
+repository-code: "https://github.com/SverreBr/MasterThesis"
+abstract: >-
+  Java code of agent-based simulations of negotiation in the Colored Trails game,
+  in which agents with zeroth-, first-, or second-order theory of mind can send
+  goal location messages, and in which agents can be honest, misleading, or lying.
+  The repository contains a GUI to inspect single negotiations, the code of the
+  simulation experiments of the master's thesis "The influence of lying in a
+  negotiation setting: Colored Trails" (Brok, 2023, University of Groningen), and
+  Jupyter notebooks for part of the analysis. The article "Is Honesty the Best
+  Policy in Negotiation? The Influence of Lying in Colored Trails" (Brok,
+  Verbrugge, and de Weerd, Autonomous Agents and Multi-Agent Systems) reports
+  simulation results of the thesis.
+authors:
+  - given-names: Sverre
+    family-names: Brok
+    affiliation: University of Groningen
+  - given-names: Harmen
+    family-names: de Weerd
+    affiliation: University of Groningen
+keywords:
+  - agent-based model
+  - negotiation
+  - Colored Trails
+  - theory of mind
+  - lying
+  - deception
